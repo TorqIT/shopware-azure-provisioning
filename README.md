@@ -3,8 +3,8 @@ The scripts in this directory can be used to easily provision an Azure environme
 1. Pull the image and run it with either `docker run` or `docker-compose`. With `compose`, use the following specification:
    ```yaml
    services:
-     azure:
-        image: torqit/pimcore-azure
+     pimcore-azure-provisioning:
+        image: torqitdev/pimcore-azure-provisioning:latest
         volumes:
            # Necessary for running Docker commands within the container
            - /var/run/docker.sock:/var/run/docker.sock
