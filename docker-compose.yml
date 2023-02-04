@@ -1,8 +1,0 @@
-version: "3.7"
-
-services:
-  pimcore-azure-provisioning:
-    image: torqitdev/pimcore-azure-provisioning:latest
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
