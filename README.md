@@ -4,7 +4,7 @@ This Docker image can be used to easily provision an Azure environment to host a
    ```yaml
    services:
      pimcore-azure-provisioning:
-        image: ghcr.io/pimcore-azure-provisioning:latest
+        image: ghcr.io/torqit/pimcore-azure-provisioning:latest
         volumes:
            # Necessary for running Docker commands within the container
            - /var/run/docker.sock:/var/run/docker.sock
