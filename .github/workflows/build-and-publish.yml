@@ -5,8 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.head_ref }}
+concurrency: 
+  group: pimcore-azure-provisioning__${{ github.ref }}
   cancel-in-progress: true
 
 env:
