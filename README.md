@@ -1,4 +1,4 @@
-The scripts in this directory can be used to easily provision an Azure environment to host a Pimcore solution. Follow these steps:
+This Docker image can be used to easily provision an Azure environment to host a Pimcore solution. Follow these steps:
 
 1. Pull the image and run it with either `docker run` or `docker-compose`. With `compose`, use the following specification:
    ```yaml
