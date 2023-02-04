@@ -19,8 +19,6 @@ param supervisordContainerAppName string
 param supervisordImageName string
 param redisContainerAppName string
 param redisImageName string
-param certRenewalContainerAppName string
-param certRenewalImageName string
 
 // Environment variables for PHP-FPM and supervisord containers
 param appDebug string
@@ -163,8 +161,6 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             weight: 100
           }
         ]
-        // Note: not defining custom domain here because that requires the certificate to already be
-        // created and present
       }
     }
     template: {
@@ -299,40 +295,6 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
 //       scale: {
 //         minReplicas: 1
 //         maxReplicas: 1 
-//       }
-//     }
-//   }
-// }
-
-// TODO not sure the best way to go about this
-// resource certRenewalContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
-//   name: certRenewalContainerAppName
-//   location: location
-//   properties: {
-//     managedEnvironmentId: containerAppsEnvironment.id
-//     configuration: {
-//       activeRevisionsMode: 'Single'
-//       secrets: [
-//         containerRegistryPasswordSecret
-//       ]
-//       registries: [
-//         containerRegistryConfiguration
-//       ]
-//     }
-//     template: {
-//       containers: [
-//         {
-//           name: certRenewalImageName
-//           image: '${containerRegistryName}.azurecr.io/${certRenewalImageName}:latest'
-//           resources: {
-//             cpu: 1
-//             memory: '2Gi'
-//           }
-//         }
-//       ]
-//       scale: {
-//         minReplicas: 1
-//         maxReplicas: 1 // TODO do we ever want more?
 //       }
 //     }
 //   }

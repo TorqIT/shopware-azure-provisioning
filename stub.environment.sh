@@ -30,7 +30,6 @@ export CONTAINER_REGISTRY_SKU=
 export PHP_FPM_IMAGE_NAME=
 export SUPERVISORD_IMAGE_NAME=
 export REDIS_IMAGE_NAME=
-export CERT_RENEWAL_IMAGE_NAME=
 
 # Storage Account
 export STORAGE_ACCOUNT_NAME=
@@ -44,7 +43,6 @@ export CONTAINER_APPS_ENVIRONMENT_NAME=pimcore-dev
 export PHP_FPM_CONTAINER_APP_NAME=pimcore-php-fpm-dev
 export SUPERVISORD_CONTAINER_APP_NAME=pimcore-supervisord-dev
 export REDIS_CONTAINER_APP_NAME=pimcore-redis-dev
-export CERT_RENEWAL_CONTAINER_APP_NAME=pimcore-cert-renewal-dev
 export APP_DEBUG=1
 export APP_ENV=dev
 export PIMCORE_DEV=1

@@ -34,8 +34,6 @@ az deployment group create \
     supervisordImageName=$SUPERVISORD_IMAGE_NAME \
     redisContainerAppName=$REDIS_CONTAINER_APP_NAME \
     redisImageName=$REDIS_IMAGE_NAME \
-    certRenewalContainerAppName=$CERT_RENEWAL_CONTAINER_APP_NAME \
-    certRenewalImageName=$CERT_RENEWAL_IMAGE_NAME \
     appDebug=$APP_DEBUG \
     appEnv=$APP_ENV \
     databaseName=$DATABASE_NAME \
