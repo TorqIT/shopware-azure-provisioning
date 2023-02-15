@@ -14,7 +14,8 @@ This Docker image can be used to easily provision an Azure environment to host a
          environment:
            # These vars are required so that the scripts can properly tag and
            # push the necessary images to Azure. Ensure these images are built
-           # and set the values here to match the image names.
+           # and set the values here to match the image names (can be found by
+           # running docker image ls).
            - LOCAL_PHP_FPM_IMAGE=${LOCAL_PHP_FPM_IMAGE}
            - LOCAL_SUPERVISORD_IMAGE=${LOCAL_SUPERVISORD_IMAGE}
            - LOCAL_REDIS_IMAGE=${LOCAL_REDIS_IMAGE}
