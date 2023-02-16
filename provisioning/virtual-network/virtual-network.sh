@@ -9,4 +9,6 @@ az deployment group create \
   --parameters \
     virtualNetworkName=$VIRTUAL_NETWORK_NAME \
     subnetName=$VIRTUAL_NETWORK_SUBNET_NAME \
-    includeDatabaseInVirtualNetwork=$INCLUDE_DATABASE_IN_VIRTUAL_NETWORK
+    includeDatabaseInVirtualNetwork=$INCLUDE_DATABASE_IN_VIRTUAL_NETWORK \
+    virtualNetworkAddressSpacePrefix=$VIRTUAL_NETWORK_ADDRESS_SPACE_PREFIX \
+    subnetAddressPrefix=$VIRTUAL_NETWORK_SUBNET_ADDRESS_SPACE_PREFIX
