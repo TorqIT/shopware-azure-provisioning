@@ -16,7 +16,6 @@ param databaseName string = 'pimcore'
 
 param virtualNetworkName string
 param virtualNetworkSubnetName string
-var subnetId = resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
 
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
   name: serverName
@@ -33,7 +32,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
       storageSizeGB: storageSizeGB
     }
     network: {
-      delegatedSubnetResourceId: subnetId
+      delegatedSubnetResourceId: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
     }
   }
   
