@@ -1,11 +1,15 @@
 param location string = resourceGroup().location
 
 param virtualNetworkName string
-param virtualNetworkAddressSpacePrefix string = '10.0.0.0/8'
-param subnetName string = 'default'
-param subnetAddressPrefix string = '10.0.0.0/23' // an address space of at least /23 is currently required for Container Apps
-@description('Boolean value to specify whether the database will be included in the Virtual Network, which will add a Microsoft.Sql endpoint here')
-param includeDatabaseInVirtualNetwork bool = true
+param virtualNetworkAddressSpace string
+
+param containerAppsSubnetName string
+@description('Address space to allocate for the Container Apps subnet. Note that a subnet of at least /23 is required, and it must occupied exclusively by the Container Apps Environment and its Apps.')
+param containerAppsSubnetAddressSpace string
+
+param databaseSubnetName string
+@description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
+param databaseSubnetAddressSpace string
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName
@@ -13,24 +17,30 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   properties: {
     addressSpace: {
       addressPrefixes: [
-        virtualNetworkAddressSpacePrefix
+        virtualNetworkAddressSpace
       ]
     }
     subnets: [
       {
-        name: subnetName
+        name: containerAppsSubnetName
         properties: {
-          addressPrefix: subnetAddressPrefix
-          serviceEndpoints: (includeDatabaseInVirtualNetwork) ? [
+          addressPrefix: containerAppsSubnetAddressSpace
+          serviceEndpoints: [
             {
               service: 'Microsoft.Storage'
             }
+          ]
+        }
+      }
+      {
+        name: databaseSubnetName
+        properties: {
+          addressPrefix: databaseSubnetAddressSpace
+          delegations: [
             {
-              service: 'Microsoft.Sql'
-            }
-          ] : [
-            {
-              service: 'Microsoft.Storage'
+              properties: {
+                serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+              }
             }
           ]
         }
