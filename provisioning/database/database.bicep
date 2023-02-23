@@ -17,7 +17,16 @@ param databaseName string = 'pimcore'
 param virtualNetworkName string
 param virtualNetworkSubnetName string
 
+// A private DNS zone is required for VNet integration
+resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: '${serverName}.private.mysql.database.azure.com'
+  location: location
+}
+
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
+  dependsOn: [
+    privateDNSzoneForDatabase
+  ]
   name: serverName
   location: location
   sku: {
