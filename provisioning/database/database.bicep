@@ -25,7 +25,7 @@ resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01
     name: 'virtualNetworkLink'
     properties: {
       virtualNetwork: {
-        id: resourceId('Microsoft.Network/VirtualNetworks', virtualNetworkName);
+        id: resourceId('Microsoft.Network/VirtualNetworks', virtualNetworkName)
       }
     }
   }
