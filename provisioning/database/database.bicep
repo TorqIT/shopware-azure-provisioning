@@ -28,6 +28,7 @@ resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01
       virtualNetwork: {
         id: resourceId('Microsoft.Network/VirtualNetworks', virtualNetworkName)
       }
+      registrationEnabled: true
     }
   }
 }
