@@ -21,6 +21,14 @@ param virtualNetworkSubnetName string
 resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: '${serverName}.private.mysql.database.azure.com'
   location: 'global'
+  resource virtualNetworkLink 'virtualNetworkLinks' = {
+    name: 'virtualNetworkLink'
+    properties: {
+      virtualNetwork: {
+        id: resourceId('Microsoft.Network/VirtualNetworks', virtualNetworkName);
+      }
+    }
+  }
 }
 
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
