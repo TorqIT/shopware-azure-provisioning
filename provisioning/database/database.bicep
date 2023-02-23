@@ -23,7 +23,7 @@ resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01
   location: 'global'
   resource virtualNetworkLink 'virtualNetworkLinks' = {
     name: 'virtualNetworkLink'
-    location: location
+    location: 'global'
     properties: {
       virtualNetwork: {
         id: resourceId('Microsoft.Network/VirtualNetworks', virtualNetworkName)
