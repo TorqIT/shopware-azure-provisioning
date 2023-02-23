@@ -38,6 +38,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           addressPrefix: databaseSubnetAddressSpace
           delegations: [
             {
+              name: 'Microsoft.DBforMySQL/flexibleServers'
               properties: {
                 serviceName: 'Microsoft.DBforMySQL/flexibleServers'
               }
