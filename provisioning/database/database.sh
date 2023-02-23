@@ -15,4 +15,4 @@ az deployment group create \
     storageSizeGB=$DATABASE_STORAGE_SIZE_GB \
     databaseName=$DATABASE_NAME \
     virtualNetworkName=$VIRTUAL_NETWORK_NAME \
-    virtualNetworkSubnetName=$VIRTUAL_NETWORK_SUBNET_NAME
+    virtualNetworkSubnetName=$VIRTUAL_NETWORK_DATABASE_SUBNET_NAME
