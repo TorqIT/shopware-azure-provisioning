@@ -1,7 +1,6 @@
 param location string = resourceGroup().location
 
 param serverName string
-param mysqlServerVersion string = '8.0'
 
 @minLength(8)
 @secure()
@@ -10,7 +9,7 @@ param administratorLogin string = 'adminuser'
 
 param skuName string = 'Standard_B1ms'
 param skuTier string = 'Burstable'
-param storageSizeGB int = 5
+param storageSizeGB int = 20
 
 param databaseName string = 'pimcore'
 
@@ -34,6 +33,9 @@ resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01
 }
 
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
+  dependsOn: [
+    privateDNSzoneForDatabase
+  ]
   name: serverName
   location: location
   sku: {
@@ -41,7 +43,6 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
     tier: skuTier
   }
   properties: {
-    version: mysqlServerVersion
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorLoginPassword
     storage: {
