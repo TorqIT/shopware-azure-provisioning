@@ -42,6 +42,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
     }
     network: {
       delegatedSubnetResourceId: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
+      privateDnsZoneResourceId: privateDNSzoneForDatabase.id
     }
   }
   
