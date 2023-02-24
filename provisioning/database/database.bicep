@@ -43,6 +43,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
     tier: skuTier
   }
   properties: {
+    version: '8.0.21'
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorLoginPassword
     storage: {
