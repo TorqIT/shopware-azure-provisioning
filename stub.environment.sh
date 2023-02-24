@@ -21,7 +21,7 @@ export DATABASE_SERVER_NAME=
 export DATABASE_ADMIN_USER=adminuser
 export DATABASE_SKU_NAME=Standard_B1ms
 export DATABASE_SKU_TIER=Burstable
-export DATABASE_STORAGE_SIZE_GB=5
+export DATABASE_STORAGE_SIZE_GB=20
 export DATABASE_NAME=pimcore
 
 # Container Registry
