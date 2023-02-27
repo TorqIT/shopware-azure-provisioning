@@ -173,16 +173,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             cpu: 1
             memory: '2Gi'
           }
-          probes: [
-            {
-              type: 'Readiness'
-              httpGet: {
-                port: 80
-              }
-              failureThreshold: 10
-              periodSeconds: 10
-            }
-          ]
+          // TODO readiness probe
         }
       ]
       scale: {
@@ -199,25 +190,6 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           }
         ]
       }
-    }
-  }
-}
-
-// Configure the database to accept traffic from the Container Apps (if the database has not already been configured to allow access via the Virtual Network). 
-// Several assumptions are being made here:
-// 1. The container app will only have one outbound IP address, hence we use the first entry in the returned array.
-// 2. The outbound IP address of the PHP-FPM container app is assumed to be the same as that of the supervisord
-//    container app, hence we only add one firewall rule
-// If either of these assumptions turn out to be wrong, this logic will need to change.
-var containerAppOutboundIpAddress = phpFpmContainerApp.properties.outboundIpAddresses
-resource database 'Microsoft.DBforMariaDB/servers@2018-06-01' existing = if (!isDatabaseIncludedInVirtualNetwork) {
-  scope: resourceGroup()
-  name: databaseServerName
-  resource containerAppsFirewallRule 'firewallRules' = {
-    name: 'ContainerApps'
-    properties: {
-      startIpAddress: containerAppOutboundIpAddress[0]
-      endIpAddress: containerAppOutboundIpAddress[0]
     }
   }
 }
