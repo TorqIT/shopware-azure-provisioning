@@ -22,7 +22,7 @@ az deployment group create \
   --parameters \
     containerAppsEnvironmentName=$CONTAINER_APPS_ENVIRONMENT_NAME \
     virtualNetworkName=$VIRTUAL_NETWORK_NAME \
-    virtualNetworkSubnetName=$VIRTUAL_NETWORK_SUBNET_NAME \
+    virtualNetworkSubnetName=$VIRTUAL_NETWORK_CONTAINER_APPS_SUBNET_NAME \
     containerRegistryName=$CONTAINER_REGISTRY_NAME \
     databaseServerName=$DATABASE_SERVER_NAME \
     isDatabaseIncludedInVirtualNetwork=$INCLUDE_DATABASE_IN_VIRTUAL_NETWORK \

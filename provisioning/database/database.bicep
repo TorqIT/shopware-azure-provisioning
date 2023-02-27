@@ -33,9 +33,6 @@ resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01
 }
 
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
-  dependsOn: [
-    privateDNSzoneForDatabase
-  ]
   name: serverName
   location: location
   sku: {
