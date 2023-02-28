@@ -30,9 +30,10 @@ This Docker image can be used to easily provision an Azure environment to host a
     1. Inside the container, run `. ./environment.sh`, `. ./secrets.sh` and `./login.sh`.
     2. Make up a secure password that you will use to log into the Pimcore admin panel and save it somewhere secure such as LastPass.
     3. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`.
-    4. Run the following command to seed the database:
+    4. Run `az containerapp exec --resource-group $RESOURCE_GROUP --name $PHP_FPM_CONTAINER_APP_NAME --command bash` to enter the Container App's shell.
+    5. Run the following command to seed the database:
        ```
-       az containerapp exec --resource-group $RESOURCE_GROUP --name $PHP_FPM_CONTAINER_APP_NAME --command vendor/bin/pimcore-install \
+       vendor/bin/pimcore-install \
          --admin-username=admin \
          --admin-password=<secure admin password> \         
          --mysql-host-socket=$DATABASE_HOST \
