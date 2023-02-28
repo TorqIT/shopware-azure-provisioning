@@ -28,5 +28,17 @@ This Docker image can be used to easily provision an Azure environment to host a
 7. The initial deployments of Container Apps from Bicep do not appear to work reliably, so you will likely need to create new revisions of at least the PHP-FPM and supervisord apps (either manually in the portal or via a GitHub Action - see https://github.com/TorqIT/pimcore-github-actions-workflows for examples).
 8. Follow these steps to seed the database with the Pimcore schema:
     1. Inside the container, run `. ./environment.sh`, `. ./secrets.sh` and `. ./login.sh`.
-    2. Run `az containerapp exec --resource-group $RESOURCE_GROUP --name $PHP_FPM_CONTAINER_APP_NAME --command vendor/bin/pimcore-install --admin-username=admin --admin-password=<secure admin password>`. Be sure to store your admin password somewhere safe like LastPass.
+    2. Make up a secure password that you will use to log into the Pimcore admin panel and save it somewhere secure such as LastPass.
+    3. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`.
+    4. Run the following command to seed the database:
+       ```
+       az containerapp exec --resource-group $RESOURCE_GROUP --name $PHP_FPM_CONTAINER_APP_NAME --command vendor/bin/pimcore-install \
+         --admin-username=admin \
+         --admin-password=<secure admin password> \         
+         --mysql-host-socket=$DATABASE_HOST \
+         --mysql-database=$DATABASE_NAME \
+         --mysql-username=$DATABASE_USER \         
+         --mysql-password=$DATABASE_PASSWORD \         
+         --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem
+        ```
 9. TODO custom domains and HTTPS certs
