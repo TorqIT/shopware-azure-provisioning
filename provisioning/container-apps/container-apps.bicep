@@ -74,7 +74,7 @@ var databasePasswordSecret = {
   value: databasePassword
 }
 
-var databaseHost = '${databaseServerName}.mariadb.database.azure.com'
+var databaseHost = '${databaseServerName}.mysql.database.azure.com'
 
 // Common environment variable configuration shared by the PHP-FPM and supervisord containers
 var environmentVariables = [
