@@ -27,7 +27,7 @@ This Docker image can be used to easily provision an Azure environment to host a
 6. Run `./provision.sh` to provision the Azure environment. Note that you may experience an error when running this script that complains about the Service Principal not being available in the Resource Group. This appears to just be a lag in the provisioning process - simply wait a minute or two before trying to run `provision.sh` again.
 7. The initial deployments of Container Apps from Bicep do not appear to work reliably, so you will likely need to create new revisions of at least the PHP-FPM and supervisord apps (either manually in the portal or via a GitHub Action - see https://github.com/TorqIT/pimcore-github-actions-workflows for examples).
 8. Follow these steps to seed the database with the Pimcore schema:
-    1. Inside the container, run `. ./environment.sh`, `. ./secrets.sh` and `. ./login.sh`.
+    1. Inside the container, run `. ./environment.sh`, `. ./secrets.sh` and `./login.sh`.
     2. Make up a secure password that you will use to log into the Pimcore admin panel and save it somewhere secure such as LastPass.
     3. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`.
     4. Run the following command to seed the database:
