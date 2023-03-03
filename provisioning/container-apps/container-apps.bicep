@@ -11,6 +11,7 @@ param containerRegistryName string
 
 param storageAccountName string
 param storageAccountContainerName string
+param storageAccountAssetsContainerName string
 
 param phpFpmContainerAppName string
 param phpFpmImageName string
@@ -88,6 +89,10 @@ var environmentVariables = [
   {
     name: 'AZURE_STORAGE_ACCOUNT_CONTAINER'
     value: storageAccountContainerName
+  }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_CONTAINER_ASSETS'
+    value: storageAccountAssetsContainerName
   }
   {
     name: 'AZURE_STORAGE_ACCOUNT_KEY'

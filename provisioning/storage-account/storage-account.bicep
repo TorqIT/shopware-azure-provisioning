@@ -4,6 +4,8 @@ param sku string = 'Standard_LRS'
 param kind string = 'StorageV2'
 param accessTier string = 'Cool'
 param containerName string
+param assetsContainerName string
+param publicAssetAccess bool = false
 param virtualNetworkName string
 param virtualNetworkSubnetName string
 
@@ -16,8 +18,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
   kind: kind
   properties: {
     minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: true
-    allowSharedKeyAccess: true
+    allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
     largeFileSharesState: 'Enabled'
     networkAcls: {
       resourceAccessRules: []
@@ -51,5 +53,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
 
 resource storageAccountContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
   name: '${storageAccount.name}/default/${containerName}'
-  properties: {}
+}
+
+resource storageAccountContainerAssets 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  name: '${storageAccount.name}/default/${assetsContainerName}'
+  properties: {
+    publicAccess: publicAssetAccess ? 'Blob' : 'None'
+  }
 }

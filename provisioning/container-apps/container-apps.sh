@@ -27,6 +27,7 @@ az deployment group create \
     databaseServerName=$DATABASE_SERVER_NAME \
     storageAccountName=$STORAGE_ACCOUNT_NAME \
     storageAccountContainerName=$STORAGE_ACCOUNT_CONTAINER_NAME \
+    storageAccountAssetsContainerName=$STORAGE_ACCOUNT_ASSETS_CONTAINER_NAME \
     phpFpmContainerAppName=$PHP_FPM_CONTAINER_APP_NAME \
     phpFpmImageName=$PHP_FPM_IMAGE_NAME \
     supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME \
