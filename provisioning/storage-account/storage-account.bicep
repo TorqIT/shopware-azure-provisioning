@@ -9,7 +9,7 @@ param publicAssetAccess bool = false
 param virtualNetworkName string
 param virtualNetworkSubnetName string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
   location: location
   sku: {
@@ -21,16 +21,15 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
     allowBlobPublicAccess: false
     allowSharedKeyAccess: false
     largeFileSharesState: 'Enabled'
+    publicNetworkAccess: publicAssetAccess ? 'Enabled' : 'Disabled'
     networkAcls: {
       resourceAccessRules: []
-      bypass: 'AzureServices'
       virtualNetworkRules: [
         {
           id: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
           action: 'Allow'
         }
       ]
-      ipRules: []
       defaultAction: 'Deny'
     }
     supportsHttpsTrafficOnly: true
