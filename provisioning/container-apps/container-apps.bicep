@@ -6,7 +6,6 @@ param virtualNetworkName string
 param virtualNetworkSubnetName string
 
 param databaseServerName string
-param isDatabaseIncludedInVirtualNetwork bool = true
 
 param containerRegistryName string
 

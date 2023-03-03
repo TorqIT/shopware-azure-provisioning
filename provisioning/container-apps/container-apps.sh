@@ -25,7 +25,6 @@ az deployment group create \
     virtualNetworkSubnetName=$VIRTUAL_NETWORK_CONTAINER_APPS_SUBNET_NAME \
     containerRegistryName=$CONTAINER_REGISTRY_NAME \
     databaseServerName=$DATABASE_SERVER_NAME \
-    isDatabaseIncludedInVirtualNetwork=$INCLUDE_DATABASE_IN_VIRTUAL_NETWORK \
     storageAccountName=$STORAGE_ACCOUNT_NAME \
     storageAccountContainerName=$STORAGE_ACCOUNT_CONTAINER_NAME \
     phpFpmContainerAppName=$PHP_FPM_CONTAINER_APP_NAME \
