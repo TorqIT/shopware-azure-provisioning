@@ -11,7 +11,7 @@ This Docker image can be used to easily provision an Azure environment to host a
            # Volume mount in your environment/secret files as needed - copy these from stub.environment.sh and stub.secrets.sh, respectively
            - environment.sh:/provisioning/environment.sh
            - secrets.sh:/provisioning/secrets.sh
-           # You may want to mount in environment files for specific environments as well
+           # You may want instead want to mount in environment and secret files for specific environments
            - environment.dev.sh:/provisioning/environment.dev.sh
            - secrets.dev.sh:/provisioning/secrets.dev.sh
            - environment.prod.sh:/provisioning/environment.prod.sh
