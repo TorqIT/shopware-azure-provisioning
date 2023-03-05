@@ -1,6 +1,6 @@
 This Docker image can be used to easily provision an Azure environment to host a Pimcore solution. Follow these steps:
 
-1. Pull the image and run it with either `docker run` or `docker-compose`. With `compose`, use the following specification:
+1. Pull the image and run it with either `docker run` or `docker-compose`. With `compose`, use something like the following:
    ```yaml
    services:
      pimcore-azure-provisioning:
@@ -11,6 +11,11 @@ This Docker image can be used to easily provision an Azure environment to host a
            # Volume mount in your environment/secret files as needed - copy these from stub.environment.sh and stub.secrets.sh, respectively
            - environment.sh:/provisioning/environment.sh
            - secrets.sh:/provisioning/secrets.sh
+           # You may want to mount in environment files for specific environments as well
+           - environment.dev.sh:/provisioning/environment.dev.sh
+           - secrets.dev.sh:/provisioning/secrets.dev.sh
+           - environment.prod.sh:/provisioning/environment.prod.sh
+           - secrets.prod.sh:/provisioning/secrets.prod.sh
          environment:
            # These vars are required so that the scripts can properly tag and
            # push the necessary images to Azure. Ensure these images are built
@@ -43,3 +48,5 @@ This Docker image can be used to easily provision an Azure environment to host a
          --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem
         ```
 9. TODO custom domains and HTTPS certs
+10. The `container-app-exec` scripts can be used to enter the shell of a running PHP-FPM Pimcore container app (analogous to SSH'ing into a virtual machine).
+
