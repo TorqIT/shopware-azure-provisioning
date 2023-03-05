@@ -41,8 +41,11 @@ export STORAGE_ACCOUNT_ASSETS_CONTAINER_NAME=assets
 export STORAGE_ACCOUNT_PUBLIC_ASSET_ACCESS=false
 
 # Container Apps
+export DEPLOY_IMAGES_TO_REGISTRY=true
 export CONTAINER_APPS_ENVIRONMENT_NAME=pimcore-dev
 export PHP_FPM_CONTAINER_APP_NAME=pimcore-php-fpm-dev
+export PHP_FPM_CONTAINER_APP_USE_STARTUP_PROBE=false
+export PHP_FPM_CONTAINER_APP_USE_LIVENESS_PROBE=false
 export SUPERVISORD_CONTAINER_APP_NAME=pimcore-supervisord-dev
 export REDIS_CONTAINER_APP_NAME=pimcore-redis-dev
 # Environment variable values for the Container Apps. This list can be expanded if your app requires more variables - just be sure
