@@ -144,6 +144,20 @@ var environmentVariables = [
   }
 ]
 
+var startupProbe = phpFpmContainerAppUseStartupProbe ? {
+  type: 'Startup'
+  httpGet: {
+    port: 80
+    path: '/'
+  }
+} : {}
+var livenessProbe = phpFpmContainerAppUseLivenessProbe ? {
+  type: 'Liveness'
+  httpGet: {
+    port: 80
+    path: '/'
+  }
+}: {}
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: phpFpmContainerAppName
   location: location
@@ -182,20 +196,8 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             memory: '2Gi'
           }
           probes: [
-            phpFpmContainerAppUseStartupProbe ? { 
-              type: 'Startup'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            } : {}
-            phpFpmContainerAppUseLivenessProbe ? {
-              type: 'Liveness'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            } : {}
+            startupProbe
+            livenessProbe
           ]
         }
       ]
