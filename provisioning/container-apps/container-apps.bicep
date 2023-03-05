@@ -15,8 +15,7 @@ param storageAccountAssetsContainerName string
 
 param phpFpmContainerAppName string
 param phpFpmImageName string
-param phpFpmContainerAppUseStartupProbe bool = false
-param phpFpmContainerAppUseLivenessProbe bool = false
+param phpFpmContainerAppUseProbes bool = false
 
 param supervisordContainerAppName string
 param supervisordImageName string
@@ -144,20 +143,6 @@ var environmentVariables = [
   }
 ]
 
-var startupProbe = phpFpmContainerAppUseStartupProbe ? {
-  type: 'Startup'
-  httpGet: {
-    port: 80
-    path: '/'
-  }
-} : {}
-var livenessProbe = phpFpmContainerAppUseLivenessProbe ? {
-  type: 'Liveness'
-  httpGet: {
-    port: 80
-    path: '/'
-  }
-}: {}
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: phpFpmContainerAppName
   location: location
@@ -195,22 +180,22 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             cpu: 1
             memory: '2Gi'
           }
-          probes: [
-            phpFpmContainerAppUseStartupProbe ? { 
+          probes: phpFpmContainerAppUseProbes ? [
+            { 
               type: 'Startup'
               httpGet: {
                 port: 80
                 path: '/'
               }
-            }: null
-            phpFpmContainerAppUseLivenessProbe ? {
+            }
+            { 
               type: 'Liveness'
               httpGet: {
                 port: 80
                 path: '/'
               }
-            }: null
-          ]
+            }
+          ]: []
         }
       ]
       scale: {

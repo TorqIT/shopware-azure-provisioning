@@ -35,8 +35,7 @@ az deployment group create \
     storageAccountContainerName=$STORAGE_ACCOUNT_CONTAINER_NAME \
     storageAccountAssetsContainerName=$STORAGE_ACCOUNT_ASSETS_CONTAINER_NAME \
     phpFpmContainerAppName=$PHP_FPM_CONTAINER_APP_NAME \
-    phpFpmContainerAppUseStartupProbe=$PHP_FPM_CONTAINER_APP_USE_STARTUP_PROBE \
-    phpFpmContainerAppUseLivenessProbe=$PHP_FPM_CONTAINER_APP_USE_LIVENESS_PROBE \
+    phpFpmContainerAppUseProbes=$PHP_FPM_CONTAINER_APP_USE_PROBES \
     phpFpmImageName=$PHP_FPM_IMAGE_NAME \
     supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME \
     supervisordImageName=$SUPERVISORD_IMAGE_NAME \
