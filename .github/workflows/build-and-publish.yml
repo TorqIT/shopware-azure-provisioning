@@ -2,11 +2,10 @@ name: Create and publish Docker image
 
 on:
   push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency: 
-  group: pimcore-azure-provisioning__${{ github.ref }}
+  group: ${{ github.repository }}__${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -38,12 +37,21 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Determine image label
+        id: label
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "label=latest" >> $GITHUB_OUTPUT
+          else
+            echo "label=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: latest
+          tags: ${{ steps.label.outputs.label }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4

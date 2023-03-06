@@ -18,19 +18,18 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   kind: kind
   properties: {
     minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: false
-    allowSharedKeyAccess: false
-    largeFileSharesState: 'Enabled'
-    publicNetworkAccess: publicAssetAccess ? 'Enabled' : 'Disabled'
+    allowSharedKeyAccess: true
+    allowBlobPublicAccess: publicAssetAccess
+    publicNetworkAccess: publicAssetAccess ? 'Enabled' : null
     networkAcls: {
-      resourceAccessRules: []
       virtualNetworkRules: [
         {
           id: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
           action: 'Allow'
         }
       ]
-      defaultAction: 'Deny'
+      defaultAction: publicAssetAccess ? 'Allow' : 'Deny'
+      bypass: 'None'
     }
     supportsHttpsTrafficOnly: true
     encryption: {
@@ -58,5 +57,31 @@ resource storageAccountContainerAssets 'Microsoft.Storage/storageAccounts/blobSe
   name: '${storageAccount.name}/default/${assetsContainerName}'
   properties: {
     publicAccess: publicAssetAccess ? 'Blob' : 'None'
+  }
+}
+
+var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
+resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = {
+  location: location
+  name: storageAccountName
+  sku: {
+    name: 'Standard_Microsoft'
+  }
+
+  resource endpoint 'endpoints@2022-11-01-preview' = {
+    location: location
+    name: storageAccountName
+    properties: {
+      originHostHeader: storageAccountDomainName
+      isHttpAllowed: false
+      origins: [
+        {
+          name: storageAccount.name
+          properties: {
+            hostName: storageAccountDomainName
+          } 
+        }
+      ]
+    }
   }
 }
