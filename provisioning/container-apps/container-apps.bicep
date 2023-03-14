@@ -13,6 +13,7 @@ param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 
+param phpFpmContainerAppExternal bool = true
 param phpFpmContainerAppName string
 param phpFpmImageName string
 param phpFpmContainerAppUseProbes bool = false
@@ -159,7 +160,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
         containerRegistryConfiguration
       ]
       ingress: {
-        external: true
+        external: phpFpmContainerAppExternal
         allowInsecure: false
         targetPort: 80
         traffic: [

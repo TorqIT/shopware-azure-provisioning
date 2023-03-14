@@ -43,6 +43,7 @@ export STORAGE_ACCOUNT_PUBLIC_ASSET_ACCESS=false
 # Container Apps
 export DEPLOY_IMAGES_TO_REGISTRY=true
 export CONTAINER_APPS_ENVIRONMENT_NAME=pimcore-dev
+export PHP_FPM_CONTAINER_APP_EXTERNAL=true
 export PHP_FPM_CONTAINER_APP_NAME=pimcore-php-fpm-dev
 export PHP_FPM_CONTAINER_APP_USE_PROBES=false
 export SUPERVISORD_CONTAINER_APP_NAME=pimcore-supervisord-dev

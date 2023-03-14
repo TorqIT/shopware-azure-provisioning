@@ -34,6 +34,7 @@ az deployment group create \
     storageAccountName=$STORAGE_ACCOUNT_NAME \
     storageAccountContainerName=$STORAGE_ACCOUNT_CONTAINER_NAME \
     storageAccountAssetsContainerName=$STORAGE_ACCOUNT_ASSETS_CONTAINER_NAME \
+    phpFpmContainerAppExternal=$PHP_FPM_CONTAINER_APP_EXTERNAL \
     phpFpmContainerAppName=$PHP_FPM_CONTAINER_APP_NAME \
     phpFpmContainerAppUseProbes=$PHP_FPM_CONTAINER_APP_USE_PROBES \
     phpFpmImageName=$PHP_FPM_IMAGE_NAME \
