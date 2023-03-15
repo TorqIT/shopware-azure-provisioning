@@ -44,7 +44,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
   location: location
   properties: {
     vnetConfiguration: {
-      internal: false
+      internal: phpFpmContainerAppExternal
       infrastructureSubnetId: subnetId
     }
   }
