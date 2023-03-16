@@ -61,7 +61,7 @@ resource storageAccountContainerAssets 'Microsoft.Storage/storageAccounts/blobSe
 }
 
 var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
-resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = {
+resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = if (publicAssetAccess) {
   location: location
   name: storageAccountName
   sku: {
