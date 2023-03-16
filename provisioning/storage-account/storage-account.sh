@@ -13,6 +13,6 @@ az deployment group create \
     accessTier=$STORAGE_ACCOUNT_ACCESS_TIER \
     containerName=$STORAGE_ACCOUNT_CONTAINER_NAME \
     assetsContainerName=$STORAGE_ACCOUNT_ASSETS_CONTAINER_NAME \
-    publicAssetAccess=$STORAGE_ACCOUNT_PUBLIC_ASSET_ACCESS \
+    cdnAssetAccess=$STORAGE_ACCOUNT_CDN_ASSET_ACCESS \
     virtualNetworkName=$VIRTUAL_NETWORK_NAME \
     virtualNetworkSubnetName=$VIRTUAL_NETWORK_CONTAINER_APPS_SUBNET_NAME

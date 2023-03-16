@@ -5,7 +5,7 @@ param kind string = 'StorageV2'
 param accessTier string = 'Cool'
 param containerName string
 param assetsContainerName string
-param publicAssetAccess bool = false
+param cdnAssetAccess bool = false
 param virtualNetworkName string
 param virtualNetworkSubnetName string
 
@@ -19,8 +19,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   properties: {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
-    allowBlobPublicAccess: publicAssetAccess
-    publicNetworkAccess: publicAssetAccess ? 'Enabled' : null
+    allowBlobPublicAccess: cdnAssetAccess
+    publicNetworkAccess: cdnAssetAccess ? 'Enabled' : null
     networkAcls: {
       virtualNetworkRules: [
         {
@@ -28,7 +28,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
           action: 'Allow'
         }
       ]
-      defaultAction: publicAssetAccess ? 'Allow' : 'Deny'
+      defaultAction: cdnAssetAccess ? 'Allow' : 'Deny'
       bypass: 'None'
     }
     supportsHttpsTrafficOnly: true
@@ -56,12 +56,12 @@ resource storageAccountContainer 'Microsoft.Storage/storageAccounts/blobServices
 resource storageAccountContainerAssets 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
   name: '${storageAccount.name}/default/${assetsContainerName}'
   properties: {
-    publicAccess: publicAssetAccess ? 'Blob' : 'None'
+    publicAccess: cdnAssetAccess ? 'Blob' : 'None'
   }
 }
 
 var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
-resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = if (publicAssetAccess) {
+resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = if (cdnAssetAccess) {
   location: location
   name: storageAccountName
   sku: {
