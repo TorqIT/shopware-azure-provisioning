@@ -10,6 +10,8 @@ export SERVICE_PRINCIPAL_NAME=
 
 # Virtual Network
 export VIRTUAL_NETWORK_NAME=
+# Only required if different than the resource group defined above. If defined, it will be assumed to already exist in that resource group.
+export VIRTUAL_NETWORK_RESOURCE_GROUP=
 export VIRTUAL_NETWORK_CONTAINER_APPS_SUBNET_NAME=container-apps
 export VIRTUAL_NETWORK_ADDRESS_SPACE='11.0.0.0/16'
 export VIRTUAL_NETWORK_CONTAINER_APPS_SUBNET_ADDRESS_SPACE='11.0.0.0/23'
@@ -23,6 +25,9 @@ export DATABASE_SKU_NAME=Standard_B1ms
 export DATABASE_SKU_TIER=Burstable
 export DATABASE_STORAGE_SIZE_GB=20
 export DATABASE_NAME=pimcore
+# MySQL flexible servers seem to have some limitations in regards to location, so it may be necessary to deploy them to a different location
+# from the other resources. This is only required if it is different than the location defined above.
+export DATABASE_LOCATION=canadacentral
 
 # Container Registry
 export CONTAINER_REGISTRY_NAME=

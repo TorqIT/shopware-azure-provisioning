@@ -5,7 +5,12 @@ set -e
 ./login.sh
 
 cd virtual-network
-./virtual-network.sh
+if [ "$VIRTUAL_NETWORK_RESOURCE_GROUP" == "$RESOURCE_GROUP" ]
+then
+    ./virtual-network.sh
+else
+    echo Virtual network is defined to be in resource group $VIRTUAL_NETWORK_RESOURCE_GROUP and will be assumed to be existing, so skipping deployment of virtual network
+fi
 cd ..
 
 cd container-registry

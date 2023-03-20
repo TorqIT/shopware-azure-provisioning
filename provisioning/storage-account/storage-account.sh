@@ -15,4 +15,5 @@ az deployment group create \
     assetsContainerName=$STORAGE_ACCOUNT_ASSETS_CONTAINER_NAME \
     cdnAssetAccess=$STORAGE_ACCOUNT_CDN_ASSET_ACCESS \
     virtualNetworkName=$VIRTUAL_NETWORK_NAME \
+    virtualNetworkResourceGroup=$VIRTUAL_NETWORK_RESOURCE_GROUP \
     virtualNetworkSubnetName=$VIRTUAL_NETWORK_CONTAINER_APPS_SUBNET_NAME

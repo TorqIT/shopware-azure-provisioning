@@ -7,6 +7,7 @@ az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file database.bicep \
   --parameters \
+    location=$DATABASE_LOCATION \
     serverName=$DATABASE_SERVER_NAME \
     administratorLogin=$DATABASE_ADMIN_USER \
     administratorLoginPassword=$DATABASE_ADMIN_PASSWORD \
@@ -14,5 +15,6 @@ az deployment group create \
     skuTier=$DATABASE_SKU_TIER \
     storageSizeGB=$DATABASE_STORAGE_SIZE_GB \
     databaseName=$DATABASE_NAME \
+    virtualNetworkResourceGroup=$VIRTUAL_NETWORK_RESOURCE_GROUP \
     virtualNetworkName=$VIRTUAL_NETWORK_NAME \
     virtualNetworkSubnetName=$VIRTUAL_NETWORK_DATABASE_SUBNET_NAME

@@ -6,8 +6,20 @@ param accessTier string = 'Cool'
 param containerName string
 param assetsContainerName string
 param cdnAssetAccess bool = false
+
 param virtualNetworkName string
+param virtualNetworkResourceGroup string = resourceGroup().name
 param virtualNetworkSubnetName string
+
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
+  scope: resourceGroup(virtualNetworkResourceGroup)
+  name: virtualNetworkName
+}
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+  parent: virtualNetwork
+  name: virtualNetworkSubnetName
+}
+var subnetId = subnet.id
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
@@ -24,7 +36,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     networkAcls: {
       virtualNetworkRules: [
         {
-          id: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
+          id: subnetId
           action: 'Allow'
         }
       ]

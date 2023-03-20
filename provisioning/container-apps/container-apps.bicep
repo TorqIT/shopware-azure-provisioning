@@ -3,6 +3,7 @@ param location string = resourceGroup().location
 param containerAppsEnvironmentName string
 
 param virtualNetworkName string
+param virtualNetworkResourceGroup string = resourceGroup().name
 param virtualNetworkSubnetName string
 
 param databaseServerName string
@@ -37,8 +38,15 @@ param redisDb string
 param redisHost string
 param redisSessionDb string
 
-var subnetId = resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, virtualNetworkSubnetName)
-
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
+  scope: resourceGroup(virtualNetworkResourceGroup)
+  name: virtualNetworkName
+}
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+  parent: virtualNetwork
+  name: virtualNetworkSubnetName
+}
+var subnetId = subnet.id
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01' = {
   name: containerAppsEnvironmentName
   location: location
