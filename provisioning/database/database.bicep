@@ -30,19 +30,21 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
 resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: '${serverName}.private.mysql.database.azure.com'
   location: 'global'
-  resource virtualNetworkLink 'virtualNetworkLinks' = {
-    name: 'virtualNetworkLink'
-    location: 'global'
-    properties: {
-      virtualNetwork: {
-        id: virtualNetwork.id
-      }
-      registrationEnabled: true
+}
+resource virtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDNSzoneForDatabase
+  name: 'virtualNetworkLink'
+  location: 'global'
+  properties: {
+    virtualNetwork: {
+      id: virtualNetwork.id
     }
+    registrationEnabled: true
   }
 }
 
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
+  dependsOn: [virtualNetworkLink]
   name: serverName
   location: location
   sku: {
