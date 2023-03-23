@@ -52,7 +52,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
   location: location
   properties: {
     vnetConfiguration: {
-      internal: phpFpmContainerAppExternal
+      internal: !phpFpmContainerAppExternal
       infrastructureSubnetId: subnetId
     }
   }
@@ -168,7 +168,11 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
         containerRegistryConfiguration
       ]
       ingress: {
-        external: phpFpmContainerAppExternal
+        // Slightly confusing - when we want to restrict access to this container to within the VNet, 
+        // the environment (declared above) can be set to be internal within the VNet, but the webapp itself
+        // still needs to be declared external here. Declaring it internal here would limit it to within the Container
+        // Apps Environment, which is not what we want.
+        external: true
         allowInsecure: false
         targetPort: 80
         traffic: [
