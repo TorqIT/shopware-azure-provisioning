@@ -47,6 +47,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
   name: virtualNetworkSubnetName
 }
 var subnetId = subnet.id
+
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01' = {
   name: containerAppsEnvironmentName
   location: location
@@ -55,6 +56,17 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01'
       internal: !phpFpmContainerAppExternal
       infrastructureSubnetId: subnetId
     }
+  }
+}
+
+// If the app is to be internal within the VNet, a private DNS zone needs to be configured
+// that will point the domain to the static IP of the Container Apps Environment
+module privateDns 'container-apps-private-dns-zone.bicep' = if (!phpFpmContainerAppExternal) {
+  name: 'private-dns-zone'
+  params: {
+    name: containerAppsEnvironment.properties.defaultDomain
+    staticIp: containerAppsEnvironment.properties.staticIp
+    vnetId: virtualNetwork.id
   }
 }
 
