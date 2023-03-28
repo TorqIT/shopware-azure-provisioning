@@ -45,7 +45,9 @@ This Docker image can be used to easily provision an Azure environment to host a
          --mysql-database=$DATABASE_NAME \
          --mysql-username=$DATABASE_USER \         
          --mysql-password=$DATABASE_PASSWORD \         
-         --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem
+         --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem \
+         --ignore-existing-config \
+         --skip-database-config
         ```
 9. TODO custom domains and HTTPS certs
 10. The `container-app-exec` scripts can be used to enter the shell of a running PHP-FPM Pimcore container app (analogous to SSH'ing into a virtual machine).
