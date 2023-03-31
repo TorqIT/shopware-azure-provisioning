@@ -1,14 +1,15 @@
-param storageAccountName string
 param location string = resourceGroup().location
-param sku string = 'Standard_LRS'
-param kind string = 'StorageV2'
-param accessTier string = 'Cool'
+
+param storageAccountName string
+param sku string
+param kind string
+param accessTier string
 param containerName string
 param assetsContainerName string
-param cdnAssetAccess bool = false
+param cdnAssetAccess bool
 
 param virtualNetworkName string
-param virtualNetworkResourceGroup string = resourceGroup().name
+param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
@@ -59,16 +60,20 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     }
     accessTier: accessTier
   }
-}
 
-resource storageAccountContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
-  name: '${storageAccount.name}/default/${containerName}'
-}
+  resource blobServices 'blobServices' = {
+    name: 'default'
 
-resource storageAccountContainerAssets 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
-  name: '${storageAccount.name}/default/${assetsContainerName}'
-  properties: {
-    publicAccess: cdnAssetAccess ? 'Blob' : 'None'
+    resource storageAccountContainer 'containers' = {
+      name: containerName
+    }
+
+    resource storageAccountContainerAssets 'containers' = {
+      name: assetsContainerName
+      properties: {
+        publicAccess: cdnAssetAccess ? 'Blob' : 'None'
+      }
+    }
   }
 }
 

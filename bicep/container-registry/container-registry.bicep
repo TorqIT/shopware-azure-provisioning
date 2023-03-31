@@ -1,8 +1,9 @@
+param location string = resourceGroup().location
+
 @minLength(5)
 @maxLength(50)
-param containerRegistryName string = 'acr${uniqueString(resourceGroup().id)}'
-param location string = resourceGroup().location
-param sku string = 'Basic'
+param containerRegistryName string
+param sku string
 
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: containerRegistryName

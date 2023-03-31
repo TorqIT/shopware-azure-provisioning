@@ -1,0 +1,108 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  // Note that this stub file only contains the required fields that need to be set (excluding the additionalEnvVars and additionalSecrets fields).
+  // Refer to main.bicep for the full list of parameters that can be set.
+  "parameters": {
+    "subscriptionId": {
+      "value": "my-subscription-id"
+    },
+    "tenantName": {
+      "value": "my-tenant-name"
+    },
+    "resourceGroupName": {
+      "value": "my-resource-group"
+    },
+    "location": {
+      "value": "canadacentral"
+    },
+    "keyVaultName": {
+      "value": "my-key-vault-name"
+    },
+    "virtualNetworkName": {
+      "value": "my-virtual-network"
+    },
+    "virtualNetworkAddressSpace": {
+      "value": "10.0.0.0/16"
+    },
+    "virtualNetworkContainerAppsSubnetAddressSpace": {
+      "value": "10.0.0.0/23"
+    }, 
+    "virtualNetworkDatabaseSubnetAddressSpace": {
+      "value": "10.0.2.0/28"
+    },
+    "containerRegistryName": {
+      "value": "mycontainerregistry"
+    },
+    "containerRegistrySku": {
+      "value": "Basic"
+    },
+    "deployImagesToContainerRegistry": {
+      "value": true
+    },
+    "storageAccountName": {
+      "value": "mystorageaccount"
+    },
+    "storageAccountContainerName": {
+      "value": "mystorageaccountcontainer"
+    },
+    "storageAccountAssetsContainerName": {
+      "value": "mystorageaccountassetscontainer"
+    },
+    "databaseServerName": {
+      "value": "my-database-server"
+    },
+    "databasePasswordSecretName": {
+      "value": "my-database-password-secret-name"
+    },
+    "containerAppsEnvironmentName": {
+      "value": "my-container-apps-environment"
+    },
+    "phpFpmContainerAppName": {
+      "value": "my-php-fpm-container-app"
+    },
+    "phpFpmImageName": {
+      "value": "my-php-fpm-image"
+    },
+    "supervisordContainerAppName": {
+      "value": "my-supervisord-container-app"
+    },
+    "supervisordImageName": {
+      "value": "my-supervisord-image"
+    },
+    "redisContainerAppName": {
+      "value": "my-redis-container-app"
+    },
+    "redisImageName": {
+      "value": "my-redis-image"
+    },
+    // Add any additional environment variables for your Container Apps here. Note that these will be applied
+    // to both the PHP-FPM and supervisord containers. Also note that environment variables that need to 
+    // reference secret values should not be placed here - see additionalSecrets below.
+    "additionalEnvVars": {
+      "value": [
+        {
+          "name": "MY_ENV_VAR_1",
+          "value": "myEnvVarValue2"
+        },
+        {
+          "name": "MY_ENV_VAR_2",
+          "value": "myEnvVarValue2"
+        }
+      ]
+    },
+    // Add any additional secrets required by your Container Apps here. Note that this requires the secret value to 
+    // be present in the Resource Group's Key Vault. 
+    "additionalSecrets": {
+      "value": {
+        "array": [
+          {
+            "secretNameInKeyVault": "my-secret-name",
+            "secretEnvVarNameInContainerApp": "MY_SECRET_ENV_VAR",
+            "secretRefInContainerApp": "mySecretName"
+          }
+        ]
+      }
+    }
+  }
+}
