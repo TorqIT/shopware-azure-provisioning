@@ -12,9 +12,9 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
 param virtualNetworkName string
 param virtualNetworkAddressSpace string
 param virtualNetworkResourceGroupName string = resourceGroup().name
-param virtualNetworkContainerAppsSubnetName string = 'container-apps-subnet'
+param virtualNetworkContainerAppsSubnetName string
 param virtualNetworkContainerAppsSubnetAddressSpace string
-param virtualNetworkDatabaseSubnetName string = 'database-subnet'
+param virtualNetworkDatabaseSubnetName string
 param virtualNetworkDatabaseSubnetAddressSpace string
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
@@ -31,13 +31,13 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
 
 // Storage Account
 param storageAccountName string
-param storageAccountSku string = 'Standard_LRS'
-param storageAccountKind string = 'StorageV2'
-param storageAccountAccessTier string = 'Hot'
+param storageAccountSku string
+param storageAccountKind string
+param storageAccountAccessTier string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
-param storageAccountCdnAccess bool = false
-param storageAccountBackupRetentionDays int = 7
+param storageAccountCdnAccess bool
+param storageAccountBackupRetentionDays int
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
   params: {
@@ -58,15 +58,14 @@ module storageAccount 'storage-account/storage-account.bicep' = {
 
 // Database
 param databaseServerName string
-param databaseAdminUsername string = 'adminuser'
+param databaseAdminUsername string
 param databasePasswordSecretName string
-param databaseSkuName string = 'Standard_B1ms'
-param databaseSkuTier string = 'Burstable'
-param databaseStorageSizeGB int = 20
-param databaseName string = 'pimcore'
-@description('Number of days to keep point-in-time backups of the database. Valid values are 1 through 35')
-param databaseBackupRetentionDays int = 7
-param databaseGeoRedundantBackup bool = false
+param databaseSkuName string
+param databaseSkuTier string
+param databaseStorageSizeGB int
+param databaseName string
+param databaseBackupRetentionDays int
+param databaseGeoRedundantBackup bool
 module database 'database/database.bicep' = {
   name: 'database'
   params: {
@@ -97,13 +96,13 @@ param supervisordImageName string
 param redisContainerAppName string
 param redisImageName string
 @allowed(['0', '1'])
-param appDebug string = '0'
-param appEnv string = 'dev'
+param appDebug string
+param appEnv string
 @allowed(['0', '1'])
-param pimcoreDev string = '1'
-param pimcoreEnvironment string = 'dev'
-param redisDb string = '12'
-param redisSessionDb string = '14'
+param pimcoreDev string
+param pimcoreEnvironment string
+param redisDb string
+param redisSessionDb string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'

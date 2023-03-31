@@ -1,8 +1,6 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
-  // Note that this stub file only contains the required fields that need to be set (excluding the additionalEnvVars and additionalSecrets fields).
-  // Refer to main.bicep for the full list of parameters that can be set.
   "parameters": {
     "subscriptionId": {
       "value": "my-subscription-id"
@@ -13,53 +11,140 @@
     "resourceGroupName": {
       "value": "my-resource-group"
     },
+    // The location of your resources. A complete list can be found by running
+    // az account list-locations -o table
     "location": {
       "value": "canadacentral"
     },
     "keyVaultName": {
       "value": "my-key-vault-name"
     },
+    "containerRegistryName": {
+      "value": "mycontainerregistry"
+    },
+    // The SKU to use for the Container Registry. A complete list can be found here
+    // https://learn.microsoft.com/en-us/azure/container-registry/container-registry-skus.
+    "containerRegistrySku": {
+      "value": "Basic"
+    },
     "virtualNetworkName": {
       "value": "my-virtual-network"
+    },
+    // The resource group in which the VNet exists. If set to a resource group different than 
+    // the one used for the rest of the resources, it will be assumed that the VNet already 
+    // exists there and no deployment will occur
+    "virtualNetworkResourceGroup": {
+      "value": "my-resource-group"
     },
     "virtualNetworkAddressSpace": {
       "value": "10.0.0.0/16"
     },
+    "virtualNetworkContainerAppsSubnetName": {
+      "value": "container-apps-subnet"
+    },
+    // The address space in which your Container Apps will be deployed. Container Apps
+    // require a subnet of at least size /23, and the subnet cannot be occupied by an other 
+    // resources.
     "virtualNetworkContainerAppsSubnetAddressSpace": {
       "value": "10.0.0.0/23"
     }, 
+    "virtualNetworkDatabaseSubnetName": {
+      "value": "database-subnet"
+    },
+    // The address space in which the MySQL Database Server will be deployed. This subnet
+    // must be of at least /28 size, and must not be occupied by any other resources.
     "virtualNetworkDatabaseSubnetAddressSpace": {
       "value": "10.0.2.0/28"
     },
-    "containerRegistryName": {
-      "value": "mycontainerregistry"
-    },
-    "containerRegistrySku": {
-      "value": "Basic"
-    },
+    // Whether to deploy initial Docker images to the Container Registry during this deployment.
+    // This is necessary when first deploying a Container Apps Environment as its provisioning requires
+    // images to actually be present. After this first deployment, this value can be set to false.
     "deployImagesToContainerRegistry": {
       "value": true
     },
     "storageAccountName": {
       "value": "mystorageaccount"
     },
+    // The Storage Account SKU. A complete list can be found here 
+    // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#sku.
+    "storageAccountSku": {
+      "value": "Standard_LRS"
+    },
+    // The Storage Account kind. A complete list can be found here
+    // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#storageaccounts.
+    "storageAccountKind": {
+      "value": "StorageV2"
+    },
+    // The Storage Account access tier, indicating how often the files will be accessed.
+    // A complete list can be found here: https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#storageaccountpropertiescreateparametersorstorageacc.
+    "storageAccountAccessTier": {
+      "value": "Hot"
+    },
+    // Whether the Storage Account should have a public CDN placed in front of it. Note that
+    // setting this to true will make the entire Storage Account available on the public internet (albeit protected with keys).
+    "storageAccountCdnAccess": {
+      "value": false
+    },
+    // How long in days to keep short-term backups of the Storage Account files. Valid values are 1 through 365.
+    "storageAccountBackupRetentionDays": {
+      "value": 7
+    },
+    // The container in which the majority of Pimcore files will be stored, excluding assets.
     "storageAccountContainerName": {
       "value": "mystorageaccountcontainer"
     },
+    // The container in which Pimcore assets will be stored
     "storageAccountAssetsContainerName": {
       "value": "mystorageaccountassetscontainer"
     },
     "databaseServerName": {
       "value": "my-database-server"
     },
+    "databaseAdminUsername": {
+      "value": "adminuser"
+    },
+    // The name of the secret in the Key Vault where the database password is stored
     "databasePasswordSecretName": {
       "value": "my-database-password-secret-name"
+    },
+    // The SKU tier to use for the database. A complete list can be found by running
+    // az mysql flexible-server list-skus --location <your location>
+    "databaseSkuTier": {
+      "value": "Burstable"
+    },
+    // The SKU name to use for the database. A complete list can be found by running
+    // az mysql flexible-server list-skus --location <your location>
+    "databaseSkuName": {
+      "value": "Standard_B1ms"
+    },
+    "databaseStorageSizeGB": {
+      "value": 20
+    },
+    "databaseName": {
+      "value": "pimcore"
+    },
+    // How long in days to keep point-in-time backups of the database. Valid values are 
+    // 1 through 35.
+    "databaseBackupRetentionDays": {
+      "value": 7
+    },
+    "databaseGeoRedundantBackup": {
+      "value": false
     },
     "containerAppsEnvironmentName": {
       "value": "my-container-apps-environment"
     },
+    // Whether the PHP-FPM (web) container should be available on the public internet. If false,
+    // it will be restricted to be only accessible within the configured Virtual Network.
+    "phpFpmContainerAppExternal": {
+      "value": true
+    },
     "phpFpmContainerAppName": {
       "value": "my-php-fpm-container-app"
+    },
+    // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
+    "phpFpmContainerAppUseProbes": {
+      "value": false
     },
     "phpFpmImageName": {
       "value": "my-php-fpm-image"
@@ -75,6 +160,33 @@
     },
     "redisImageName": {
       "value": "my-redis-image"
+    },
+    // The following values are the common environment variables used by Pimcore. These will
+    // be applied to both the PHP-FPM and supervisord containers.
+
+    // Debug setting for Symfony. Numerical string value of "0" (false) or "1" (true).
+    "appDebug": {
+      "value": "1"
+    },
+    // Symfony environment setting
+    "appEnv": {
+      "value": "dev"
+    },
+    // Pimcore Dev mode setting. Numerical string of "0" (false) or "1" (true).
+    "pimcoreDev": {
+      "value": "1"
+    },
+    // Pimcore environment setting
+    "pimcoreEnvironment": {
+      "value": "dev"
+    },
+    // The Redis DB to use for caching. Numerical string value (e.g. "12")
+    "redisDb": {
+      "value": "12"
+    },
+    // The Redis DB to use for session storage. Numerical string value (e.g. "14")
+    "redisSessionDb": {
+      "value": "14"
     },
     // Add any additional environment variables for your Container Apps here. Note that these will be applied
     // to both the PHP-FPM and supervisord containers. Also note that environment variables that need to 
