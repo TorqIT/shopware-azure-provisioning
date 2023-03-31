@@ -31,7 +31,7 @@ var defaultEnvVars = [
     value: storageAccountContainerName
   }
   {
-    name: 'AZURE_STORAGE_ACCOUNT_ASSETS_CONTAINER'
+    name: 'AZURE_STORAGE_ACCOUNT_CONTAINER_ASSETS'
     value: storageAccountAssetsContainerName
   }
   {
