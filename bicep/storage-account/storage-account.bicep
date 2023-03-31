@@ -7,6 +7,7 @@ param accessTier string
 param containerName string
 param assetsContainerName string
 param cdnAssetAccess bool
+param backupRetentionDays int
 
 param virtualNetworkName string
 param virtualNetworkResourceGroup string
@@ -34,17 +35,17 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     allowSharedKeyAccess: true
     allowBlobPublicAccess: cdnAssetAccess
     publicNetworkAccess: cdnAssetAccess ? 'Enabled' : null
+    
     networkAcls: {
       virtualNetworkRules: [
         {
           id: subnetId
           action: 'Allow'
-        }
+}
       ]
       defaultAction: cdnAssetAccess ? 'Allow' : 'Deny'
       bypass: 'None'
     }
-    supportsHttpsTrafficOnly: true
     encryption: {
       services: {
         file: {
@@ -61,8 +62,23 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     accessTier: accessTier
   }
 
-  resource blobServices 'blobServices' = {
+  resource blobService 'blobServices' = {
     name: 'default'
+    properties: {
+      deleteRetentionPolicy: {
+        enabled: true
+        days: backupRetentionDays + 1
+      }
+      changeFeed: {
+        enabled: true
+        retentionInDays: backupRetentionDays + 1
+      }
+      isVersioningEnabled: true
+      restorePolicy: {
+        enabled: true
+        days: backupRetentionDays
+      }
+    }
 
     resource storageAccountContainer 'containers' = {
       name: containerName

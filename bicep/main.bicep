@@ -37,6 +37,7 @@ param storageAccountAccessTier string = 'Hot'
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 param storageAccountCdnAccess bool = false
+param storageAccountBackupRetentionDays int = 7
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
   params: {
@@ -51,6 +52,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    backupRetentionDays: storageAccountBackupRetentionDays
   }
 }
 
@@ -62,6 +64,9 @@ param databaseSkuName string = 'Standard_B1ms'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
 param databaseName string = 'pimcore'
+@description('Number of days to keep point-in-time backups of the database. Valid values are 1 through 35')
+param databaseBackupRetentionDays int = 7
+param databaseGeoRedundantBackup bool = false
 module database 'database/database.bicep' = {
   name: 'database'
   params: {
@@ -76,6 +81,8 @@ module database 'database/database.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
     virtualNetworkSubnetName: virtualNetworkDatabaseSubnetName
+    backupRetentionDays: databaseBackupRetentionDays
+    geoRedundantBackup: databaseGeoRedundantBackup
   }
 }
 

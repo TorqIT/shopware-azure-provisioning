@@ -10,6 +10,9 @@ param skuName string
 param skuTier string
 param storageSizeGB int
 
+param backupRetentionDays int
+param geoRedundantBackup bool
+
 param databaseName string
 
 param virtualNetworkResourceGroup string
@@ -60,6 +63,10 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
     network: {
       delegatedSubnetResourceId: subnet.id
       privateDnsZoneResourceId: privateDNSzoneForDatabase.id
+    }
+    backup: {
+      backupRetentionDays: backupRetentionDays
+      geoRedundantBackup: geoRedundantBackup ? 'Enabled' : 'Disabled'
     }
   }
   
