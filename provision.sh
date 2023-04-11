@@ -4,7 +4,7 @@ set -e
 
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 
-echo "Deploying Continer Registry..."
+echo "Deploying Container Registry..."
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
 CONTAINER_REGISTRY_SKU=$(jq -r '.parameters.containerRegistrySku.value' $1)
 az deployment group create \
