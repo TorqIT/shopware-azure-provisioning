@@ -4,8 +4,10 @@ param containerRegistryName string
 
 // Key Vault (assumed to have been created prior to this)
 param keyVaultName string
+param keyVaultResourceGroupName string
 resource keyVault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
   name: keyVaultName
+  scope: resourceGroup(keyVaultResourceGroupName)
 }
 
 // Virtual Network

@@ -22,6 +22,10 @@
     "keyVaultName": {
       "value": "my-key-vault-name"
     },
+    // The resource group in which the Key Vault exists. 
+    "keyVaultResourceGroup": {
+      "value": "my-key-vault-resource-group"
+    },
     "containerRegistryName": {
       "value": "mycontainerregistry"
     },
