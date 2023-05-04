@@ -4,6 +4,9 @@ set -e
 
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 
+# Because we need to run some non-Bicep scripts after deploying the Container Registry (but before
+# deploying the other resources), we create the Container Registry separately here before running the
+# main Bicep file.
 echo "Deploying Container Registry..."
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
 CONTAINER_REGISTRY_SKU=$(jq -r '.parameters.containerRegistrySku.value' $1)

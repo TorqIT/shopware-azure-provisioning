@@ -23,7 +23,7 @@
       "value": "my-key-vault-name"
     },
     // The resource group in which the Key Vault exists. 
-    "keyVaultResourceGroup": {
+    "keyVaultResourceGroupName": {
       "value": "my-key-vault-resource-group"
     },
     "containerRegistryName": {
@@ -40,7 +40,7 @@
     // The resource group in which the VNet exists. If set to a resource group different than 
     // the one used for the rest of the resources, it will be assumed that the VNet already 
     // exists there and no deployment will occur
-    "virtualNetworkResourceGroup": {
+    "virtualNetworkResourceGroupName": {
       "value": "my-resource-group"
     },
     "virtualNetworkAddressSpace": {
