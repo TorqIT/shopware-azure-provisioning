@@ -147,6 +147,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
 param subscriptionId string = ''
 param resourceGroupName string = ''
 param tenantName string = ''
+param servicePrincipalName string = ''
 param deployImagesToContainerRegistry bool = false
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
