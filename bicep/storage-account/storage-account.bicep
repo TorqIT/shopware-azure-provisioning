@@ -35,13 +35,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     allowSharedKeyAccess: true
     allowBlobPublicAccess: cdnAssetAccess
     publicNetworkAccess: cdnAssetAccess ? 'Enabled' : null
-    
+    accessTier: accessTier
     networkAcls: {
       virtualNetworkRules: [
         {
           id: subnetId
           action: 'Allow'
-}
+        }
       ]
       defaultAction: cdnAssetAccess ? 'Allow' : 'Deny'
       bypass: 'None'
@@ -59,7 +59,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       }
       keySource: 'Microsoft.Storage'
     }
-    accessTier: accessTier
   }
 
   resource blobService 'blobServices' = {

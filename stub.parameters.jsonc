@@ -138,6 +138,14 @@
     "databaseGeoRedundantBackup": {
       "value": false
     },
+    "databaseBackupsStorageAccountName": {
+      "value": "my-database-backup-storage-account"
+    },
+    // The database backups Storage Account SKU. A complete list can be found here 
+    // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#sku.
+    "databaseBackupsStorageAccountSku": {
+      "value": "Standard_LRS"
+    },
     "containerAppsEnvironmentName": {
       "value": "my-container-apps-environment"
     },
