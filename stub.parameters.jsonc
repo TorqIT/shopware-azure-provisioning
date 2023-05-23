@@ -157,6 +157,12 @@
     "phpFpmContainerAppName": {
       "value": "my-php-fpm-container-app"
     },
+    "phpFpmContainerAppCustomDomain": {
+      "value": "my-custom-domain.example.com"
+    },
+    "phpFpmContainerAppCertificateName": {
+      "value": "my-certificate-name"
+    },
     // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
     "phpFpmContainerAppUseProbes": {
       "value": false

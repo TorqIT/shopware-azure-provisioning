@@ -11,6 +11,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 # Install AZ CLI extensions
 RUN az config set bicep.use_binary_from_path=false
 RUN az bicep install
+RUN az bicep upgrade
 RUN az extension add -n containerapp
 
 ADD /*.sh /azure/

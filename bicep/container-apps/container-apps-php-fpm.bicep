@@ -1,11 +1,13 @@
 param location string = resourceGroup().location
 
-param containerAppsEnvironmentId string
+param containerAppsEnvironmentName string
 param containerAppName string
 param imageName string
 param environmentVariables array
 param containerRegistryName string
 param containerRegistryConfiguration object
+param customDomain string
+param certificateName string
 param useProbes bool
 @secure()
 param databasePasswordSecret object
@@ -13,6 +15,18 @@ param databasePasswordSecret object
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
+
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+  name: containerAppsEnvironmentName
+  scope: resourceGroup()
+}
+var containerAppsEnvironmentId = containerAppsEnvironment.id
+
+resource certificate 'Microsoft.App/managedEnvironments/certificates@2022-11-01-preview' existing = if (!(empty(certificateName))) {
+  parent: containerAppsEnvironment
+  name: certificateName
+}
+var certificateId = certificate.id
 
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
@@ -38,6 +52,13 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             latestRevision: true
             weight: 100
           }
+        ]
+        customDomains: [
+          (!empty(customDomain) && !empty(certificateId)) ? {
+            name: customDomain
+            bindingType: 'SniEnabled'
+            certificateId: certificateId
+          } : {}
         ]
       }
     }

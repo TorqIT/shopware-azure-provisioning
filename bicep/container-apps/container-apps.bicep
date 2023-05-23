@@ -15,6 +15,8 @@ param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 
 param phpFpmContainerAppExternal bool
+param phpFpmContainerAppCustomDomain string
+param phpFpmContainerAppCertificateName string
 param phpFpmContainerAppName string
 param phpFpmImageName string
 param phpFpmContainerAppUseProbes bool
@@ -101,13 +103,15 @@ module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
   name: 'php-fpm-container-app'
   params: {
     location: location
-    containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
+    containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppName: phpFpmContainerAppName
     imageName: phpFpmImageName
     environmentVariables: environmentVariables.outputs.envVars
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
     useProbes: phpFpmContainerAppUseProbes
+    customDomain: phpFpmContainerAppCustomDomain
+    certificateName: phpFpmContainerAppCertificateName
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
