@@ -58,7 +58,9 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             name: customDomain
             bindingType: 'SniEnabled'
             certificateId: certificateId
-          } : {}
+          } : {
+            name: ''
+          }
         ]
       }
     }
