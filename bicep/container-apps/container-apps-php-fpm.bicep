@@ -60,6 +60,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             certificateId: certificateId
           } : {
             name: ''
+            certificateId: ''
           }
         ]
       }
