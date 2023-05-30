@@ -53,16 +53,13 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             weight: 100
           }
         ]
-        customDomains: [
-          (!empty(customDomain) && !empty(certificateId)) ? {
+        customDomains: (!empty(customDomain) && !empty(certificateId)) ? [
+          {
             name: customDomain
             bindingType: 'SniEnabled'
             certificateId: certificateId
-          } : {
-            name: ''
-            certificateId: ''
           }
-        ]
+        ]: []
       }
     }
     template: {
