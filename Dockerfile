@@ -13,9 +13,11 @@ RUN az config set bicep.use_binary_from_path=false
 RUN az bicep install
 RUN az bicep upgrade
 RUN az extension add -n containerapp
+RUN az extension add -n storage-preview
 
 ADD /*.sh /azure/
 ADD /bicep /azure/bicep
+ADD /scripts /azure/scripts
 
 WORKDIR /azure
 
