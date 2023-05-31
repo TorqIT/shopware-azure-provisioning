@@ -54,3 +54,8 @@ Follow these steps to provision an environment for the first time:
 ## Updating an existing environment
 
 TODO how to update an existing environment (e.g. updating DB storage size, adding Container Apps envs/secrets)
+
+## Useful scripts
+
+Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its README).
+
