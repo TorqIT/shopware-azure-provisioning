@@ -57,5 +57,5 @@ TODO how to update an existing environment (e.g. updating DB storage size, addin
 
 ## Useful scripts
 
-Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its README).
+Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/pimcore-azure-provisioning/blob/main/scripts/README.md)).
 
