@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Downloads the Pimcore assets directory from the assets Storage Account.
 # Usage: ./download-assets.sh <path to parameters.json file> <destination path>
 # If you run this from within a container, you can copy the results to your host OS by exiting the container and running `docker cp -r <container name>:<path inside container> <destination path on host OS>`
 
