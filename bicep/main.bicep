@@ -139,6 +139,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
     storageAccountContainerName: storageAccountContainerName
     storageAccountName: storageAccountName
+    databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     supervisordContainerAppName: supervisordContainerAppName
     supervisordImageName: supervisordImageName
     virtualNetworkName: virtualNetworkName

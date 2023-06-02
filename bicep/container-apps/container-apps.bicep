@@ -14,6 +14,8 @@ param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 
+param databaseBackupsStorageAccountName string
+
 param phpFpmContainerAppExternal bool
 param phpFpmContainerAppCustomDomain string
 param phpFpmContainerAppCertificateName string
@@ -57,6 +59,9 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' e
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
+resource databaseBackupsStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: databaseBackupsStorageAccountName
+}
 
 // Set up common secrets for the PHP-FPM and supervisord Container Apps
 var containerRegistryPasswordSecret = {
@@ -70,6 +75,10 @@ var storageAccountKeySecret = {
 var databasePasswordSecret = {
   name: 'database-password'
   value: databasePassword
+}
+var databaseBackupsStorageAccountKeySecret = {
+  name: 'database-backups-storage-account-key'
+  value: databaseBackupsStorageAccount.listKeys().keys[0].value
 }
 
 // Set up common environment variables for the Container Apps
@@ -115,6 +124,7 @@ module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
+    databaseBackupsStorageAccountKeySecret: databaseBackupsStorageAccountKeySecret
   }
 }
 
@@ -131,6 +141,7 @@ module supervisordContainerApp 'container-apps-supervisord.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
+    databaseBackupsStorageAccountKeySecret: databaseBackupsStorageAccountKeySecret
   }
 }
 

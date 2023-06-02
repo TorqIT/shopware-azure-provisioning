@@ -15,6 +15,8 @@ param databasePasswordSecret object
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
+@secure()
+param databaseBackupsStorageAccountKeySecret object
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -35,7 +37,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
     managedEnvironmentId: containerAppsEnvironmentId
     configuration: {
       activeRevisionsMode: 'Multiple'
-      secrets: [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
+      secrets: [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
       registries: [
         containerRegistryConfiguration
       ]

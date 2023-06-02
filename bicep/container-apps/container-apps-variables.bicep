@@ -51,12 +51,16 @@ var defaultEnvVars = [
     value: databaseName
   }
   {
+    name: 'DATABASE_USER'
+    value: databaseUser
+  }
+  {
     name: 'DATABASE_PASSWORD'
     secretRef: 'database-password'
   }
   {
-    name: 'DATABASE_USER'
-    value: databaseUser
+    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_KEY'
+    secretRef: 'database-backups-storage-account-key'
   }
   {
     name: 'PIMCORE_DEV'
