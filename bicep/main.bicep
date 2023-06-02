@@ -68,7 +68,7 @@ param databaseStorageSizeGB int
 param databaseName string
 param databaseBackupRetentionDays int
 param databaseGeoRedundantBackup bool
-param databaseBackupStorageAccountName string
+param databaseBackupsStorageAccountName string
 param databaseBackupsStorageAccountSku string
 module database 'database/database.bicep' = {
   name: 'database'
@@ -87,7 +87,7 @@ module database 'database/database.bicep' = {
     virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     backupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
-    databaseBackupsStorageAccountName: databaseBackupStorageAccountName
+    databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     databaseBackupsStorageAccountSku: databaseBackupsStorageAccountSku
   }
 }
