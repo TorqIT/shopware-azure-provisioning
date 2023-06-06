@@ -22,7 +22,7 @@
     "keyVaultName": {
       "value": "my-key-vault-name"
     },
-    // The resource group in which the Key Vault exists. 
+    // The resource group in which the Key Vault exists.
     "keyVaultResourceGroupName": {
       "value": "my-key-vault-resource-group"
     },
@@ -37,8 +37,8 @@
     "virtualNetworkName": {
       "value": "my-virtual-network"
     },
-    // The resource group in which the VNet exists. If set to a resource group different than 
-    // the one used for the rest of the resources, it will be assumed that the VNet already 
+    // The resource group in which the VNet exists. If set to a resource group different than
+    // the one used for the rest of the resources, it will be assumed that the VNet already
     // exists there and no deployment will occur
     "virtualNetworkResourceGroupName": {
       "value": "my-resource-group"
@@ -50,11 +50,11 @@
       "value": "container-apps-subnet"
     },
     // The address space in which your Container Apps will be deployed. Container Apps
-    // require a subnet of at least size /23, and the subnet cannot be occupied by an other 
+    // require a subnet of at least size /23, and the subnet cannot be occupied by an other
     // resources.
     "virtualNetworkContainerAppsSubnetAddressSpace": {
       "value": "10.0.0.0/23"
-    }, 
+    },
     "virtualNetworkDatabaseSubnetName": {
       "value": "database-subnet"
     },
@@ -72,7 +72,7 @@
     "storageAccountName": {
       "value": "mystorageaccount"
     },
-    // The Storage Account SKU. A complete list can be found here 
+    // The Storage Account SKU. A complete list can be found here
     // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#sku.
     "storageAccountSku": {
       "value": "Standard_LRS"
@@ -130,7 +130,7 @@
     "databaseName": {
       "value": "pimcore"
     },
-    // How long in days to keep point-in-time backups of the database. Valid values are 
+    // How long in days to keep point-in-time backups of the database. Valid values are
     // 1 through 35.
     "databaseBackupRetentionDays": {
       "value": 7
@@ -141,7 +141,7 @@
     "databaseBackupsStorageAccountName": {
       "value": "my-database-backup-storage-account"
     },
-    // The database backups Storage Account SKU. A complete list can be found here 
+    // The database backups Storage Account SKU. A complete list can be found here
     // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#sku.
     "databaseBackupsStorageAccountSku": {
       "value": "Standard_LRS"
@@ -157,7 +157,7 @@
     "phpFpmContainerAppName": {
       "value": "my-php-fpm-container-app"
     },
-    // The following two values (custom domain and certificate name) are optional, and can not be present during the initial provisioning of the environment. 
+    // The following two values (custom domain and certificate name) are optional, and can not be present during the initial provisioning of the environment.
     // This is because manual intervention is required in order to validate the custom domain against your DNS. Once this has been done manually the first time
     // the environment is set up, the values can be present here so that subsequent provisions will leave the custom domain and certificate intact.
     "phpFpmContainerAppCustomDomain": {
@@ -165,6 +165,9 @@
     },
     "phpFpmContainerAppCertificateName": {
       "value": "my-certificate-name"
+    },
+    "phpFpmContainerAppCertificateIsManaged": {
+      "value": true
     },
     // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
     "phpFpmContainerAppUseProbes": {
@@ -213,7 +216,7 @@
       "value": "14"
     },
     // Add any additional environment variables for your Container Apps here. Note that these will be applied
-    // to both the PHP-FPM and supervisord containers. Also note that environment variables that need to 
+    // to both the PHP-FPM and supervisord containers. Also note that environment variables that need to
     // reference secret values should not be placed here - see additionalSecrets below.
     "additionalEnvVars": {
       "value": [
@@ -227,8 +230,8 @@
         }
       ]
     },
-    // Add any additional secrets required by your Container Apps here. Note that this requires the secret value to 
-    // be present in the Resource Group's Key Vault. 
+    // Add any additional secrets required by your Container Apps here. Note that this requires the secret value to
+    // be present in the Resource Group's Key Vault.
     "additionalSecrets": {
       "value": {
         "array": [

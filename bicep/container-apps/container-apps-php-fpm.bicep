@@ -8,6 +8,7 @@ param containerRegistryName string
 param containerRegistryConfiguration object
 param customDomain string
 param certificateName string
+param certificateIsManaged bool
 param useProbes bool
 @secure()
 param databasePasswordSecret object
@@ -24,11 +25,15 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-resource certificate 'Microsoft.App/managedEnvironments/certificates@2022-11-01-preview' existing = if (!(empty(certificateName))) {
+resource managedCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2022-11-01-preview' existing = if (!(empty(certificateName)) && certificateIsManaged) {
   parent: containerAppsEnvironment
   name: certificateName
 }
-var certificateId = certificate.id
+resource certificate 'Microsoft.App/managedEnvironments/certificates@2022-11-01-preview' existing = if (!(empty(certificateName)) && !certificateIsManaged) {
+  parent: containerAppsEnvironment
+  name: certificateName
+}
+var certificateId = !empty(managedCertificate) ? managedCertificate.id : certificate.id
 
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
