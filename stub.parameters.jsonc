@@ -167,10 +167,6 @@
     "phpFpmContainerAppCertificateName": {
       "value": "my-certificate-name"
     },
-    // Set to true if using a certificate managed by Azure Container Apps. Otherwise, set to false.
-    "phpFpmContainerAppCertificateIsManaged": {
-      "value": true
-    },
     // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
     "phpFpmContainerAppUseProbes": {
       "value": false

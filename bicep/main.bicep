@@ -100,7 +100,6 @@ param phpFpmImageName string
 param phpFpmContainerAppUseProbes bool = false
 param phpFpmContainerAppCustomDomain string = ''
 param phpFpmContainerAppCertificateName string = ''
-param phpFpmContainerAppCertificateIsManaged bool = true
 param supervisordContainerAppName string
 param supervisordImageName string
 param redisContainerAppName string
@@ -130,7 +129,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpFpmContainerAppName: phpFpmContainerAppName
     phpFpmContainerAppCustomDomain: phpFpmContainerAppCustomDomain
     phpFpmContainerAppCertificateName: phpFpmContainerAppCertificateName
-    phpFpmContainerAppCertificateIsManaged: phpFpmContainerAppCertificateIsManaged
     phpFpmImageName: phpFpmImageName
     pimcoreDev: pimcoreDev
     pimcoreEnvironment: pimcoreEnvironment

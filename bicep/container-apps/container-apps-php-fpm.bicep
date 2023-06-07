@@ -8,7 +8,6 @@ param containerRegistryName string
 param containerRegistryConfiguration object
 param customDomain string
 param certificateName string
-param certificateIsManaged bool
 param useProbes bool
 @secure()
 param databasePasswordSecret object
@@ -25,15 +24,10 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-resource managedCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2022-11-01-preview' existing = if (!(empty(certificateName)) && certificateIsManaged) {
+resource certificate 'Microsoft.App/managedEnvironments/managedCertificates@2022-11-01-preview' existing = if (!empty(certificateName)) {
   parent: containerAppsEnvironment
   name: certificateName
 }
-resource certificate 'Microsoft.App/managedEnvironments/certificates@2022-11-01-preview' existing = if (!(empty(certificateName)) && !certificateIsManaged) {
-  parent: containerAppsEnvironment
-  name: certificateName
-}
-var certificateId = !empty(managedCertificate) ? managedCertificate.id : certificate.id
 
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
@@ -60,11 +54,11 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             weight: 100
           }
         ]
-        customDomains: (!empty(customDomain) && !empty(certificateId)) ? [
+        customDomains: (!empty(customDomain) && !empty(certificateName)) ? [
           {
             name: customDomain
             bindingType: 'SniEnabled'
-            certificateId: certificateId
+            certificateId: certificate.id
           }
         ]: []
       }
