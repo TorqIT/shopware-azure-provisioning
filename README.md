@@ -59,7 +59,7 @@ Container Apps support custom domains and Azure-managed HTTPS certificates, but 
 2. Once provisioned, go to https://portal.azure.com and navigate to your PHP-FPM Container App.
 3. In the left-hand menu, click "Custom Domains". Click "Add", select the "Managed Certificate" option, and follow the instructions for adding a custom domain to your DNS.
 4. Once complete, you should be able to access your Container App at the configured custom domain, and it should be secured with HTTPS.
-5. Add the `phpFpmContainerAppCustomDomain`, `phpFpmContainerAppCertificateName` and `phpFpmContainerCertificateIsManaged` parameters to your `parameters.json` file. This will these settings to be maintained whenever you deploy infrastructure updates. The certificate name can be found by going to the Container Apps Environment, clicking "Certificates", and copying the value in the "Friendly name" column. `phpFpmContainerCertificateIsManaged` can be set to `true`.
+5. Add the `phpFpmContainerAppCustomDomain`, `phpFpmContainerAppCertificateName` and `phpFpmContainerCertificateIsManaged` parameters to your `parameters.json` file. This will these settings to be maintained whenever you deploy infrastructure updates. The certificate name can be found by going to the Container Apps Environment, clicking "Certificates", and copying the value in the "Friendly name" column. 
 
 ## Updating an existing environment
 
