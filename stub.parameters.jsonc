@@ -157,7 +157,7 @@
     "phpFpmContainerAppName": {
       "value": "my-php-fpm-container-app"
     },
-    // The following three values are optional, and must not be present during the initial provisioning of the environment.
+    // The following two values are optional, and must not be present during the initial provisioning of the environment.
     // This is because manual intervention is required in order to validate a custom domain against your DNS. Once this has been done manually the first time
     // the environment is set up, the values can be present here so that subsequent provisions will leave the custom domain and certificate intact. For more details,
     // see the README.
