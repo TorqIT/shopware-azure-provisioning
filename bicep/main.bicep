@@ -10,6 +10,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
   scope: resourceGroup(keyVaultResourceGroupName)
 }
 
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
+  name: containerRegistryName
+}
+
 // Virtual Network
 param virtualNetworkName string
 param virtualNetworkAddressSpace string
@@ -42,6 +46,7 @@ param storageAccountCdnAccess bool
 param storageAccountBackupRetentionDays int
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
+  dependsOn: [virtualNetwork]
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -72,6 +77,7 @@ param databaseBackupsStorageAccountName string
 param databaseBackupsStorageAccountSku string
 module database 'database/database.bicep' = {
   name: 'database'
+  dependsOn: [virtualNetwork]
   params: {
     location: location
     administratorLogin: databaseAdminUsername
@@ -115,6 +121,7 @@ param redisSessionDb string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
+  dependsOn: [virtualNetwork, storageAccount, containerRegistry]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
