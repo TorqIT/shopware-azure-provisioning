@@ -81,7 +81,7 @@ var databaseBackupsStorageAccountKeySecret = {
   value: databaseBackupsStorageAccount.listKeys().keys[0].value
 }
 
-// Set up common environment variables for the Container Apps
+// Set up common environment variables for the PHP-FPM and supervisord Container Apps
 module environmentVariables 'container-apps-variables.bicep' = {
   name: 'environment-variables'
   params: {
