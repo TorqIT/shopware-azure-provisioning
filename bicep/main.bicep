@@ -121,7 +121,7 @@ param redisSessionDb string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [database, virtualNetwork, storageAccount, containerRegistry]
+  dependsOn: [virtualNetwork, storageAccount, containerRegistry, database]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
