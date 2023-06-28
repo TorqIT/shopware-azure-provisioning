@@ -110,6 +110,7 @@ var containerRegistryConfiguration = {
 
 module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
   name: 'php-fpm-container-app'
+  dependsOn: [containerAppsEnvironment, environmentVariables]
   params: {
     location: location
     containerAppsEnvironmentName: containerAppsEnvironmentName
@@ -130,6 +131,7 @@ module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
 
 module supervisordContainerApp 'container-apps-supervisord.bicep' = {
   name: 'supervisord-container-app'
+  dependsOn: [containerAppsEnvironment, environmentVariables]
   params: {
     location: location
     containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
@@ -147,6 +149,7 @@ module supervisordContainerApp 'container-apps-supervisord.bicep' = {
 
 module redisContainerApp 'container-apps-redis.bicep' = {
   name: 'redis-container-app'
+  dependsOn: [containerAppsEnvironment]
   params: {
     location: location
     containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
