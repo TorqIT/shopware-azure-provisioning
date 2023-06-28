@@ -65,7 +65,7 @@ Container Apps support custom domains and Azure-managed HTTPS certificates, but 
 
 Bicep files are declarative, meaning that they declare the desired state of your resources. This means that you can deploy using the same files multiple times, and only the new changes that you've made will be applied. If you wish to change any resource names or properties, simply update them in your `parameters.json` file and re-run `./provision.sh parameters.json`. Keeping the `parameters.json` files committed in your source control is a good practice as it will allow you to maintain a snapshot of your environment's state.
 
-When adding/updating/removing Container Apps secrets for the PHP-FPM container, you will need to deactivate any active revisions that are using the existing secrets (Azure will throw an error if you do not first deactivate). To deactivate a revision, find its revision number in the Azure Portal, then `exec` into this container and run `./scripts/deactivate-php-fpm-container-app-revisions.sh`.
+When adding/updating/removing Container Apps secrets for the PHP-FPM container, you will need to deactivate any active revisions that are using the existing secrets (Azure will throw an error if you do not first deactivate). To deactivate the active revisions, enter this container and run `./scripts/deactivate-php-fpm-container-app-revisions.sh parameters.json`.
 
 ## Useful scripts
 
