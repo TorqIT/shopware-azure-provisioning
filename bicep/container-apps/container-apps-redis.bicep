@@ -7,6 +7,8 @@ param containerRegistryName string
 param containerRegistryConfiguration object
 @secure()
 param containerRegistryPasswordSecret object
+param cpuCores string
+param memory string
 
 resource redisContainerApp 'Microsoft.App/containerApps@2022-10-01' = {
   name: containerAppName
@@ -34,8 +36,8 @@ resource redisContainerApp 'Microsoft.App/containerApps@2022-10-01' = {
           name: imageName
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           resources: {
-            cpu: 1
-            memory: '2Gi'
+            cpu: cpuCores
+            memory: memory
           }
         }
       ]

@@ -174,17 +174,35 @@
     "phpFpmImageName": {
       "value": "my-php-fpm-image"
     },
+    "phpFpmCpuCores": {
+      "value": "1"
+    },
+    "phpFpmMemory": {
+      "value": "2Gi"
+    },
     "supervisordContainerAppName": {
       "value": "my-supervisord-container-app"
     },
     "supervisordImageName": {
       "value": "my-supervisord-image"
     },
+    "supervisordCpuCores": {
+      "value": "0.25"
+    },
+    "supervisordMemory": {
+      "value": "250Mi"
+    },
     "redisContainerAppName": {
       "value": "my-redis-container-app"
     },
     "redisImageName": {
       "value": "my-redis-image"
+    },
+    "redisCpuCores": {
+      "value": "0.25"
+    },
+    "redisMemory": {
+      "value": "1Gi"
     },
     // The following values are the common environment variables used by Pimcore. These will
     // be applied to both the PHP-FPM and supervisord containers.

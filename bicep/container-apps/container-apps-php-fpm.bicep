@@ -6,6 +6,8 @@ param imageName string
 param environmentVariables array
 param containerRegistryName string
 param containerRegistryConfiguration object
+param cpuCores string
+param memory string
 param customDomain string
 param certificateName string
 param useProbes bool
@@ -70,8 +72,8 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           env: environmentVariables
           resources: {
-            cpu: 1
-            memory: '2Gi'
+            cpu: cpuCores
+            memory: memory
           }
           probes: useProbes ? [
             { 
