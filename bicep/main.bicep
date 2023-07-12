@@ -104,8 +104,7 @@ param phpFpmContainerAppExternal bool = true
 param phpFpmContainerAppName string
 param phpFpmImageName string
 param phpFpmContainerAppUseProbes bool = false
-param phpFpmContainerAppCustomDomain string = ''
-param phpFpmContainerAppCertificateName string = ''
+param phpFpmContainerAppCustomDomains array = []
 param phpFpmCpuCores string = '1.0'
 param phpFpmMemory string = '2Gi'
 param supervisordContainerAppName string
@@ -140,8 +139,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
     phpFpmContainerAppName: phpFpmContainerAppName
-    phpFpmContainerAppCustomDomain: phpFpmContainerAppCustomDomain
-    phpFpmContainerAppCertificateName: phpFpmContainerAppCertificateName
+    phpFpmContainerAppCustomDomains: phpFpmContainerAppCustomDomains
     phpFpmImageName: phpFpmImageName
     phpFpmCpuCores: phpFpmCpuCores
     phpFpmMemory: phpFpmMemory

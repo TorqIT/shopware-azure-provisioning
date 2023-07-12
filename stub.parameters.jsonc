@@ -157,15 +157,17 @@
     "phpFpmContainerAppName": {
       "value": "my-php-fpm-container-app"
     },
-    // The following two values are optional, and must not be present during the initial provisioning of the environment.
+    // The following is optional, and must not be present during the initial provisioning of the environment.
     // This is because manual intervention is required in order to validate a custom domain against your DNS. Once this has been done manually the first time
-    // the environment is set up, the values can be present here so that subsequent provisions will leave the custom domain and certificate intact. For more details,
+    // the environment is set up, the values can be present here so that subsequent provisions will leave the custom domains and certificates intact. For more details,
     // see the README.
-    "phpFpmContainerAppCustomDomain": {
-      "value": "my-custom-domain.example.com"
-    },
-    "phpFpmContainerAppCertificateName": {
-      "value": "my-certificate-name"
+    "phpFpmContainerAppCustomDomains": {
+      "value": [
+        {
+          "domainName": "my-custom.domain.com",
+          "certificateName": "my-certificate-name"
+        }
+      ]
     },
     // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
     "phpFpmContainerAppUseProbes": {
