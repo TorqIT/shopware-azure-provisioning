@@ -157,10 +157,10 @@
     "phpFpmContainerAppName": {
       "value": "my-php-fpm-container-app"
     },
-    // The following is optional, and must not be present during the initial provisioning of the environment.
-    // This is because manual intervention is required in order to validate a custom domain against your DNS. Once this has been done manually the first time
-    // the environment is set up, the values can be present here so that subsequent provisions will leave the custom domains and certificates intact. For more details,
-    // see the README.
+    // Defines custom domains and their associated managed certificates for the PHP-FPM container app (the "web" container).
+    // When you are initially provisioning your environment, leave the "value" here as an empty array ([]), set up
+    // the custom domain(s) in the portal, and add the values back here so that subsequent deployments will keep
+    // the custom domains intact. For more information, see the README.
     "phpFpmContainerAppCustomDomains": {
       "value": [
         {

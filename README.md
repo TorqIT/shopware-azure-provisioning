@@ -12,8 +12,8 @@ Follow these steps to provision an environment for the first time:
         volumes:
            # Necessary for running Docker commands within the container
            - /var/run/docker.sock:/var/run/docker.sock
-           # Volume mount in your parameter file as needed - copy this from stub.parameters.jsonc and
-           # fill in your values
+           # Volume mount in your parameter file as needed - copy this from stub.parameters.json and
+           # fill in your preferred values
            - ./azure/parameters.json:/azure/parameters.json
            # You may also want to declare per-environment files like so
            - ./azure/parameters.dev.json:/azure/parameters.dev.json
@@ -27,7 +27,7 @@ Follow these steps to provision an environment for the first time:
            - LOCAL_SUPERVISORD_IMAGE=${LOCAL_SUPERVISORD_IMAGE}
            - LOCAL_REDIS_IMAGE=${LOCAL_REDIS_IMAGE}
    ```
-2. Update `parameters.json` with the appropriate values for your Azure environment. Note that the comments present in `stub.parameters.jsonc` will need to be removed. Note that you will also need to remove the parameters related to custom domains and certificates (see section below) for the initial provisioning.
+2. Update `parameters.json` with the appropriate values for your Azure environment. Note that the comments present in `stub.parameters.json` will need to be removed. Note that you will also need to remove the parameters related to custom domains and certificates (see section below) for the initial provisioning.
 3. Enter the container shell with `docker exec -it <container-name> bash`.
 4. Run `./login-to-tenant.sh parameters.json` and follow the browser prompts to log in.
 5. If a Resource Group and Service Principal have not yet been created (e.g. if you are not an Owner in the Azure tenant), run `initialize-resource-group-and-service-principal.sh parameters.json`. Once complete, note down the `appId` and `password` that are returned from the creation of the Service Principal (the app ID is the service principal ID). The service principal can then be used in your CI/CD pipeline.
