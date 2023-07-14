@@ -16,6 +16,7 @@ param geoRedundantBackup bool
 param databaseName string
 
 param databaseBackupsStorageAccountName string
+param databaseBackupStorageAccountContainerName string
 param databaseBackupsStorageAccountSku string
 
 param virtualNetworkResourceGroup string
@@ -115,7 +116,7 @@ resource databaseBackupsStorageAccount 'Microsoft.Storage/storageAccounts@2022-0
   resource blobService 'blobServices' = {
     name: 'default'
     resource container 'containers' = {
-      name: 'database-backups'
+      name: databaseBackupStorageAccountContainerName
     }
   }
 }

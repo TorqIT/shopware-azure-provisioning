@@ -74,6 +74,7 @@ param databaseName string
 param databaseBackupRetentionDays int
 param databaseGeoRedundantBackup bool
 param databaseBackupsStorageAccountName string
+param databaseBackupsStorageAccountContainerName string = 'database-backups'
 param databaseBackupsStorageAccountSku string
 module database 'database/database.bicep' = {
   name: 'database'
@@ -94,6 +95,7 @@ module database 'database/database.bicep' = {
     backupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
+    databaseBackupStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     databaseBackupsStorageAccountSku: databaseBackupsStorageAccountSku
   }
 }
@@ -157,6 +159,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     storageAccountContainerName: storageAccountContainerName
     storageAccountName: storageAccountName
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
+    databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     supervisordContainerAppName: supervisordContainerAppName
     supervisordImageName: supervisordImageName
     supervisordCpuCores: supervisordCpuCores

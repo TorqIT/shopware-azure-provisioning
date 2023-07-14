@@ -15,6 +15,7 @@ param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 
 param databaseBackupsStorageAccountName string
+param databaseBackupsStorageAccountContainerName string
 
 param phpFpmContainerAppExternal bool
 param phpFpmContainerAppCustomDomains array
@@ -103,6 +104,8 @@ module environmentVariables 'container-apps-variables.bicep' = {
     storageAccountName: storageAccountName
     storageAccountContainerName: storageAccountContainerName
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
+    databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
+    databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     additionalVars: additionalEnvVars
   }
 }

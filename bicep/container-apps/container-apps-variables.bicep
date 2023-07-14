@@ -3,6 +3,8 @@ param appEnv string
 param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
+param databaseBackupsStorageAccountName string
+param databaseBackupsStorageAccountContainerName string
 param databaseServerName string
 param databaseName string
 param databaseUser string
@@ -57,6 +59,14 @@ var defaultEnvVars = [
   {
     name: 'DATABASE_PASSWORD'
     secretRef: 'database-password'
+  }
+  {
+    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_NAME'
+    value: databaseBackupsStorageAccountName
+  }
+  {
+    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_CONTAINER_NAME'
+    value: databaseBackupsStorageAccountContainerName
   }
   {
     name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_KEY'
