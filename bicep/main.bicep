@@ -59,7 +59,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
-    backupRetentionDays: storageAccountBackupRetentionDays
+    shortTermBackupRetentionDays: storageAccountBackupRetentionDays
   }
 }
 
@@ -73,9 +73,9 @@ param databaseStorageSizeGB int
 param databaseName string
 param databaseBackupRetentionDays int
 param databaseGeoRedundantBackup bool
-param databaseBackupsStorageAccountName string
+param databaseBackupsStorageAccountName string = '${databaseServerName}-backups-storage-account'
 param databaseBackupsStorageAccountContainerName string = 'database-backups'
-param databaseBackupsStorageAccountSku string
+param databaseBackupsStorageAccountSku string = 'Standard_LRS'
 module database 'database/database.bicep' = {
   name: 'database'
   dependsOn: [virtualNetwork]

@@ -65,7 +65,29 @@ Container Apps support custom domains and Azure-managed HTTPS certificates, but 
 2. Once your environment is provisioned, go to https://portal.azure.com and navigate to your PHP-FPM Container App.
 3. In the left-hand menu, click "Custom Domains". Click "Add", select the "Managed Certificate" option, and follow the instructions for adding a custom domain to your DNS.
 4. Once complete, you should be able to access your Container App at the configured custom domain, and it should be secured with HTTPS.
-5. Add the `phpFpmContainerAppCustomDomain` and `phpFpmContainerAppCertificateName` parameters to your `parameters.json` file. This will ensure these settings are maintained whenever you deploy infrastructure updates. The certificate name can be found by going to the Container Apps Environment, clicking "Certificates", and copying the value in the "Friendly name" column.
+5. Add the custom domain and certificate to the `phpFpmContainerAppCustomDomains` parameter in your `parameters.json` file like so:
+   ```
+   "phpFpmContainerAppCustomDomains": {
+      "value": [
+         {
+            "domainName": "my-domain.example.com"
+            "certificateName": "my-certificate"
+         }
+      ]
+   }
+   ```
+   This will ensure these settings are maintained whenever you deploy infrastructure updates. The certificate name can be found by going to the Container Apps Environment, clicking "Certificates", and copying the value in the "Friendly name" column.
+
+## Automated backups
+
+The provisioning script will automatically configure the following backups:
+
+1. Point-in-time snapshots of the database. Retention of these snapshots is controlled by the `databaseBackupRetentionDays` parameter.
+2. Point-in-time snapshots of the Storage Account (which contains persistent Pimcore files such as assets). Retention of these snapshots is controlled by the `storageAccountBackupRetentionDays` parameter.
+3. Long-term backups of the database. As Azure Database for MySQL does not have built-in support for long-term backups, this image uses a custom solution using https://github.com/TorqIT/pimcore-database-backup-bundle to store backups in a Storage Account configured by the `databaseBackupsStorageAccount*` parameters.
+4. Long-term backups of the Storage Account. The provisioning script will automatically create a Backup Vault that stores monthly backups of the containers. These backups are retained for up to one year.
+
+Note that all backups are stored using Local Redundancy (see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy#locally-redundant-storage for more information).
 
 ## Updating an existing environment
 

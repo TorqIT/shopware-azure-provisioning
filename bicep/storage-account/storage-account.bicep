@@ -7,7 +7,7 @@ param accessTier string
 param containerName string
 param assetsContainerName string
 param cdnAssetAccess bool
-param backupRetentionDays int
+param shortTermBackupRetentionDays int
 
 param virtualNetworkName string
 param virtualNetworkResourceGroup string
@@ -66,16 +66,16 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     properties: {
       deleteRetentionPolicy: {
         enabled: true
-        days: backupRetentionDays + 1
+        days: shortTermBackupRetentionDays + 1
       }
       changeFeed: {
         enabled: true
-        retentionInDays: backupRetentionDays + 1
+        retentionInDays: shortTermBackupRetentionDays + 1
       }
       isVersioningEnabled: true
       restorePolicy: {
         enabled: true
-        days: backupRetentionDays
+        days: shortTermBackupRetentionDays
       }
     }
 
@@ -89,6 +89,15 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
         publicAccess: cdnAssetAccess ? 'Blob' : 'None'
       }
     }
+  }
+}
+
+module storageAccountBackupVault './storage-account-backup-vault.bicep' = {
+  name: 'storage-account-backup-vault'
+  dependsOn: [storageAccount]
+  params: {
+    storageAccountName: storageAccountName
+    location: location
   }
 }
 

@@ -69,6 +69,7 @@
     "deployImagesToContainerRegistry": {
       "value": true
     },
+    // Storage Account in which the persistent Pimcore files will be stored (e.g. assets)
     "storageAccountName": {
       "value": "mystorageaccount"
     },
