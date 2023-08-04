@@ -1,4 +1,4 @@
-This Docker image can be used to easily provision an Azure environment to host a Pimcore solution.
+This Docker image can be used to easily provision an Azure environment to host a Pimcore solution, leveraging Docker and [Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview).
 
 The topography of the resulting environment will look like:
 
