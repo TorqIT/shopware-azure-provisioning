@@ -1,5 +1,7 @@
 This Docker image can be used to easily provision an Azure environment to host a Pimcore solution.
 
+![Diagram](./architecture.drawio.svg)
+
 ## Initial provisioning
 
 Follow these steps to provision an environment for the first time:
