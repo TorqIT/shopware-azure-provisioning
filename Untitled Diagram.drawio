@@ -1,6 +1,6 @@
-<mxfile modified="2023-08-04T21:36:52.700Z" host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0" etag="XUKmLTF9PagWSeP21Rwr" version="21.1.4" type="github">
+<mxfile modified="2023-08-04T21:40:43.219Z" host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0" etag="G-SYb76-qNpoOfP_w9aD" version="21.1.4" type="github">
   <diagram id="WI9T0HZ2pTsCkuznbFz-" name="Page-1">
-    <mxGraphModel dx="1173" dy="703" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1242" dy="745" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -16,17 +16,14 @@
         <mxCell id="SgmOHQw0R8KX80-jazoh-5" value="&lt;div&gt;Resource Group&lt;/div&gt;" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/ResourceGroup.svg;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
           <mxGeometry x="59.99808510638299" width="70.8598509701003" height="56.687880776080235" as="geometry" />
         </mxCell>
-        <mxCell id="SgmOHQw0R8KX80-jazoh-48" value="Container Apps subnet (/23)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_network;pointerEvents=1;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
-          <mxGeometry x="290" y="105" width="50" height="27.500000000000004" as="geometry" />
-        </mxCell>
-        <mxCell id="SgmOHQw0R8KX80-jazoh-49" value="Database subnet (/28)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_network;pointerEvents=1;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
-          <mxGeometry x="540" y="132.5" width="50" height="27.500000000000004" as="geometry" />
-        </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-51" value="" style="group" vertex="1" connectable="0" parent="SgmOHQw0R8KX80-jazoh-47">
-          <mxGeometry x="150" y="105" width="330" height="365" as="geometry" />
+          <mxGeometry x="150" y="90" width="330" height="380" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-52" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-51">
-          <mxGeometry y="16.590909090909093" width="330" height="348.40909090909093" as="geometry" />
+          <mxGeometry y="17.272727272727273" width="330" height="362.72727272727275" as="geometry" />
+        </mxCell>
+        <mxCell id="SgmOHQw0R8KX80-jazoh-48" value="Container Apps subnet (/23)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_network;pointerEvents=1;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-51">
+          <mxGeometry x="140" y="3" width="50" height="27.500000000000004" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-16" value="Storage Account for DB backups" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/storage/Storage_Accounts.svg;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
           <mxGeometry x="695" y="218.5" width="65" height="52" as="geometry" />
@@ -42,6 +39,9 @@
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-55" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=1;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-54">
           <mxGeometry y="9.022727272727275" width="150" height="189.47727272727275" as="geometry" />
+        </mxCell>
+        <mxCell id="SgmOHQw0R8KX80-jazoh-49" value="Database subnet (/28)" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.virtual_network;pointerEvents=1;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
+          <mxGeometry x="540" y="131.5" width="50" height="27.500000000000004" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-23" value="Backup Vault" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Azure_Backup_Center.svg;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
           <mxGeometry x="830" y="375" width="68" height="62" as="geometry" />
@@ -59,7 +59,7 @@
           <mxGeometry x="302.5" y="500" width="65" height="52" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-12" value="Container Apps Environment" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Container_App_Environments.svg;" vertex="1" parent="1">
-          <mxGeometry x="302.5" y="277" width="68" height="68" as="geometry" />
+          <mxGeometry x="303" y="283.5" width="60.5" height="60.5" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-22" value="Container Registry" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/containers/Container_Registries.svg;" vertex="1" parent="1">
           <mxGeometry x="41.97999999999999" y="385" width="78.03" height="70" as="geometry" />
