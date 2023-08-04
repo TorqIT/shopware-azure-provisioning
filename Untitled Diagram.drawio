@@ -1,9 +1,12 @@
-<mxfile modified="2023-08-04T21:26:55.065Z" host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0" etag="IKEBGCq6Uq415THMzsqW" version="21.1.4" type="github">
+<mxfile modified="2023-08-04T21:36:52.700Z" host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0" etag="XUKmLTF9PagWSeP21Rwr" version="21.1.4" type="github">
   <diagram id="WI9T0HZ2pTsCkuznbFz-" name="Page-1">
-    <mxGraphModel dx="1006" dy="603" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1173" dy="703" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="SgmOHQw0R8KX80-jazoh-24" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="190" width="700" height="420" as="geometry" />
+        </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-47" value="" style="group" vertex="1" connectable="0" parent="1">
           <mxGeometry x="20" y="120" width="910" height="520" as="geometry" />
         </mxCell>
@@ -26,7 +29,7 @@
           <mxGeometry y="16.590909090909093" width="330" height="348.40909090909093" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-16" value="Storage Account for DB backups" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/storage/Storage_Accounts.svg;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
-          <mxGeometry x="690" y="218.5" width="65" height="52" as="geometry" />
+          <mxGeometry x="695" y="218.5" width="65" height="52" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-20" value="MySQL DB" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Database_for_MySQL_servers.svg;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
           <mxGeometry x="536.04" y="205" width="60.04" height="79" as="geometry" />
@@ -42,9 +45,6 @@
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-23" value="Backup Vault" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Azure_Backup_Center.svg;" vertex="1" parent="SgmOHQw0R8KX80-jazoh-47">
           <mxGeometry x="830" y="375" width="68" height="62" as="geometry" />
-        </mxCell>
-        <mxCell id="SgmOHQw0R8KX80-jazoh-24" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="140" y="190" width="700" height="420" as="geometry" />
         </mxCell>
         <mxCell id="SgmOHQw0R8KX80-jazoh-38" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#B266FF;" vertex="1" parent="1">
           <mxGeometry x="180" y="320" width="310" height="160" as="geometry" />
