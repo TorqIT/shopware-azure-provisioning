@@ -97,6 +97,8 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = {
   dependsOn: [storageAccount]
   params: {
     storageAccountName: storageAccountName
+    containerName: containerName
+    assetsContainerName: assetsContainerName
     location: location
   }
 }

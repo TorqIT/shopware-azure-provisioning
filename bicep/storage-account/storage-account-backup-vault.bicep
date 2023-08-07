@@ -1,4 +1,6 @@
 param storageAccountName string
+param containerName string
+param assetsContainerName string
 param location string = resourceGroup().location
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
@@ -106,7 +108,7 @@ resource backupVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
   }
 }
 
-resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2022-09-01-preview' = {
+resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2023-01-01' = {
   parent: backupVault
   name: 'storage-account-backup-instance'
   dependsOn: [backupVaultRoleAssignment]
@@ -122,6 +124,17 @@ resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2022-09
     }
     policyInfo: {
       policyId: policy.id
+      policyParameters: {
+        backupDatasourceParametersList: [
+          {
+            containersList: [
+              containerName
+              assetsContainerName
+            ]
+            objectType: 'BlobBackupDatasourceParameters'
+          }
+        ]
+      }
     }
   }
 }
