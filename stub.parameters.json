@@ -184,6 +184,10 @@
     "phpFpmMemory": {
       "value": "2Gi"
     },
+    // Set to true if the webapp can be scaled to zero during inactivity. This may be desirable for dev/testing applications as a cost-saving measure.
+    "phpFpmScaleToZero": {
+      "value": false
+    },
     "supervisordContainerAppName": {
       "value": "my-supervisord-container-app"
     },
