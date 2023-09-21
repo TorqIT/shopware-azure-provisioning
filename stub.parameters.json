@@ -39,7 +39,9 @@
     },
     // The resource group in which the VNet exists. If set to a resource group different than
     // the one used for the rest of the resources, it will be assumed that the VNet already
-    // exists there and no deployment will occur
+    // exists there and no deployment will occur. Note that when integrating with an
+    // existing Virtual Network in another Resource Group, the user you use to run these scripts
+    // will need at least the "Network Contributor" role on the Virtual Network.
     "virtualNetworkResourceGroupName": {
       "value": "my-resource-group"
     },
