@@ -39,7 +39,7 @@ Follow these steps to provision an environment for the first time:
 7. Run `./provision.sh parameters.json` to provision the Azure environment.
 8. Once provisioned, follow these steps to seed the database with the Pimcore schema:
    1. Make up a secure password that you will use to log into the Pimcore admin panel and save it somewhere secure such as a password manager, or within the key vault you created earlier. Note that symbols such as % and # will not work with the bash command below, so a long alphanumeric password should be used.
-   2. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`.
+   2. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`. Additionally, your Symfony database connection string (usually present in `config/database.yaml`) must be configured to use the certificate (e.g. `options: !php/const:PDO::MYSQL_ATTR_SSL_CA: '/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem'`). If this is not properly set, the command below will fail with "Connections using insecure transport are prohibited".
    3. Run `az containerapp exec --resource-group <your-resource-group> --name <your-php-fpm-container-app> --command bash` to enter the Container App's shell.
    4. Run the following command to seed the database:
       ```bash
