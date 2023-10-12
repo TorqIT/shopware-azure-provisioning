@@ -52,7 +52,6 @@ Follow these steps to provision an environment for the first time:
         --mysql-username=$DATABASE_USER \
         --mysql-password=$DATABASE_PASSWORD \
         --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem \
-        --ignore-existing-config \
         --skip-database-config
       ```
 
