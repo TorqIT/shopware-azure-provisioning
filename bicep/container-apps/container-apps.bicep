@@ -48,6 +48,12 @@ param additionalEnvVars array
 @secure()
 param databasePassword string
 
+param provisionForPortalEngine bool
+param elasticsearchContainerAppName string
+param elasticsearchNodeName string
+param elasticsearchCpuCores string
+param elasticsearchMemory string
+
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
   params: {
@@ -107,6 +113,7 @@ module environmentVariables 'container-apps-variables.bicep' = {
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
+    elasticSearchHost: elasticsearchContainerAppName
     additionalVars: additionalEnvVars
   }
 }
@@ -176,3 +183,15 @@ module redisContainerApp 'container-apps-redis.bicep' = {
   }
 }
 
+module elasticsearchContainerApp 'portal-engine/container-apps-elasticsearch.bicep' = if (provisionForPortalEngine) {
+  name: 'elasticsearch-container-app'
+  dependsOn: [containerAppsEnvironment]
+  params: {
+    location: location
+    containerAppName: elasticsearchContainerAppName
+    containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
+    cpuCores: elasticsearchCpuCores
+    memory: elasticsearchMemory
+    nodeName: elasticsearchNodeName
+  }
+}

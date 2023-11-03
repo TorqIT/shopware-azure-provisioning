@@ -127,6 +127,11 @@ param pimcoreEnvironment string
 param redisDb string
 param redisSessionDb string
 param additionalEnvVars array = []
+param provisionForPortalEngine bool = false
+param elasticsearchContainerAppName string = ''
+param elasticsearchCpuCores string = ''
+param elasticsearchMemory string = ''
+param elasticsearchNodeName string = ''
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
   dependsOn: [virtualNetwork, storageAccount, containerRegistry, database]
@@ -169,6 +174,11 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    provisionForPortalEngine: provisionForPortalEngine
+    elasticsearchContainerAppName: elasticsearchContainerAppName
+    elasticsearchCpuCores: elasticsearchCpuCores
+    elasticsearchMemory: elasticsearchMemory
+    elasticsearchNodeName: elasticsearchNodeName
   }
 }
 

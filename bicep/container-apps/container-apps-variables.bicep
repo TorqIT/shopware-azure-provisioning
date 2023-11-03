@@ -13,6 +13,7 @@ param pimcoreEnvironment string
 param redisDb string
 param redisHost string
 param redisSessionDb string
+param elasticSearchHost string
 param additionalVars array
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
@@ -94,4 +95,9 @@ var defaultEnvVars = [
   }
 ]
 
-output envVars array = concat(defaultEnvVars, additionalVars)
+var elasticSearchHostVar = {
+  name: 'ELASTICSEARCH_HOST'
+  value: elasticSearchHost
+}
+
+output envVars array = elasticSearchHost != '' ? concat(defaultEnvVars, additionalVars, [elasticSearchHostVar]) : concat(defaultEnvVars, additionalVars)

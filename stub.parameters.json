@@ -203,6 +203,7 @@
       "value": "0.5Gi"
     },
     "redisContainerAppName": {
+      // It will be possible to access this container using this name from the other Container Apps in your configured environment
       "value": "my-redis-container-app"
     },
     "redisImageName": {
@@ -268,6 +269,24 @@
           }
         ]
       }
+    },
+    // The following parameters are only necessary if you wish to provision an Elasticsearch Container App for use with Pimcore Portal Engine
+    // (i.e. set provisionForPortalEngine to true)
+    "provisionForPortalEngine": {
+      "value": false
+    },
+    "elasticsearchContainerAppName": {
+      // It will be possible to access this container using this name from the other Container Apps in your configured environment
+      "value": "my-elasticsearch-container-app"
+    },
+    "elasticsearchCpuCores": {
+      "value": "0.5"
+    },
+    "elasticsearchMemory": {
+      "value": "1Gi"
+    },
+    "elasticsearchNodeName": {
+      "value": "my-elasticsearch-node"
     }
   }
 }

@@ -17,7 +17,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
 }
 var subnetId = subnet.id
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-03-01' = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-02-preview' = {
   name: name
   location: location
   properties: {
