@@ -18,10 +18,10 @@ Follow these steps to provision an environment for the first time:
            - /var/run/docker.sock:/var/run/docker.sock
            # Volume mount in your parameter file as needed - copy this from stub.parameters.json and
            # fill in your preferred values
-           - ./azure/parameters.json:/azure/parameters.json
+           - ./azure/parameters.json:/azure/parameters.json:rw
            # You may also want to declare per-environment files like so
-           - ./azure/parameters.dev.json:/azure/parameters.dev.json
-           - ./azure/parameters.prod.json:/azure/parameters.prod.json
+           - ./azure/parameters.dev.json:/azure/parameters.dev.json:rw
+           - ./azure/parameters.prod.json:/azure/parameters.prod.json:rw
          environment:
            # These vars are required so that the scripts can properly tag and
            # push the necessary images to Azure. Ensure these images are built
