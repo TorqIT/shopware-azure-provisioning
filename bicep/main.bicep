@@ -193,3 +193,4 @@ param servicePrincipalName string = ''
 param deployImagesToContainerRegistry bool = false
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
+param waitForKeyVaultManualIntervention bool = false

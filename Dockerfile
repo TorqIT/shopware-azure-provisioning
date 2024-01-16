@@ -1,9 +1,14 @@
-FROM ubuntu:20.04
+FROM mcr.microsoft.com/azure-cli
 
-RUN apt-get update && \
-    apt-get install curl vim docker.io jq -y && \
-    # Install Azure CLI
-    curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+# Install cURL
+RUN apk update -qq && \
+    apk add curl
+
+# Install Docker
+ENV DOCKER_CHANNEL stable
+ENV DOCKER_VERSION 20.10.21
+ENV DOCKER_API_VERSION 1.41
+RUN curl -fsSL "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/x86_64/docker-${DOCKER_VERSION}.tgz" | tar -xzC /usr/local/bin --strip=1 docker/docker
 
 # Required to use Bicep templates
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
@@ -11,13 +16,11 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 # Install AZ CLI extensions
 RUN az config set bicep.use_binary_from_path=false
 RUN az bicep install
-RUN az bicep upgrade
 RUN az extension add -n containerapp
 RUN az extension add -n storage-preview
 
 ADD /*.sh /azure/
 ADD /bicep /azure/bicep
-ADD /scripts /azure/scripts
 
 WORKDIR /azure
 

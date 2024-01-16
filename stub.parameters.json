@@ -22,9 +22,14 @@
     "keyVaultName": {
       "value": "my-key-vault-name"
     },
-    // The resource group in which the Key Vault exists.
+    // The resource group in which the Key Vault resides.
     "keyVaultResourceGroupName": {
       "value": "my-key-vault-resource-group"
+    },
+    // Set this to true on initial provisioning to pause the scripts, allowing you to add any necessary secrets
+    // to the Key Vault required by the rest of the process
+    "waitForKeyVaultManualIntervention": {
+      "value": true
     },
     "containerRegistryName": {
       "value": "mycontainerregistry"
