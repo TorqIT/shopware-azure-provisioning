@@ -19,9 +19,11 @@ RUN az bicep install
 RUN az extension add -n containerapp
 RUN az extension add -n storage-preview
 
+# Add Bicep templates and scripts
+RUN mkdir -p azure/bicep && mkdir -p azure/scripts
 ADD /*.sh /azure
-ADD /scripts /azure/scripts
 ADD /bicep /azure/bicep
+ADD /scripts /azure/scripts
 
 WORKDIR /azure
 
