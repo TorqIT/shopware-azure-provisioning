@@ -58,7 +58,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     cdnAssetAccess: storageAccountCdnAccess
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
-    virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
   }
 }
@@ -78,7 +78,7 @@ param databaseBackupsStorageAccountContainerName string = 'database-backups'
 param databaseBackupsStorageAccountSku string = 'Standard_LRS'
 module database 'database/database.bicep' = {
   name: 'database'
-  dependsOn: [virtualNetwork]
+  dependsOn: [virtualNetwork, storageAccount]
   params: {
     location: location
     administratorLogin: databaseAdminUsername
@@ -89,7 +89,7 @@ module database 'database/database.bicep' = {
     skuTier: databaseSkuTier
     storageSizeGB: databaseStorageSizeGB
     virtualNetworkName: virtualNetworkName
-    virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
     virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     backupRetentionDays: databaseBackupRetentionDays
@@ -97,6 +97,7 @@ module database 'database/database.bicep' = {
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     databaseBackupStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     databaseBackupsStorageAccountSku: databaseBackupsStorageAccountSku
+    storageAccountPrivateDnsZoneId: storageAccount.outputs.privateDnsZoneId
   }
 }
 
