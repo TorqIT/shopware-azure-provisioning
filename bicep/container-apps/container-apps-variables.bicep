@@ -3,6 +3,7 @@ param appEnv string
 param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
+param databaseLongTermBackups bool
 param databaseBackupsStorageAccountName string
 param databaseBackupsStorageAccountContainerName string
 param databaseServerName string
@@ -62,18 +63,6 @@ var defaultEnvVars = [
     secretRef: 'database-password'
   }
   {
-    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_NAME'
-    value: databaseBackupsStorageAccountName
-  }
-  {
-    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_CONTAINER_NAME'
-    value: databaseBackupsStorageAccountContainerName
-  }
-  {
-    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_KEY'
-    secretRef: 'database-backups-storage-account-key'
-  }
-  {
     name: 'PIMCORE_DEV'
     value: pimcoreDev
   }
@@ -95,9 +84,24 @@ var defaultEnvVars = [
   }
 ]
 
-var elasticSearchHostVar = {
+var elasticSearchHostVar = elasticSearchHost != '' ? {
   name: 'ELASTICSEARCH_HOST'
   value: elasticSearchHost
-}
+}: {}
 
-output envVars array = elasticSearchHost != '' ? concat(defaultEnvVars, additionalVars, [elasticSearchHostVar]) : concat(defaultEnvVars, additionalVars)
+var longTermDatabaseBackupsVars = (databaseLongTermBackups) ? [
+  {
+    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_NAME'
+    value: databaseBackupsStorageAccountName
+  }
+  {
+    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_CONTAINER_NAME'
+    value: databaseBackupsStorageAccountContainerName
+  }
+  {
+    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_KEY'
+    secretRef: 'database-backups-storage-account-key'
+  }
+] : []
+
+output envVars array = concat(defaultEnvVars, additionalVars, [elasticSearchHostVar], longTermDatabaseBackupsVars)

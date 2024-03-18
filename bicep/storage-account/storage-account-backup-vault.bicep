@@ -1,3 +1,4 @@
+param name string
 param storageAccountName string
 param containerName string
 param assetsContainerName string
@@ -9,7 +10,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing 
 }
 
 resource backupVault 'Microsoft.DataProtection/backupVaults@2022-09-01-preview' = {
-  name: '${storageAccountName}-backup-vault'
+  name: name
   location: location
   identity: {
     type: 'SystemAssigned'

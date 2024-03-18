@@ -1,9 +1,12 @@
 param location string = resourceGroup().location
 
 param storageAccountName string
+param privateDnsZoneId string
 param virtualNetworkName string
 param virtualNetworkResourceGroupName string
 param virtualNetworkSubnetName string
+param privateEndpointName string
+param privateEndpointNicName string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
@@ -19,26 +22,8 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
   name: virtualNetworkSubnetName
 }
 
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.blob.${environment().suffixes.storage}'
-  location: 'global'
-
-  resource vnetLink 'virtualNetworkLinks' = {
-    name: 'vnet-link'
-    location: 'global' 
-    properties: {
-      registrationEnabled: false
-      virtualNetwork: {
-        id: virtualNetwork.id
-      }
-    }
-  }
-}
-// This DNS Zone is used by other Storage Accounts, so we output the ID
-output privateDnsZoneId string = privateDnsZone.id
-
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
-  name: '${storageAccountName}-private-endpoint'
+  name: privateEndpointName
   location: location
   properties: {
     subnet: {
@@ -53,6 +38,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
         }
       }
     ]
+    customNetworkInterfaceName: !empty(privateEndpointNicName) ? privateEndpointNicName : null
   }
 
   resource privateDnsZoneGroup 'privateDnsZoneGroups' = {
@@ -62,7 +48,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
         {
           name: 'privatelink-blob-core-windows-net'
           properties: {
-            privateDnsZoneId: privateDnsZone.id
+            privateDnsZoneId: privateDnsZoneId
           }
         }
       ]

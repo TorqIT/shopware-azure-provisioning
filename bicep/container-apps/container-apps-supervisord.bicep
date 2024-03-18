@@ -17,6 +17,9 @@ param storageAccountKeySecret object
 @secure()
 param databaseBackupsStorageAccountKeySecret object
 
+// TODO really don't like this
+var secrets = empty(databaseBackupsStorageAccountKeySecret) ? [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret] : [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
+
 resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
   location: location
@@ -24,7 +27,7 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
     managedEnvironmentId: containerAppsEnvironmentId
     configuration: {
       activeRevisionsMode: 'Single'
-      secrets: [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
+      secrets: secrets
       registries: [
         containerRegistryConfiguration
       ]
@@ -36,7 +39,7 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           env: environmentVariables
           resources: {
-            cpu: cpuCores
+            cpu: json(cpuCores)
             memory: memory
           }
         }

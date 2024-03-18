@@ -15,15 +15,20 @@ param geoRedundantBackup bool
 
 param databaseName string
 
+param longTermBackups bool
 param databaseBackupsStorageAccountName string
 param databaseBackupStorageAccountContainerName string
 param databaseBackupsStorageAccountSku string
-param storageAccountPrivateDnsZoneId string
+param databaseBackupsStorageAccountPrivateEndpointName string
+param databaseBackupsStorageAccountPrivateEndpointNicName string
 
 param virtualNetworkResourceGroupName string
 param virtualNetworkName string
 param virtualNetworkDatabaseSubnetName string
-param virtualNetworkContainerAppsSubnetName string
+param virtualNetworkStorageAccountPrivateEndpointSubnetName string
+
+param privateDnsZoneForDatabaseId string
+param privateDnsZoneForStorageAccountsId string
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroupName)
@@ -34,25 +39,7 @@ resource databaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' e
   name: virtualNetworkDatabaseSubnetName
 }
 
-// A private DNS zone is required for VNet integration
-resource privateDNSzoneForDatabase 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: '${serverName}.private.mysql.database.azure.com'
-  location: 'global'
-}
-resource virtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: privateDNSzoneForDatabase
-  name: 'virtualNetworkLink'
-  location: 'global'
-  properties: {
-    virtualNetwork: {
-      id: virtualNetwork.id
-    }
-    registrationEnabled: true
-  }
-}
-
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
-  dependsOn: [virtualNetworkLink]
   name: serverName
   location: location
   sku: {
@@ -68,7 +55,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
     }
     network: {
       delegatedSubnetResourceId: databaseSubnet.id
-      privateDnsZoneResourceId: privateDNSzoneForDatabase.id
+      privateDnsZoneResourceId: privateDnsZoneForDatabaseId
     }
     backup: {
       backupRetentionDays: backupRetentionDays
@@ -85,7 +72,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
   }
 }
 
-module databaseBackupStorageAccount './database-backup-storage-account.bicep' = {
+module databaseBackupStorageAccount './database-backup-storage-account.bicep' = if (longTermBackups) {
   name: 'database-backup-storage-account'
   params: {
     location: location
@@ -94,7 +81,9 @@ module databaseBackupStorageAccount './database-backup-storage-account.bicep' = 
     storageAccountContainerName: databaseBackupStorageAccountContainerName
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
-    virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
-    privateDnsZoneId: storageAccountPrivateDnsZoneId
+    virtualNetworkSubnetName: virtualNetworkStorageAccountPrivateEndpointSubnetName
+    privateDnsZoneId: privateDnsZoneForStorageAccountsId
+    privateEndpointName: databaseBackupsStorageAccountPrivateEndpointName
+    privateEndpointNetworkInterfaceName: databaseBackupsStorageAccountPrivateEndpointNicName
   }
 }

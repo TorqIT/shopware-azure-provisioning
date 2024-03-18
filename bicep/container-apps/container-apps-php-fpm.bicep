@@ -11,6 +11,7 @@ param cpuCores string
 param memory string
 param useProbes bool
 param scaleToZero bool
+param maxReplicas int
 @secure()
 param databasePasswordSecret object
 @secure()
@@ -31,6 +32,9 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
+// TODO really don't like this
+var secrets = empty(databaseBackupsStorageAccountKeySecret) ? [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret] : [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
+
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
   location: location
@@ -38,7 +42,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
     managedEnvironmentId: containerAppsEnvironmentId
     configuration: {
       activeRevisionsMode: 'Multiple'
-      secrets: [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
+      secrets: secrets
       registries: [
         containerRegistryConfiguration
       ]
@@ -70,7 +74,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           env: environmentVariables
           resources: {
-            cpu: cpuCores
+            cpu: json(cpuCores)
             memory: memory
           }
           probes: useProbes ? [
@@ -93,7 +97,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
       ]
       scale: {
         minReplicas: scaleToZero ? 0: 1
-        maxReplicas: 5
+        maxReplicas: maxReplicas
         rules: [
           {
             name: 'http-scaling'

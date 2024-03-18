@@ -9,9 +9,16 @@ param assetsContainerName string
 param cdnAssetAccess bool
 param shortTermBackupRetentionDays int
 
+param privateDnsZoneId string
+param privateEndpointName string
+param privateEndpointNicName string
+
 param virtualNetworkName string
 param virtualNetworkResourceGroupName string
-param virtualNetworkSubnetName string
+param virtualNetworkPrivateEndpointSubnetName string
+
+param longTermBackups bool
+param backupVaultName string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
@@ -82,21 +89,24 @@ module storageAccountPrivateEndpoint './storage-account-private-endpoint.bicep' 
   params: {
     location: location
     storageAccountName: storageAccountName
+    privateDnsZoneId: privateDnsZoneId
+    privateEndpointName: privateEndpointName
+    privateEndpointNicName: privateEndpointNicName
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
-    virtualNetworkSubnetName: virtualNetworkSubnetName
+    virtualNetworkSubnetName: virtualNetworkPrivateEndpointSubnetName
   }
 }
-output privateDnsZoneId string = storageAccountPrivateEndpoint.outputs.privateDnsZoneId
 
-module storageAccountBackupVault './storage-account-backup-vault.bicep' = {
+module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (longTermBackups) {
   name: 'storage-account-backup-vault'
   dependsOn: [storageAccount]
   params: {
+    location: location
+    name: backupVaultName
     storageAccountName: storageAccountName
     containerName: containerName
     assetsContainerName: assetsContainerName
-    location: location
   }
 }
 

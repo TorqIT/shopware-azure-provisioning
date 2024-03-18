@@ -14,6 +14,7 @@ param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 
+param databaseLongTermBackups bool
 param databaseBackupsStorageAccountName string
 param databaseBackupsStorageAccountContainerName string
 
@@ -25,6 +26,7 @@ param phpFpmContainerAppUseProbes bool
 param phpFpmCpuCores string
 param phpFpmMemory string
 param phpFpmScaleToZero bool
+param phpFpmMaxReplicas int
 
 param supervisordContainerAppName string
 param supervisordImageName string
@@ -72,7 +74,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' e
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
-resource databaseBackupsStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+resource databaseBackupsStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = if (databaseLongTermBackups) {
   name: databaseBackupsStorageAccountName
 }
 
@@ -89,10 +91,10 @@ var databasePasswordSecret = {
   name: 'database-password'
   value: databasePassword
 }
-var databaseBackupsStorageAccountKeySecret = {
+var databaseBackupsStorageAccountKeySecret = (databaseLongTermBackups) ? {
   name: 'database-backups-storage-account-key'
   value: databaseBackupsStorageAccount.listKeys().keys[0].value
-}
+} : {}
 
 // Set up common environment variables for the PHP-FPM and supervisord Container Apps
 module environmentVariables 'container-apps-variables.bicep' = {
@@ -111,6 +113,7 @@ module environmentVariables 'container-apps-variables.bicep' = {
     storageAccountName: storageAccountName
     storageAccountContainerName: storageAccountContainerName
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
+    databaseLongTermBackups: databaseLongTermBackups
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     elasticSearchHost: elasticsearchContainerAppName
@@ -139,6 +142,7 @@ module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
     memory: phpFpmMemory
     useProbes: phpFpmContainerAppUseProbes
     scaleToZero: phpFpmScaleToZero
+    maxReplicas: phpFpmMaxReplicas
     customDomains: phpFpmContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret

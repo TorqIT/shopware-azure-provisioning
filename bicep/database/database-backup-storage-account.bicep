@@ -3,15 +3,18 @@
 
 param location string = resourceGroup().location
 
-param storageAccountName string
-param storageAccountSku string
-param storageAccountContainerName string
 param virtualNetworkName string
 param virtualNetworkResourceGroupName string
 param virtualNetworkSubnetName string
-// Since Azure only permits a single Private DNS Zone per Resource Group per resource type (in this case, Storage Accounts), we 
-// re-use the Zone created for the main Storage Account
+
+param storageAccountName string
+param storageAccountSku string
+param storageAccountContainerName string
+
 param privateDnsZoneId string
+
+param privateEndpointName string
+param privateEndpointNetworkInterfaceName string
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' existing = {
   name: virtualNetworkName
@@ -46,7 +49,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 }
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
-  name: '${storageAccountName}-private-endpoint'
+  name: privateEndpointName
   location: location
   properties: {
     subnet: {
@@ -61,6 +64,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
         }
       }
     ]
+    customNetworkInterfaceName: !empty(privateEndpointNetworkInterfaceName) ? privateEndpointNetworkInterfaceName : null
   }
 
   resource privateDnsZoneGroup 'privateDnsZoneGroups' = {

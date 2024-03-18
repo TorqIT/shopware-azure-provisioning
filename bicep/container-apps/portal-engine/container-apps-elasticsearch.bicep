@@ -44,7 +44,7 @@ resource elasticsearchContainerApp 'Microsoft.App/containerApps@2023-05-02-previ
             }
           ]
           resources: {
-            cpu: cpuCores
+            cpu: json(cpuCores)
             memory: memory
           }
         }
