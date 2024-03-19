@@ -84,10 +84,10 @@ var defaultEnvVars = [
   }
 ]
 
-var elasticSearchHostVar = elasticSearchHost != '' ? {
+var elasticSearchVars = elasticSearchHost != '' ? [{
   name: 'ELASTICSEARCH_HOST'
   value: elasticSearchHost
-}: {}
+}]: []
 
 var longTermDatabaseBackupsVars = (databaseLongTermBackups) ? [
   {
@@ -104,4 +104,4 @@ var longTermDatabaseBackupsVars = (databaseLongTermBackups) ? [
   }
 ] : []
 
-output envVars array = concat(defaultEnvVars, additionalVars, [elasticSearchHostVar], longTermDatabaseBackupsVars)
+output envVars array = concat(defaultEnvVars, additionalVars, elasticSearchVars, longTermDatabaseBackupsVars)
