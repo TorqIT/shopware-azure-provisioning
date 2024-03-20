@@ -15,6 +15,7 @@ param redisDb string
 param redisHost string
 param redisSessionDb string
 param elasticSearchHost string
+param openSearchHost string
 param additionalVars array
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
@@ -89,6 +90,11 @@ var elasticSearchVars = elasticSearchHost != '' ? [{
   value: elasticSearchHost
 }]: []
 
+var openSearchVars = openSearchHost != '' ? [{
+  name: 'OPENSEARCH_HOST'
+  value: openSearchHost
+}]: []
+
 var longTermDatabaseBackupsVars = (databaseLongTermBackups) ? [
   {
     name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_NAME'
@@ -104,4 +110,4 @@ var longTermDatabaseBackupsVars = (databaseLongTermBackups) ? [
   }
 ] : []
 
-output envVars array = concat(defaultEnvVars, additionalVars, elasticSearchVars, longTermDatabaseBackupsVars)
+output envVars array = concat(defaultEnvVars, additionalVars, elasticSearchVars, openSearchVars, longTermDatabaseBackupsVars)

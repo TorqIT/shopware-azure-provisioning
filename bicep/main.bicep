@@ -165,11 +165,15 @@ param pimcoreEnvironment string
 param redisDb string
 param redisSessionDb string
 param additionalEnvVars array = []
-param provisionForPortalEngine bool = false
+param provisionElasticsearch bool = false
 param elasticsearchContainerAppName string = ''
 param elasticsearchCpuCores string = ''
 param elasticsearchMemory string = ''
 param elasticsearchNodeName string = ''
+param provisionOpenSearch bool = false
+param openSearchContainerAppName string = ''
+param openSearchCpuCores string = ''
+param openSearchMemory string = ''
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
   dependsOn: [virtualNetwork, containerRegistry, storageAccount, database]
@@ -214,11 +218,15 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
-    provisionForPortalEngine: provisionForPortalEngine
+    provisionElasticsearch: provisionElasticsearch
     elasticsearchContainerAppName: elasticsearchContainerAppName
     elasticsearchCpuCores: elasticsearchCpuCores
     elasticsearchMemory: elasticsearchMemory
     elasticsearchNodeName: elasticsearchNodeName
+    provisionOpenSearch: provisionOpenSearch
+    openSearchContainerAppName: openSearchContainerAppName
+    openSearchCpuCores: openSearchCpuCores
+    openSearchMemory: openSearchMemory
   }
 }
 

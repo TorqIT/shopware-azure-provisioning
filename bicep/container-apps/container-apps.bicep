@@ -50,11 +50,16 @@ param additionalEnvVars array
 @secure()
 param databasePassword string
 
-param provisionForPortalEngine bool
+param provisionElasticsearch bool
 param elasticsearchContainerAppName string
 param elasticsearchNodeName string
 param elasticsearchCpuCores string
 param elasticsearchMemory string
+
+param provisionOpenSearch bool
+param openSearchContainerAppName string
+param openSearchCpuCores string
+param openSearchMemory string
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
@@ -117,6 +122,7 @@ module environmentVariables 'container-apps-variables.bicep' = {
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     elasticSearchHost: elasticsearchContainerAppName
+    openSearchHost: openSearchContainerAppName
     additionalVars: additionalEnvVars
   }
 }
@@ -187,7 +193,7 @@ module redisContainerApp 'container-apps-redis.bicep' = {
   }
 }
 
-module elasticsearchContainerApp 'portal-engine/container-apps-elasticsearch.bicep' = if (provisionForPortalEngine) {
+module elasticsearchContainerApp './container-apps-elasticsearch.bicep' = if (provisionElasticsearch) {
   name: 'elasticsearch-container-app'
   dependsOn: [containerAppsEnvironment]
   params: {
@@ -197,5 +203,17 @@ module elasticsearchContainerApp 'portal-engine/container-apps-elasticsearch.bic
     cpuCores: elasticsearchCpuCores
     memory: elasticsearchMemory
     nodeName: elasticsearchNodeName
+  }
+}
+
+module openSearchContainerApp './container-apps-open-search.bicep' = if (provisionOpenSearch) {
+  name: 'open-search-container-app'
+  dependsOn: [containerAppsEnvironment]
+  params: {
+    location: location
+    containerAppName: openSearchContainerAppName
+    containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
+    cpuCores: openSearchCpuCores
+    memory: openSearchMemory
   }
 }
