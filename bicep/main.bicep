@@ -16,16 +16,16 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 
 // Virtual Network
 param virtualNetworkName string
-param virtualNetworkAddressSpace string
+param virtualNetworkAddressSpace string = '10.0.0.0/16'
+// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
 param virtualNetworkResourceGroupName string = resourceGroup().name
 param virtualNetworkContainerAppsSubnetName string = 'pimcore-container-apps'
-param virtualNetworkContainerAppsSubnetAddressSpace string
+param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
 param virtualNetworkDatabaseSubnetName string = 'pimcore-database'
-param virtualNetworkDatabaseSubnetAddressSpace string
+param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 // As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
 // subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
-// TODO conditionally support creation of above subnet in module below
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
