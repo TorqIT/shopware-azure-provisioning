@@ -6,7 +6,12 @@ param kind string
 param accessTier string
 param containerName string
 param assetsContainerName string
+
+@allowed(['public', 'partial', 'private'])
+param assetsContainerAccessLevel string
+param firewallIps array
 param cdnAssetAccess bool
+
 param shortTermBackupRetentionDays int
 
 param privateDnsZoneId string
@@ -30,11 +35,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   properties: {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
-    allowBlobPublicAccess: cdnAssetAccess
-    publicNetworkAccess: cdnAssetAccess ? 'Enabled' : 'Disabled'
     accessTier: accessTier
+    allowBlobPublicAccess: assetsContainerAccessLevel == 'public' || assetsContainerAccessLevel == 'partial'
+    publicNetworkAccess: assetsContainerAccessLevel == 'public' || assetsContainerAccessLevel == 'partial' ? 'Enabled' : 'Disabled'
     networkAcls: {
-      defaultAction: cdnAssetAccess ? 'Allow' : 'Deny'
+      ipRules: [for ip in firewallIps: {value: ip}]
+      defaultAction: assetsContainerAccessLevel == 'public' ? 'Allow' : 'Deny'
       bypass: 'None'
     }
     encryption: {
@@ -77,7 +83,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     resource storageAccountContainerAssets 'containers' = {
       name: assetsContainerName
       properties: {
-        publicAccess: cdnAssetAccess ? 'Blob' : 'None'
+        publicAccess: assetsContainerAccessLevel == 'public' || assetsContainerAccessLevel == 'partial' ? 'Blob' : 'None'
       }
     }
   }
