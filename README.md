@@ -22,6 +22,8 @@ Follow these steps to provision an environment for the first time:
            # You may also want to declare per-environment files like so
            - ./azure/parameters.dev.json:/azure/parameters.dev.json:rw
            - ./azure/parameters.prod.json:/azure/parameters.prod.json:rw
+           # Define a volume to hold your login information between container restarts
+           - azure:/root/.azure
          environment:
            # These vars are required so that the scripts can properly tag and
            # push the necessary images to Azure. Ensure these images are built
@@ -30,6 +32,8 @@ Follow these steps to provision an environment for the first time:
            - LOCAL_PHP_FPM_IMAGE=${LOCAL_PHP_FPM_IMAGE}
            - LOCAL_SUPERVISORD_IMAGE=${LOCAL_SUPERVISORD_IMAGE}
            - LOCAL_REDIS_IMAGE=${LOCAL_REDIS_IMAGE}
+   volumes:
+      azure:
    ```
 2. Update `parameters.json` with the appropriate values for your Azure environment. Note that the comments present in `stub.parameters.json` will need to be removed. Note that you will also need to remove the parameters related to custom domains and certificates (see section below) for the initial provisioning.
 3. Enter the container shell with `docker exec -it <container-name> bash`.
