@@ -73,11 +73,11 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2024-04-01
   }
 }
 
-// Built-in role definition for Backup Contributor. We get this definition so that we 
+// Built-in role definition for MySQL Backup And Export Operator. We get this definition so that we 
 // can assign it to the Backup Vault on the database, allowing it to perform its backups.
 resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
-  name: '5e467623-bb1f-42f4-a55d-6e525e11384b'
+  name: 'd18ad5f3-1baf-4119-b49b-d944edb1f9d0'
 }
 resource backupVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: database
