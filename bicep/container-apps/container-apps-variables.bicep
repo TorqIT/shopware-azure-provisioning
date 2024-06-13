@@ -3,9 +3,6 @@ param appEnv string
 param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
-param databaseLongTermBackups bool
-param databaseBackupsStorageAccountName string
-param databaseBackupsStorageAccountContainerName string
 param databaseServerName string
 param databaseName string
 param databaseUser string
@@ -95,19 +92,4 @@ var openSearchVars = openSearchHost != '' ? [{
   value: openSearchHost
 }]: []
 
-var longTermDatabaseBackupsVars = (databaseLongTermBackups) ? [
-  {
-    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_NAME'
-    value: databaseBackupsStorageAccountName
-  }
-  {
-    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_CONTAINER_NAME'
-    value: databaseBackupsStorageAccountContainerName
-  }
-  {
-    name: 'DATABASE_BACKUP_STORAGE_ACCOUNT_KEY'
-    secretRef: 'database-backups-storage-account-key'
-  }
-] : []
-
-output envVars array = concat(defaultEnvVars, additionalVars, elasticSearchVars, openSearchVars, longTermDatabaseBackupsVars)
+output envVars array = concat(defaultEnvVars, additionalVars, elasticSearchVars, openSearchVars)

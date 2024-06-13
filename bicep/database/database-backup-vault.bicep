@@ -1,26 +1,23 @@
 param location string = resourceGroup().location
 
 param backupVaultName string
-param storageAccountName string
-param containerName string
-param assetsContainerName string
+param databaseServerName string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
-  name: storageAccountName
-  scope: resourceGroup()
+resource database 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
+  name: databaseServerName
 }
 
-resource backupVault 'Microsoft.DataProtection/backupVaults@2022-09-01-preview' existing = {
+resource backupVault 'Microsoft.DataProtection/backupVaults@2024-04-01' existing = {
   name: backupVaultName
 }
 
-resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-09-01-preview' = {
+resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2024-04-01' = {
   parent: backupVault
-  name: 'storage-account-backup-policy'
+  name: 'database-backup-policy'
   properties: {
     objectType: 'BackupPolicy'
     datasourceTypes: [
-        'Microsoft.Storage/storageAccounts/blobServices'
+        'Microsoft.DBforMySQL/flexibleServers'
     ]
     policyRules: [
       {
@@ -42,18 +39,18 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-09-01
         ]
       }
       {
-        name: 'BackupMonthly'
+        name: 'BackupWeekly'
         objectType: 'AzureBackupRule'
         backupParameters: {
           objectType: 'AzureBackupParams'
-          backupType: 'Discrete'
+          backupType: 'Full'
         }
         trigger: {
           objectType: 'ScheduleBasedTriggerContext'
           schedule: {
             repeatingTimeIntervals: [
                 // This does not seem to function without a "start" date, so we place an arbitrary one here
-                'R/2023-07-01T00:00:00+00:00/P1M'
+                'R/2024-07-01T00:00:00+00:00/P1W'
             ]
             timeZone: 'UTC'
           }
@@ -76,14 +73,14 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-09-01
   }
 }
 
-// Built-in role definition for Storage Account Backup Contributor. We get this definition so that we 
-// can assign it to the Backup Vault on the Storage Account, allowing it to perform its backups.
+// Built-in role definition for Backup Contributor. We get this definition so that we 
+// can assign it to the Backup Vault on the database, allowing it to perform its backups.
 resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
-  name: 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1' 
+  name: '5e467623-bb1f-42f4-a55d-6e525e11384b'
 }
 resource backupVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: storageAccount
+  scope: database
   name: guid(resourceGroup().id, roleDefinition.id)
   properties: {
     roleDefinitionId: roleDefinition.id
@@ -92,33 +89,22 @@ resource backupVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
   }
 }
 
-resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2023-01-01' = {
+resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2024-04-01' = {
   parent: backupVault
-  name: 'storage-account-backup-instance'
+  name: 'database-backup-instance'
   dependsOn: [backupVaultRoleAssignment]
   properties: {
-    friendlyName: 'storage-account-backup-instance'
+    friendlyName: 'database-backup-instance'
     objectType: 'BackupInstance'
     dataSourceInfo: {
-      resourceName: storageAccount.name
-      resourceID: storageAccount.id
+      resourceName: database.name
+      resourceID: database.id
       objectType: 'Datasource'
       resourceLocation: location
-      datasourceType: 'Microsoft.Storage/storageAccounts/blobServices'
+      datasourceType: 'Microsoft.DBforMySQL/flexibleServers'
     }
     policyInfo: {
       policyId: policy.id
-      policyParameters: {
-        backupDatasourceParametersList: [
-          {
-            containersList: [
-              containerName
-              assetsContainerName
-            ]
-            objectType: 'BlobBackupDatasourceParameters'
-          }
-        ]
-      }
     }
   }
 }

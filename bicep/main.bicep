@@ -55,6 +55,17 @@ module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = {
   }
 }
 
+// Backup Vault
+// TODO remove once all clients are moved over to use this model - relic of previously using the Backup Vault for Storage Accounts only
+param storageAccountBackupVaultName string = '${storageAccountName}-backup-vault'
+param backupVaultName string = storageAccountBackupVaultName
+module backupVault 'backup-vault/backup-vault.bicep' = if (databaseLongTermBackups || storageAccountLongTermBackups) {
+  name: 'backup-vault'
+  params: {
+    name: backupVaultName
+  }
+}
+
 // Storage Account
 param storageAccountName string
 param storageAccountSku string = 'Standard_LRS'
@@ -69,11 +80,10 @@ param storageAccountCdnAccess bool = false
 param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
 param storageAccountPrivateEndpointNicName string = ''
-param storageAccountBackupVaultName string = '${storageAccountName}-backup-vault'
 param storageAccountLongTermBackups bool = true
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
-  dependsOn: [virtualNetwork, privateDnsZones]
+  dependsOn: [virtualNetwork, privateDnsZones, backupVault]
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -93,7 +103,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     privateEndpointName: storageAccountPrivateEndpointName
     privateEndpointNicName: storageAccountPrivateEndpointNicName
     longTermBackups: storageAccountLongTermBackups
-    backupVaultName: storageAccountBackupVaultName
+    backupVaultName: backupVaultName
   }
 }
 
@@ -107,15 +117,10 @@ param databaseStorageSizeGB int = 20
 param databaseName string = 'pimcore'
 param databaseBackupRetentionDays int = 7
 param databaseGeoRedundantBackup bool = false
-param databaseBackupsStorageAccountName string = '${databaseServerName}-backups-storage-account'
-param databaseBackupsStorageAccountContainerName string = 'database-backups'
-param databaseBackupsStorageAccountSku string = 'Standard_LRS'
-param databaseBackupsStorageAccountPrivateEndpointName string = '${databaseBackupsStorageAccountName}-private-endpoint'
-param databaseBackupsStorageAccountPrivateEndpointNicName string = ''
 param databaseLongTermBackups bool = true
 module database 'database/database.bicep' = {
   name: 'database'
-  dependsOn: [virtualNetwork, privateDnsZones]
+  dependsOn: [virtualNetwork, privateDnsZones, backupVault]
   params: {
     location: location
     administratorLogin: databaseAdminUsername
@@ -132,11 +137,7 @@ module database 'database/database.bicep' = {
     backupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
     longTermBackups: databaseLongTermBackups
-    databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
-    databaseBackupStorageAccountContainerName: databaseBackupsStorageAccountContainerName
-    databaseBackupsStorageAccountSku: databaseBackupsStorageAccountSku
-    databaseBackupsStorageAccountPrivateEndpointName: databaseBackupsStorageAccountPrivateEndpointName
-    databaseBackupsStorageAccountPrivateEndpointNicName: databaseBackupsStorageAccountPrivateEndpointNicName
+    backupVaultName: backupVaultName
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
     privateDnsZoneForStorageAccountsId: privateDnsZones.outputs.zoneIdForStorageAccounts
   }
@@ -237,9 +238,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
     storageAccountContainerName: storageAccountContainerName
     storageAccountName: storageAccountName
-    databaseLongTermBackups: databaseLongTermBackups
-    databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
-    databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     supervisordContainerAppName: supervisordContainerAppName
     supervisordImageName: supervisordImageName
     supervisordCpuCores: supervisordCpuCores

@@ -16,11 +16,7 @@ param geoRedundantBackup bool
 param databaseName string
 
 param longTermBackups bool
-param databaseBackupsStorageAccountName string
-param databaseBackupStorageAccountContainerName string
-param databaseBackupsStorageAccountSku string
-param databaseBackupsStorageAccountPrivateEndpointName string
-param databaseBackupsStorageAccountPrivateEndpointNicName string
+param backupVaultName string
 
 param virtualNetworkResourceGroupName string
 param virtualNetworkName string
@@ -72,18 +68,10 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
   }
 }
 
-module databaseBackupStorageAccount './database-backup-storage-account.bicep' = if (longTermBackups) {
-  name: 'database-backup-storage-account'
+module databaseBackupVaultPolicy 'database-backup-vault.bicep' = if (longTermBackups) {
+  name: 'database-backup-vault'
   params: {
-    location: location
-    storageAccountName: databaseBackupsStorageAccountName
-    storageAccountSku: databaseBackupsStorageAccountSku
-    storageAccountContainerName: databaseBackupStorageAccountContainerName
-    virtualNetworkName: virtualNetworkName
-    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
-    virtualNetworkSubnetName: virtualNetworkStorageAccountPrivateEndpointSubnetName
-    privateDnsZoneId: privateDnsZoneForStorageAccountsId
-    privateEndpointName: databaseBackupsStorageAccountPrivateEndpointName
-    privateEndpointNetworkInterfaceName: databaseBackupsStorageAccountPrivateEndpointNicName
+    backupVaultName: backupVaultName
+    databaseServerName: serverName
   }
 }

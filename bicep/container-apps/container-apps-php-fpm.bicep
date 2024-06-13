@@ -18,8 +18,6 @@ param databasePasswordSecret object
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
-@secure()
-param databaseBackupsStorageAccountKeySecret object
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -32,8 +30,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-// TODO really don't like this
-var secrets = empty(databaseBackupsStorageAccountKeySecret) ? [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret] : [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
+var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 
 resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName

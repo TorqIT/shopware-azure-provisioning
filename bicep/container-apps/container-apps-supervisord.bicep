@@ -14,11 +14,8 @@ param memory string
 param databasePasswordSecret object
 @secure()
 param storageAccountKeySecret object
-@secure()
-param databaseBackupsStorageAccountKeySecret object
 
-// TODO really don't like this
-var secrets = empty(databaseBackupsStorageAccountKeySecret) ? [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret] : [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, databaseBackupsStorageAccountKeySecret]
+var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 
 resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
