@@ -104,7 +104,7 @@ module storageAccountPrivateEndpoint './storage-account-private-endpoint.bicep' 
   }
 }
 
-module storageAccountBackupVaultPolicy './storage-account-backup-vault.bicep' = if (longTermBackups) {
+module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (longTermBackups) {
   name: 'storage-account-backup-vault'
   dependsOn: [storageAccount]
   params: {

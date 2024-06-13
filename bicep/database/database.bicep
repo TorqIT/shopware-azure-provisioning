@@ -68,7 +68,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
   }
 }
 
-module databaseBackupVaultPolicy 'database-backup-vault.bicep' = if (longTermBackups) {
+module databaseBackupVault 'database-backup-vault.bicep' = if (longTermBackups) {
   name: 'database-backup-vault'
   params: {
     backupVaultName: backupVaultName
