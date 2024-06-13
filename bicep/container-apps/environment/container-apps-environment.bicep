@@ -7,6 +7,8 @@ param virtualNetworkName string
 param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
+param logAnalyticsWorkspaceName string
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroup)
   name: virtualNetworkName
@@ -17,13 +19,24 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
 }
 var subnetId = subnet.id
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-02-preview' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
+
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name
   location: location
   properties: {
     vnetConfiguration: {
       internal: !phpFpmContainerAppExternal
       infrastructureSubnetId: subnetId
+    }
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+      logAnalyticsConfiguration: {
+        customerId: logAnalyticsWorkspace.properties.customerId
+        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
+      }
     }
   }
 }

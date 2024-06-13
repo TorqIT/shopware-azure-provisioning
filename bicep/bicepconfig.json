@@ -6,6 +6,9 @@
       "rules": {
         "no-unused-params": {
           "level": "off"
+        },
+        "secure-secrets-in-params": {
+          "level": "off"
         }
       }
     }

@@ -1,6 +1,7 @@
 param location string = resourceGroup().location
 
 param containerAppsEnvironmentName string
+param logAnalyticsWorkspaceName string
 
 param virtualNetworkName string
 param virtualNetworkResourceGroup string
@@ -17,6 +18,15 @@ param storageAccountAssetsContainerName string
 param databaseLongTermBackups bool
 param databaseBackupsStorageAccountName string
 param databaseBackupsStorageAccountContainerName string
+
+param provisionInit bool
+param initContainerAppJobName string
+param initContainerAppJobImageName string
+param initContainerAppJobCpuCores string
+param initContainerAppJobMemory string
+param initContainerAppJobRunPimcoreInstall bool
+@secure()
+param pimcoreAdminPassword string
 
 param phpFpmContainerAppExternal bool
 param phpFpmContainerAppCustomDomains array
@@ -70,6 +80,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
   }
 }
 
@@ -131,6 +142,31 @@ var containerRegistryConfiguration = {
   server: '${containerRegistryName}.azurecr.io'
   username: containerRegistry.listCredentials().username
   passwordSecretRef: 'container-registry-password'
+}
+
+// TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
+module initContainerAppJob 'container-app-job-init.bicep' = if (provisionInit) {
+  name: 'init-container-app-job'
+  dependsOn: [containerAppsEnvironment, environmentVariables]
+  params: {
+    location: location
+    containerAppJobName: initContainerAppJobName
+    imageName: initContainerAppJobImageName
+    cpuCores: initContainerAppJobCpuCores
+    memory: initContainerAppJobMemory
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerRegistryConfiguration: containerRegistryConfiguration
+    containerRegistryName: containerRegistryName
+    storageAccountKeySecret: storageAccountKeySecret
+    containerRegistryPasswordSecret: containerRegistryPasswordSecret
+    databasePasswordSecret: databasePasswordSecret
+    defaultEnvVars: environmentVariables.outputs.envVars
+    databaseServerName: databaseServerName
+    databaseName: databaseName
+    databaseUser: databaseUser
+    runPimcoreInstall: initContainerAppJobRunPimcoreInstall
+    pimcoreAdminPassword: pimcoreAdminPassword
+  }
 }
 
 module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {

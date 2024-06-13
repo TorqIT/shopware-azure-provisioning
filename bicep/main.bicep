@@ -142,8 +142,24 @@ module database 'database/database.bicep' = {
   }
 }
 
+param logAnalyticsWorkspaceName string = '${resourceGroupName}-log-analytics'
+module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bicep' = {
+  name: 'log-analytics-workspace'
+  params: {
+    name: logAnalyticsWorkspaceName
+  }
+}
+
 // Container Apps
 param containerAppsEnvironmentName string
+// TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
+param provisionInit bool = false
+param initContainerAppJobName string = ''
+param initImageName string = ''
+param initCpuCores string = '0.5'
+param initMemory string = '1Gi'
+param initContainerAppJobRunPimcoreInstall bool = false
+param pimcoreAdminPasswordSecretName string = 'pimcore-admin-password'
 param phpFpmContainerAppExternal bool = true
 param phpFpmContainerAppName string
 param phpFpmImageName string
@@ -181,18 +197,26 @@ param openSearchCpuCores string = ''
 param openSearchMemory string = ''
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database]
+  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
     appDebug: appDebug
     appEnv: appEnv
     containerAppsEnvironmentName: containerAppsEnvironmentName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     databaseName: databaseName
     databasePassword: keyVault.getSecret(databasePasswordSecretName)
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
+    provisionInit: provisionInit
+    initContainerAppJobName: initContainerAppJobName
+    initContainerAppJobImageName: initImageName
+    initContainerAppJobCpuCores: initCpuCores
+    initContainerAppJobMemory: initMemory
+    initContainerAppJobRunPimcoreInstall: initContainerAppJobRunPimcoreInstall
+    pimcoreAdminPassword: provisionInit ? keyVault.getSecret(pimcoreAdminPasswordSecretName) : ''
     phpFpmContainerAppName: phpFpmContainerAppName
     phpFpmContainerAppCustomDomains: phpFpmContainerAppCustomDomains
     phpFpmImageName: phpFpmImageName
