@@ -12,6 +12,9 @@ param memory string
 param useProbes bool
 param scaleToZero bool
 param maxReplicas int
+
+param provisionWeb2Print bool
+
 @secure()
 param databasePasswordSecret object
 @secure()
@@ -89,8 +92,16 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
                 path: '/'
               }
             }
-          ]: []
+          ] : []
         }
+        (provisionWeb2Print) ? {
+          name: 'gotenberg'
+          image: 'gotenberg/gotenberg:8'
+          resources: {
+            cpu: json('0.25')
+            memory: '0.5Gi'
+          }
+        } : {}
       ]
       scale: {
         minReplicas: scaleToZero ? 0: 1

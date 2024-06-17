@@ -33,6 +33,7 @@ param phpFpmCpuCores string
 param phpFpmMemory string
 param phpFpmScaleToZero bool
 param phpFpmMaxReplicas int
+param phpFpmProvisionWeb2Print bool
 
 param supervisordContainerAppName string
 param supervisordImageName string
@@ -172,6 +173,7 @@ module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
     scaleToZero: phpFpmScaleToZero
     maxReplicas: phpFpmMaxReplicas
     customDomains: phpFpmContainerAppCustomDomains
+    provisionWeb2Print: phpFpmProvisionWeb2Print
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
