@@ -170,15 +170,14 @@ param phpFpmCpuCores string = '1.0'
 param phpFpmMemory string = '2Gi'
 param phpFpmScaleToZero bool = false
 param phpFpmMaxReplicas int = 1
-param phpFpmProvisionWeb2Print bool = false
 param supervisordContainerAppName string
 param supervisordImageName string
 param supervisordCpuCores string = '0.25'
-param supervisordMemory string = '0.5Gi'
+param supervisordMemory string = '250Mi'
 param redisContainerAppName string
 param redisImageName string
 param redisCpuCores string = '0.25'
-param redisMemory string = '0.5Gi'
+param redisMemory string = '1Gi'
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
@@ -219,7 +218,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpFpmContainerAppUseProbes: phpFpmContainerAppUseProbes
     phpFpmScaleToZero: phpFpmScaleToZero
     phpFpmMaxReplicas: phpFpmMaxReplicas
-    phpFpmProvisionWeb2Print: phpFpmProvisionWeb2Print
     pimcoreDev: pimcoreDev
     pimcoreEnvironment: pimcoreEnvironment
     redisContainerAppName: redisContainerAppName
