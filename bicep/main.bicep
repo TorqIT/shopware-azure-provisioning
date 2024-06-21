@@ -141,7 +141,7 @@ module database 'database/database.bicep' = {
   }
 }
 
-// param logAnalyticsWorkspaceName string = '${resourceGroupName}-log-analytics'
+param logAnalyticsWorkspaceName string = '${resourceGroupName}-log-analytics'
 // module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bicep' = {
 //   name: 'log-analytics-workspace'
 //   params: {
