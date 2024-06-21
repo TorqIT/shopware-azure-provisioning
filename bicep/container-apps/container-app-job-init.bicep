@@ -30,10 +30,6 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
-  name: databaseServerName
-}
-
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
   name: containerAppJobName
