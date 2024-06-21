@@ -165,9 +165,6 @@
     "initContainerAppJobName": {
       "value": "my-init-container-app-job"
     },
-    "initImageName": {
-      "value": "my-init-image"
-    },
     "initCpuCores": {
       "value": "0.25"
     },

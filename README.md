@@ -25,7 +25,6 @@ Follow these steps to provision an environment for the first time:
            # push the necessary images to Azure. Ensure these images are built
            # and set the values here to match the image names (can be found by
            # running docker image ls).
-           - LOCAL_INIT_IMAGE=${LOCAL_INIT_IMAGE}
            - LOCAL_SHOPWARE_IMAGE=${LOCAL_SHOPWARE_IMAGE}
    volumes:
       azure:

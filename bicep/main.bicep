@@ -152,7 +152,6 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 // Container Apps
 param containerAppsEnvironmentName string
 param initContainerAppJobName string = ''
-param initImageName string = ''
 param initCpuCores string = '0.5'
 param initMemory string = '1Gi'
 param shopwareContainerAppExternal bool = true
@@ -183,7 +182,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
     initContainerAppJobName: initContainerAppJobName
-    initContainerAppJobImageName: initImageName
     initContainerAppJobCpuCores: initCpuCores
     initContainerAppJobMemory: initMemory
     shopwareContainerAppName: shopwareContainerAppName
