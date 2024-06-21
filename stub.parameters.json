@@ -76,7 +76,12 @@
     "deployImagesToContainerRegistry": {
       "value": true
     },
-    // Storage Account in which the persistent Pimcore files will be stored (e.g. assets)
+    // Name of the Backup Vault. Only valid if storageAccountLongTermBackups or databaseLongTermBackups
+    // is true.
+    "backupVaultName": {
+      "value": "my-backup-vault"
+    },
+    // Storage Account in which the persistent Shopware files will be stored (e.g. assets)
     "storageAccountName": {
       "value": "mystorageaccount"
     },
@@ -104,13 +109,17 @@
     "storageAccountBackupRetentionDays": {
       "value": 7
     },
-    // The container in which the majority of Pimcore files will be stored, excluding assets.
+    // The container in which the majority of Shopware files will be stored, excluding assets.
     "storageAccountContainerName": {
       "value": "mystorageaccountcontainer"
     },
-    // The container in which Pimcore assets will be stored
+    // The container in which Shopware assets will be stored
     "storageAccountAssetsContainerName": {
       "value": "mystorageaccountassetscontainer"
+    },
+    // Whether to store long-term backups of the Storage Account containers in the Backup Vault. Default value is true.
+    "storageAccountLongTermBackups": {
+      "value": true
     },
     "databaseServerName": {
       "value": "my-database-server"
@@ -136,7 +145,7 @@
       "value": 20
     },
     "databaseName": {
-      "value": "pimcore"
+      "value": "shopware"
     },
     // How long in days to keep point-in-time backups of the database. Valid values are
     // 1 through 35.
@@ -146,30 +155,38 @@
     "databaseGeoRedundantBackup": {
       "value": false
     },
-    "databaseBackupsStorageAccountName": {
-      "value": "my-database-backup-storage-account"
-    },
-    // The database backups Storage Account SKU. A complete list can be found here
-    // https://learn.microsoft.com/en-us/azure/templates/microsoft.storage/storageaccounts?pivots=deployment-language-bicep#sku.
-    "databaseBackupsStorageAccountSku": {
-      "value": "Standard_LRS"
+    // Whether to store long-term backups of the database in the Backup Vault. Default value is true.
+    "databaseLongTermBackups": {
+      "value": true
     },
     "containerAppsEnvironmentName": {
       "value": "my-container-apps-environment"
     },
-    // Whether the PHP-FPM (web) container should be available on the public internet. If false,
+    "initContainerAppJobName": {
+      "value": "my-init-container-app-job"
+    },
+    "initImageName": {
+      "value": "my-init-image"
+    },
+    "initCpuCores": {
+      "value": "0.25"
+    },
+    "initMemory": {
+      "value": "0.5Gi"
+    },
+    // Whether the web container should be available on the public internet. If false,
     // it will be restricted to be only accessible within the configured Virtual Network.
-    "phpFpmContainerAppExternal": {
+    "shopwareContainerAppExternal": {
       "value": true
     },
-    "phpFpmContainerAppName": {
-      "value": "my-php-fpm-container-app"
+    "shopwareContainerAppName": {
+      "value": "my-shopware-container-app"
     },
-    // Defines custom domains and their associated managed certificates for the PHP-FPM container app (the "web" container).
+    // Defines custom domains and their associated managed certificates for the web container app. 
     // When you are initially provisioning your environment, leave the "value" here as an empty array ([]), set up
     // the custom domain(s) in the portal, and add the values back here so that subsequent deployments will keep
     // the custom domains intact. For more information, see the README.
-    "phpFpmContainerAppCustomDomains": {
+    "shopwareContainerAppCustomDomains": {
       "value": [
         {
           "domainName": "my-custom.domain.com",
@@ -177,51 +194,27 @@
         }
       ]
     },
-    // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
-    "phpFpmContainerAppUseProbes": {
-      "value": false
-    },
-    "phpFpmImageName": {
-      "value": "my-php-fpm-image"
+    "shopwareImageName": {
+      "value": "my-shopware-image"
     },
     // Note that in all Container Apps, the memory must be twice the number of CPU cores (e.g. 0.25 cores and 0.5Gi, or 0.5 cores and 1Gi, etc.)
-    "phpFpmCpuCores": {
+    "shopwareContainerAppCpuCores": {
       "value": "1"
     },
-    "phpFpmMemory": {
+    "shopwareContainerAppMemory": {
       "value": "2Gi"
     },
-    // Set to true if the webapp can be scaled to zero during inactivity. This may be desirable for dev/testing applications as a cost-saving measure.
-    "phpFpmScaleToZero": {
-      "value": false
+    // Minimum number of parallel replicas to be running at a time. Default value is 1. Set to 0 to scale-to-zero during inactivity.
+    "shopwareContainerAppMinReplicas": {
+      "value": 1
     },
-    "supervisordContainerAppName": {
-      "value": "my-supervisord-container-app"
+    // Maximium number of parallel replicas to be running at a time. Default value is 1. 
+    "shopwareContainerAppMaxReplicas": {
+      "value": 2
     },
-    "supervisordImageName": {
-      "value": "my-supervisord-image"
-    },
-    "supervisordCpuCores": {
-      "value": "0.25"
-    },
-    "supervisordMemory": {
-      "value": "0.5Gi"
-    },
-    "redisContainerAppName": {
-      // It will be possible to access this container using this name from the other Container Apps in your configured environment
-      "value": "my-redis-container-app"
-    },
-    "redisImageName": {
-      "value": "my-redis-image"
-    },
-    "redisCpuCores": {
-      "value": "0.25"
-    },
-    "redisMemory": {
-      "value": "0.5Gi"
-    },
-    // The following values are the common environment variables used by Pimcore. These will
-    // be applied to both the PHP-FPM and supervisord containers.
+    // The following values are the common environment variables used by Shopware. Note that
+    // values such as database credentials are automatically configured by the script and do not
+    // need to be set here.
 
     // Debug setting for Symfony. Numerical string value of "0" (false) or "1" (true).
     "appDebug": {
@@ -231,25 +224,9 @@
     "appEnv": {
       "value": "dev"
     },
-    // Pimcore Dev mode setting. Numerical string of "0" (false) or "1" (true).
-    "pimcoreDev": {
-      "value": "1"
-    },
-    // Pimcore environment setting
-    "pimcoreEnvironment": {
-      "value": "dev"
-    },
-    // The Redis DB to use for caching. Numerical string value (e.g. "12")
-    "redisDb": {
-      "value": "12"
-    },
-    // The Redis DB to use for session storage. Numerical string value (e.g. "14")
-    "redisSessionDb": {
-      "value": "14"
-    },
     // Add any additional environment variables for your Container Apps here. Note that these will be applied
-    // to both the PHP-FPM and supervisord containers. Also note that environment variables that need to
-    // reference secret values should not be placed here - see additionalSecrets below.
+    // to the Shopware. Also note that environment variables that need to reference secret values should not 
+    // be placed here - see additionalSecrets below.
     "additionalEnvVars": {
       "value": [
         {
@@ -274,39 +251,6 @@
           }
         ]
       }
-    },
-    // The following parameters are only necessary if you wish to provision an Elasticsearch Container App
-    // (i.e. set provisionElasticsearch to true)
-    "provisionElasticsearch": {
-      "value": false
-    },
-    "elasticsearchContainerAppName": {
-      // It will be possible to access this container using this name from the other Container Apps in your configured environment
-      "value": "my-elasticsearch-container-app"
-    },
-    "elasticsearchCpuCores": {
-      "value": "0.5"
-    },
-    "elasticsearchMemory": {
-      "value": "1Gi"
-    },
-    "elasticsearchNodeName": {
-      "value": "my-elasticsearch-node"
-    },
-    // The following parameters are only necessary if you wish to provision an OpenSearch Container App
-    // (i.e. set provisionOpenSearch to true)
-    "provisionOpenSearch": {
-      "value": false
-    },
-    "openSearchContainerAppName": {
-      // It will be possible to access this container using this name from the other Container Apps in your configured environment
-      "value": "my-open-search-container-app"
-    },
-    "openSearchCpuCores": {
-      "value": "0.5"
-    },
-    "openSearchMemory": {
-      "value": "1Gi"
     }
   }
 }

@@ -11,7 +11,9 @@ echo Creating resource group $RESOURCE_GROUP in $LOCATION...
 az group create --location $LOCATION --name $RESOURCE_GROUP
 
 echo Creating service principal $SERVICE_PRINCIPAL_NAME...
-az ad sp create-for-rbac \
-    --role Contributor \
-    --scopes subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
-    --display-name $SERVICE_PRINCIPAL_NAME
+az ad sp create-for-rbac --display-name $SERVICE_PRINCIPAL_NAME
+
+az role assignment create \
+    --assignee "{assignee}" \
+    --role "{roleNameOrId}" \
+    --scope "/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceSubType}/{resourceName}"

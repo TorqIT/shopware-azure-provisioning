@@ -9,15 +9,16 @@ param containerRegistryConfiguration object
 param customDomains array
 param cpuCores string
 param memory string
-param useProbes bool
-param scaleToZero bool
+param minReplicas int
 param maxReplicas int
 @secure()
 param databasePasswordSecret object
 @secure()
 param containerRegistryPasswordSecret object
-@secure()
-param storageAccountKeySecret object
+// @secure()
+// param storageAccountKeySecret object
+
+var internalCaddyPort = 8000
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -30,9 +31,9 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
+var secrets = [databasePasswordSecret, containerRegistryPasswordSecret/*, storageAccountKeySecret*/]
 
-resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
+resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
   location: location
   properties: {
@@ -50,7 +51,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
         // Apps Environment, which is not what we want.
         external: true
         allowInsecure: false
-        targetPort: 80
+        targetPort: internalCaddyPort
         traffic: [
           {
             latestRevision: true
@@ -74,26 +75,10 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
             cpu: json(cpuCores)
             memory: memory
           }
-          probes: useProbes ? [
-            { 
-              type: 'Startup'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            }
-            { 
-              type: 'Liveness'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            }
-          ]: []
         }
       ]
       scale: {
-        minReplicas: scaleToZero ? 0: 1
+        minReplicas: minReplicas
         maxReplicas: maxReplicas
         rules: [
           {

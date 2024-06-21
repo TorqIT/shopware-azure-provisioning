@@ -41,6 +41,7 @@ az deployment group create \
   --template-file ./bicep/main.bicep \
   --parameters @$1
 
-./bicep/container-apps/apply-container-apps-secrets.sh $1
+# TODO reconfigure for Shopware
+# ./bicep/container-apps/apply-container-apps-secrets.sh $1
 
 echo "Done!"

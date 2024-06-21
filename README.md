@@ -1,8 +1,4 @@
-This Docker image can be used to easily provision an Azure environment to host a Pimcore solution, leveraging Docker and [Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview).
-
-The topography of the resulting environment will look like (assuming all resources are declared within the same Resource Group):
-
-![Infrastructure diagram](./topography.drawio.svg)
+This Docker image can be used to easily provision an Azure environment to host a Shopware solution, leveraging Docker and [Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview).
 
 ## Initial provisioning
 
@@ -11,8 +7,8 @@ Follow these steps to provision an environment for the first time:
 1. Pull the image and run it with either `docker run` or `docker-compose`. With `compose`, use something like the following:
    ```yaml
    services:
-     pimcore-azure-provisioning:
-        image: ghcr.io/torqit/pimcore-azure-provisioning:latest
+     shopware-azure-provisioning:
+        image: ghcr.io/torqit/shopware-azure-provisioning:latest
         volumes:
            # Necessary for running Docker commands within the container
            - /var/run/docker.sock:/var/run/docker.sock
@@ -29,9 +25,8 @@ Follow these steps to provision an environment for the first time:
            # push the necessary images to Azure. Ensure these images are built
            # and set the values here to match the image names (can be found by
            # running docker image ls).
-           - LOCAL_PHP_FPM_IMAGE=${LOCAL_PHP_FPM_IMAGE}
-           - LOCAL_SUPERVISORD_IMAGE=${LOCAL_SUPERVISORD_IMAGE}
-           - LOCAL_REDIS_IMAGE=${LOCAL_REDIS_IMAGE}
+           - LOCAL_INIT_IMAGE=${LOCAL_INIT_IMAGE}
+           - LOCAL_SHOPWARE_IMAGE=${LOCAL_SHOPWARE_IMAGE}
    volumes:
       azure:
    ```
@@ -41,42 +36,25 @@ Follow these steps to provision an environment for the first time:
 5. If a Resource Group and Service Principal have not yet been created (e.g. if you are not an Owner in the Azure tenant), run `initialize-resource-group-and-service-principal.sh parameters.json`. Once complete, note down the `appId` and `password` that are returned from the creation of the Service Principal (the app ID is the service principal ID). The service principal can then be used in your CI/CD pipeline. Note that in order to continue, the user account you are using to run the rest of the steps should have the Owner role in the created Resource Group.
 6. Run `./create-key-vault.sh parameters.json` to create a Key Vault in your Resource Group. Once created, navigate to the created Key Vault in the Azure Portal and use the "Access control (IAM)" blade to add yourself to the "Key Vault Secrets Officer" role (the Owner role at the Resource Group will allow you to do this; but it is not itself sufficient to actually manage secrets). Additionally, make sure the Key Vault is using a "Role-based Access Policy" in the "Access configuration" blade. Make up a secure database password and add it as a secret to this vault using either the Azure Portal or CLI (make sure the `databasePasswordSecretName` value matches the secret name in the vault). Add any other secrets your Container App will need to this vault as well (see `stub.parameters.jsonc` for details on how to reference these).
    1. NOTE: There is an open issue to improve the Key Vault scripting (see [#50](https://github.com/TorqIT/pimcore-azure-provisioning/issues/50))
-8. Run `./provision.sh parameters.json` to provision the Azure environment.
-9. Once provisioned, follow these steps to seed the database with the Pimcore schema:
-   1. Make up a secure password that you will use to log into the Pimcore admin panel and save it somewhere secure such as a password manager, or within the key vault you created earlier. Note that symbols such as % and # will not work with the bash command below, so a long alphanumeric password should be used.
-   2. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`. Additionally, your Symfony database connection string (usually present in `config/database.yaml`) must be configured to use the certificate (e.g. `options: !php/const:PDO::MYSQL_ATTR_SSL_CA: '/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem'`). If this is not properly set, the command below will fail with "Connections using insecure transport are prohibited".
-   3. Run `az containerapp exec --resource-group <your-resource-group> --name <your-php-fpm-container-app> --command bash` to enter the Container App's shell.
-   4. Run the following command to seed the database:
-      ```bash
-      runuser -u www-data -- vendor/bin/pimcore-install \
-        --admin-username=admin \
-        --admin-password=<secure admin password> \
-        --mysql-host-socket=$DATABASE_HOST \
-        --mysql-database=$DATABASE_NAME \
-        --mysql-username=$DATABASE_USER \
-        --mysql-password=$DATABASE_PASSWORD \
-        --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem \
-        --skip-database-config
-      # If you are still on Pimcore 10.x, add the --ignore-existing-config flag
-      ```
+7. Run `./provision.sh parameters.json` to provision the Azure environment.
 
 ## Custom domains and HTTPS certificates
 
 Container Apps support custom domains and Azure-managed HTTPS certificates, but since they require some manual interaction with your DNS, it is best to configure them manually in your initial provisioning. Use this repository to manage these as follows:
 
-1. For the initial provisioning, leave the `phpFpmContainerAppCustomDomains` array blank, like so:
+1. For the initial provisioning, leave the `shopwareContainerAppCustomDomains` array blank, like so:
    ```
-   "phpFpmContainerAppCustomDomains": {
+   "shopwareContainerAppCustomDomains": {
      "value": [
      ]
    },
    ```
-2. Once your environment is provisioned, go to https://portal.azure.com and navigate to your PHP-FPM Container App.
+2. Once your environment is provisioned, go to https://portal.azure.com and navigate to your Shopware Container App.
 3. In the left-hand menu, click "Custom Domains". Click "Add", select the "Managed Certificate" option, and follow the instructions for adding a custom domain to your DNS.
 4. Once complete, you should be able to access your Container App at the configured custom domain, and it should be secured with HTTPS.
-5. Add the custom domain and certificate to the `phpFpmContainerAppCustomDomains` parameter in your `parameters.json` file like so:
+5. Add the custom domain and certificate to the `shopwareContainerAppCustomDomains` parameter in your `parameters.json` file like so:
    ```
-   "phpFpmContainerAppCustomDomains": {
+   "shopwareContainerAppCustomDomains": {
       "value": [
          {
             "domainName": "my-domain.example.com"
@@ -92,22 +70,22 @@ Container Apps support custom domains and Azure-managed HTTPS certificates, but 
 The provisioning script will automatically configure the following backups:
 
 1. Point-in-time snapshots of the database. Retention of these snapshots is controlled by the `databaseBackupRetentionDays` parameter.
-2. Point-in-time snapshots of the Storage Account (which contains persistent Pimcore files such as assets). Retention of these snapshots is controlled by the `storageAccountBackupRetentionDays` parameter.
-3. Long-term backups of the database. As Azure Database for MySQL does not have built-in support for long-term backups, this image uses a custom solution using https://github.com/TorqIT/pimcore-database-backup-bundle to store backups in a Storage Account configured by the `databaseBackupsStorageAccount*` parameters.
-4. Long-term backups of the Storage Account. The provisioning script will automatically create a Backup Vault that stores monthly backups of the containers. These backups are retained for up to one year.
+2. Point-in-time snapshots of the Storage Account (which contains persistent Shopware files such as assets). Retention of these snapshots is controlled by the `storageAccountBackupRetentionDays` parameter.
+3. Long-term backups of the database. The provisioning script will automatically create a Backup Vault that stores weekly backups of the database. These backups are retained for up to one year.
+4. Long-term backups of the Storage Account. The script will use the Backup Vault created above to store monthly backups of the Storage Account containers. These backups are retained for up to one year.
 
 Note that all backups are stored using Local Redundancy (see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy#locally-redundant-storage for more information).
 
 ## Configuring CI/CD
 
-See https://github.com/TorqIT/pimcore-github-actions-workflows for examples of GitHub Actions workflows that can be used to deploy to Container Apps, in particular the `container-apps-*.yml` files.
+See https://github.com/TorqIT/shopware-github-actions-workflows for examples of GitHub Actions workflows that can be used to deploy to Container Apps, in particular the `container-apps-*.yml` files.
 
 ## Updating an existing environment
 
 Bicep files are declarative, meaning that they declare the desired state of your resources. This means that you can deploy using the same files multiple times, and only the new changes that you've made will be applied. If you wish to change any resource names or properties, simply update them in your `parameters.json` file and re-run `./provision.sh parameters.json`. Keeping the `parameters.json` files committed in your source control is a good practice as it will allow you to maintain a snapshot of your environment's state.
 
-When adding/updating/removing Container Apps secrets for the PHP-FPM container, you will need to deactivate any active revisions that are using the existing secrets (Azure will throw an error if you do not first deactivate). To deactivate the active revisions, enter this container and run `./scripts/deactivate-php-fpm-container-app-revisions.sh parameters.json`.
+When adding/updating/removing Container Apps secrets for the Shopware web container, you will need to deactivate any active revisions that are using the existing secrets (Azure will throw an error if you do not first deactivate). To deactivate the active revisions, enter this container and run `./scripts/deactivate-shopware-container-app-revisions.sh parameters.json`.
 
 ## Useful scripts
 
-Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/pimcore-azure-provisioning/blob/main/scripts/README.md)).
+Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/shopware-azure-provisioning/blob/main/scripts/README.md)).

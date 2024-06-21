@@ -19,9 +19,9 @@ param virtualNetworkName string
 param virtualNetworkAddressSpace string = '10.0.0.0/16'
 // If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
 param virtualNetworkResourceGroupName string = resourceGroup().name
-param virtualNetworkContainerAppsSubnetName string = 'pimcore-container-apps'
+param virtualNetworkContainerAppsSubnetName string = 'container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
-param virtualNetworkDatabaseSubnetName string = 'pimcore-database'
+param virtualNetworkDatabaseSubnetName string = 'database'
 param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 // As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
 // subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
@@ -56,10 +56,8 @@ module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = {
 }
 
 // Backup Vault
-// TODO remove once all clients are moved over to use this model - relic of previously using the Backup Vault for Storage Accounts only
-param storageAccountBackupVaultName string = '${storageAccountName}-backup-vault'
-param backupVaultName string = storageAccountBackupVaultName
-module backupVault 'backup-vault/backup-vault.bicep' = if (databaseLongTermBackups || storageAccountLongTermBackups) {
+param backupVaultName string = ''
+module backupVault 'backup-vault/backup-vault.bicep' = if (databaseLongTermBackups/* || storageAccountLongTermBackups*/) {
   name: 'backup-vault'
   params: {
     name: backupVaultName
@@ -67,45 +65,45 @@ module backupVault 'backup-vault/backup-vault.bicep' = if (databaseLongTermBacku
 }
 
 // Storage Account
-param storageAccountName string
-param storageAccountSku string = 'Standard_LRS'
-param storageAccountKind string = 'StorageV2'
-param storageAccountAccessTier string = 'Hot'
-param storageAccountContainerName string = 'pimcore'
-param storageAccountAssetsContainerName string = 'pimcore-assets'
-@allowed(['public', 'partial', 'private'])
-param storageAccountAssetsContainerAccessLevel string = 'private'
-param storageAccountFirewallIps array = []
-param storageAccountCdnAccess bool = false
-param storageAccountBackupRetentionDays int = 7
-param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
-param storageAccountPrivateEndpointNicName string = ''
-param storageAccountLongTermBackups bool = true
-module storageAccount 'storage-account/storage-account.bicep' = {
-  name: 'storage-account'
-  dependsOn: [virtualNetwork, privateDnsZones, backupVault]
-  params: {
-    location: location
-    storageAccountName: storageAccountName
-    containerName: storageAccountContainerName
-    assetsContainerName: storageAccountAssetsContainerName
-    accessTier: storageAccountAccessTier
-    kind: storageAccountKind
-    sku: storageAccountSku
-    assetsContainerAccessLevel: storageAccountAssetsContainerAccessLevel
-    firewallIps: storageAccountFirewallIps
-    cdnAssetAccess: storageAccountCdnAccess
-    virtualNetworkName: virtualNetworkName
-    virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
-    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
-    shortTermBackupRetentionDays: storageAccountBackupRetentionDays
-    privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
-    privateEndpointName: storageAccountPrivateEndpointName
-    privateEndpointNicName: storageAccountPrivateEndpointNicName
-    longTermBackups: storageAccountLongTermBackups
-    backupVaultName: backupVaultName
-  }
-}
+// param storageAccountName string
+// param storageAccountSku string = 'Standard_LRS'
+// param storageAccountKind string = 'StorageV2'
+// param storageAccountAccessTier string = 'Hot'
+// param storageAccountContainerName string = 'shopware'
+// param storageAccountAssetsContainerName string = 'shopware-assets'
+// @allowed(['public', 'partial', 'private'])
+// param storageAccountAssetsContainerAccessLevel string = 'private'
+// param storageAccountFirewallIps array = []
+// param storageAccountCdnAccess bool = false
+// param storageAccountBackupRetentionDays int = 7
+// param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
+// param storageAccountPrivateEndpointNicName string = ''
+// param storageAccountLongTermBackups bool = true
+// module storageAccount 'storage-account/storage-account.bicep' = {
+//   name: 'storage-account'
+//   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
+//   params: {
+//     location: location
+//     storageAccountName: storageAccountName
+//     containerName: storageAccountContainerName
+//     assetsContainerName: storageAccountAssetsContainerName
+//     accessTier: storageAccountAccessTier
+//     kind: storageAccountKind
+//     sku: storageAccountSku
+//     assetsContainerAccessLevel: storageAccountAssetsContainerAccessLevel
+//     firewallIps: storageAccountFirewallIps
+//     cdnAssetAccess: storageAccountCdnAccess
+//     virtualNetworkName: virtualNetworkName
+//     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
+//     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+//     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
+//     privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
+//     privateEndpointName: storageAccountPrivateEndpointName
+//     privateEndpointNicName: storageAccountPrivateEndpointNicName
+//     longTermBackups: storageAccountLongTermBackups
+//     backupVaultName: backupVaultName
+//   }
+// }
 
 // Database
 param databaseServerName string
@@ -114,7 +112,7 @@ param databasePasswordSecretName string = 'databasePassword'
 param databaseSkuName string = 'Standard_B1ms'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
-param databaseName string = 'pimcore'
+param databaseName string = 'shopware'
 param databaseBackupRetentionDays int = 7
 param databaseGeoRedundantBackup bool = false
 param databaseLongTermBackups bool = true
@@ -153,43 +151,25 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
-// TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
-param provisionInit bool = false
 param initContainerAppJobName string = ''
 param initImageName string = ''
 param initCpuCores string = '0.5'
 param initMemory string = '1Gi'
-param initContainerAppJobRunPimcoreInstall bool = false
-param pimcoreAdminPasswordSecretName string = 'pimcore-admin-password'
-param phpFpmContainerAppExternal bool = true
-param phpFpmContainerAppName string
-param phpFpmImageName string
-param phpFpmContainerAppUseProbes bool = false
-param phpFpmContainerAppCustomDomains array = []
-param phpFpmCpuCores string = '1.0'
-param phpFpmMemory string = '2Gi'
-param phpFpmScaleToZero bool = false
-param phpFpmMaxReplicas int = 1
-param supervisordContainerAppName string
-param supervisordImageName string
-param supervisordCpuCores string = '0.25'
-param supervisordMemory string = '250Mi'
-param redisContainerAppName string
-param redisImageName string
-param redisCpuCores string = '0.25'
-param redisMemory string = '1Gi'
+param shopwareContainerAppExternal bool = true
+param shopwareContainerAppName string
+param shopwareImageName string
+param shopwareContainerAppCustomDomains array = []
+param shopwareContainerAppCpuCores string = '1.0'
+param shopwareContainerAppMemory string = '2Gi'
+param shopwareContainerAppMinReplicas int = 1
+param shopwareContainerAppMaxReplicas int = 1
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
-@allowed(['0', '1'])
-param pimcoreDev string
-param pimcoreEnvironment string
-param redisDb string
-param redisSessionDb string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
+  dependsOn: [virtualNetwork, containerRegistry, /*storageAccount,*/ database, logAnalyticsWorkspace]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -202,37 +182,21 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databasePassword: keyVault.getSecret(databasePasswordSecretName)
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
-    provisionInit: provisionInit
     initContainerAppJobName: initContainerAppJobName
     initContainerAppJobImageName: initImageName
     initContainerAppJobCpuCores: initCpuCores
     initContainerAppJobMemory: initMemory
-    initContainerAppJobRunPimcoreInstall: initContainerAppJobRunPimcoreInstall
-    pimcoreAdminPassword: provisionInit ? keyVault.getSecret(pimcoreAdminPasswordSecretName) : ''
-    phpFpmContainerAppName: phpFpmContainerAppName
-    phpFpmContainerAppCustomDomains: phpFpmContainerAppCustomDomains
-    phpFpmImageName: phpFpmImageName
-    phpFpmCpuCores: phpFpmCpuCores
-    phpFpmMemory: phpFpmMemory
-    phpFpmContainerAppExternal: phpFpmContainerAppExternal
-    phpFpmContainerAppUseProbes: phpFpmContainerAppUseProbes
-    phpFpmScaleToZero: phpFpmScaleToZero
-    phpFpmMaxReplicas: phpFpmMaxReplicas
-    pimcoreDev: pimcoreDev
-    pimcoreEnvironment: pimcoreEnvironment
-    redisContainerAppName: redisContainerAppName
-    redisDb: redisDb
-    redisImageName: redisImageName
-    redisSessionDb: redisSessionDb
-    redisCpuCores: redisCpuCores
-    redisMemory: redisMemory
-    storageAccountAssetsContainerName: storageAccountAssetsContainerName
-    storageAccountContainerName: storageAccountContainerName
-    storageAccountName: storageAccountName
-    supervisordContainerAppName: supervisordContainerAppName
-    supervisordImageName: supervisordImageName
-    supervisordCpuCores: supervisordCpuCores
-    supervisordMemory: supervisordMemory
+    shopwareContainerAppName: shopwareContainerAppName
+    shopwareContainerAppCustomDomains: shopwareContainerAppCustomDomains
+    shopwareImageName: shopwareImageName
+    shopwareContainerAppCpuCores: shopwareContainerAppCpuCores
+    shopwareContainerAppMemory: shopwareContainerAppMemory
+    shopwareContainerAppExternal: shopwareContainerAppExternal
+    shopwareContainerAppMinReplicas: shopwareContainerAppMinReplicas
+    shopwareContainerAppMaxReplicas: shopwareContainerAppMaxReplicas
+    // storageAccountAssetsContainerName: storageAccountAssetsContainerName
+    // storageAccountContainerName: storageAccountContainerName
+    // storageAccountName: storageAccountName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
