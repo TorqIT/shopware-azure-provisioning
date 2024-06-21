@@ -142,12 +142,12 @@ module database 'database/database.bicep' = {
 }
 
 param logAnalyticsWorkspaceName string = '${resourceGroupName}-log-analytics'
-// module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bicep' = {
-//   name: 'log-analytics-workspace'
-//   params: {
-//     name: logAnalyticsWorkspaceName
-//   }
-// }
+module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bicep' = {
+  name: 'log-analytics-workspace'
+  params: {
+    name: logAnalyticsWorkspaceName
+  }
+}
 
 // Container Apps
 param containerAppsEnvironmentName string
@@ -168,14 +168,14 @@ param appEnv string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, /*storageAccount,*/ database, /*logAnalyticsWorkspace*/]
+  dependsOn: [virtualNetwork, containerRegistry, /*storageAccount,*/ database, logAnalyticsWorkspace]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
     appDebug: appDebug
     appEnv: appEnv
     containerAppsEnvironmentName: containerAppsEnvironmentName
-    // logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     databaseName: databaseName
     databasePassword: keyVault.getSecret(databasePasswordSecretName)

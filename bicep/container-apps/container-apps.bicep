@@ -1,7 +1,7 @@
 param location string = resourceGroup().location
 
 param containerAppsEnvironmentName string
-// param logAnalyticsWorkspaceName string
+param logAnalyticsWorkspaceName string
 
 param virtualNetworkName string
 param virtualNetworkResourceGroup string
@@ -45,7 +45,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
-    // logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
   }
 }
 
