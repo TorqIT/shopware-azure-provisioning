@@ -16,6 +16,7 @@ param containerRegistryName string
 // param storageAccountAssetsContainerName string
 
 param initContainerAppJobName string
+param initImageName string
 param initContainerAppJobCpuCores string
 param initContainerAppJobMemory string
 
@@ -104,7 +105,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
   params: {
     location: location
     containerAppJobName: initContainerAppJobName
-    imageName: shopwareImageName
+    imageName: initImageName
     cpuCores: initContainerAppJobCpuCores
     memory: initContainerAppJobMemory
     containerAppsEnvironmentName: containerAppsEnvironmentName

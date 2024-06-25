@@ -157,6 +157,8 @@ param initMemory string = '1Gi'
 param shopwareContainerAppExternal bool = true
 param shopwareContainerAppName string
 param shopwareImageName string
+// By default, use the same image for both the init and main Shopware apps
+param initImageName string = shopwareImageName
 param shopwareContainerAppCustomDomains array = []
 param shopwareContainerAppCpuCores string = '1.0'
 param shopwareContainerAppMemory string = '2Gi'
@@ -182,6 +184,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
     initContainerAppJobName: initContainerAppJobName
+    initImageName: initImageName
     initContainerAppJobCpuCores: initCpuCores
     initContainerAppJobMemory: initMemory
     shopwareContainerAppName: shopwareContainerAppName
