@@ -67,6 +67,10 @@ var defaultEnvVars = [
     name: 'DATABASE_SSL_CA'
     value: '/var/www/html/database/DigiCertGlobalRootG2.crt.pem'
   }
+  {
+    name: 'DATABASE_SSL_DONT_VERIFY_SERVER_CERT'
+    value: '1'
+  }
 ]
 
 output envVars array = concat(defaultEnvVars, additionalVars)
