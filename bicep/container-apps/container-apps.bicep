@@ -68,11 +68,11 @@ var containerRegistryPasswordSecret = {
 //   value: storageAccount.listKeys().keys[0].value  
 // }
 var databasePasswordSecretName = 'database-password'
-var databaseUrlSecretName = 'database-url'
 var databasePasswordSecret = {
   name: databasePasswordSecretName
   value: databasePassword
 }
+var databaseUrlSecretName = 'database-url'
 var databaseUrlSecret = {
   name: databaseUrlSecretName
   value: 'mysql://${databaseUser}:${databasePassword}@${database.properties.fullyQualifiedDomainName}:3306/${databaseName}'
@@ -139,6 +139,7 @@ module shopwareContainerApp 'container-apps-shopware.bicep' = {
     customDomains: shopwareContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
+    databaseUrlSecret: databaseUrlSecret
     // storageAccountKeySecret: storageAccountKeySecret
   }
 }

@@ -14,6 +14,8 @@ param maxReplicas int
 @secure()
 param databasePasswordSecret object
 @secure()
+param databaseUrlSecret object
+@secure()
 param containerRegistryPasswordSecret object
 // @secure()
 // param storageAccountKeySecret object
@@ -31,7 +33,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [databasePasswordSecret, containerRegistryPasswordSecret/*, storageAccountKeySecret*/]
+var secrets = [databasePasswordSecret, containerRegistryPasswordSecret/*, storageAccountKeySecret*/, databaseUrlSecret]
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
@@ -80,16 +82,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
-        rules: [
-          {
-            name: 'http-scaling'
-            http: {
-              metadata: {
-               concurrentRequests: '30'
-              }
-            }
-          }
-        ]
       }
     }
   }
