@@ -63,6 +63,10 @@ var defaultEnvVars = [
     name: 'DATABASE_URL'
     secretRef: databaseUrlSecretName
   }
+  {
+    name: 'DATABASE_SSL_CERT'
+    value: '/var/www/html/database/DigiCertGlobalRootG2.crt.pem'
+  }
 ]
 
 output envVars array = concat(defaultEnvVars, additionalVars)
