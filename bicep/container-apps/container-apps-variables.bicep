@@ -64,7 +64,7 @@ var defaultEnvVars = [
     secretRef: databaseUrlSecretName
   }
   {
-    name: 'DATABASE_SSL_CERT'
+    name: 'DATABASE_SSL_CA'
     value: '/var/www/html/database/DigiCertGlobalRootG2.crt.pem'
   }
 ]
