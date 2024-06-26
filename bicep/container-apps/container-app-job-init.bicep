@@ -53,7 +53,8 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
       containers: [
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-          command: ['/setup']
+          // TODO figure out different way to generate JWT secret?
+          command: ['/setup && bin/console system:generate-jwt-secret']
           env: defaultEnvVars
           name: imageName
           resources: {
