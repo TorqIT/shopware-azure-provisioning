@@ -9,6 +9,8 @@ param databaseUser string
 param additionalVars array
 param databasePasswordSecretName string
 param databaseUrlSecretName string
+param jwtPublicKeySecretName string
+param jwtPrivateKeySecretName string
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
   name: databaseServerName
@@ -70,6 +72,14 @@ var defaultEnvVars = [
   {
     name: 'DATABASE_SSL_DONT_VERIFY_SERVER_CERT'
     value: '1'
+  }
+  {
+    name: 'JWT_PUBLIC_KEY'
+    secretRef: jwtPublicKeySecretName
+  }
+  {
+    name: 'JWT_PRIVATE_KEY'
+    secretRef: jwtPrivateKeySecretName
   }
 ]
 

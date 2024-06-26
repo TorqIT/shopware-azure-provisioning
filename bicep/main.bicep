@@ -168,6 +168,8 @@ param shopwareContainerAppMaxReplicas int = 1
 param appDebug string
 param appEnv string
 param additionalEnvVars array = []
+param jwtPublicKeySecretName string = 'jwt-secret-public'
+param jwtPrivateKeySecretName string = 'jwt-secret-private'
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
   dependsOn: [virtualNetwork, containerRegistry, /*storageAccount,*/ database, logAnalyticsWorkspace]
@@ -201,6 +203,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    jwtPublicKey: keyVault.getSecret(jwtPublicKeySecretName)
+    jwtPrivateKey: keyVault.getSecret(jwtPrivateKeySecretName)
   }
 }
 

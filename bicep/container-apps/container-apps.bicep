@@ -36,6 +36,10 @@ param databaseUser string
 param additionalEnvVars array
 @secure()
 param databasePassword string
+@secure()
+param jwtPublicKey string
+@secure()
+param jwtPrivateKey string
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
@@ -60,6 +64,7 @@ resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' exis
   name: databaseServerName
 }
 
+// Secrets
 var containerRegistryPasswordSecret = {
   name: 'container-registry-password'
   value: containerRegistry.listCredentials().passwords[0].value
@@ -78,6 +83,16 @@ var databaseUrlSecret = {
   name: databaseUrlSecretName
   value: 'mysql://${databaseUser}:${databasePassword}@${database.properties.fullyQualifiedDomainName}:3306/${databaseName}'
 }
+var jwtPublicKeySecretName = 'jwt-public-key'
+var jwtPublicKeySecret = {
+  name: jwtPublicKeySecretName
+  value: jwtPublicKey
+}
+var jwtPrivateKeySecretName = 'jwt-private-key'
+var jwtPrivateKeySecret = {
+  name: jwtPrivateKeySecretName
+  value: jwtPrivateKey
+}
 
 module environmentVariables 'container-apps-variables.bicep' = {
   name: 'environment-variables'
@@ -89,6 +104,8 @@ module environmentVariables 'container-apps-variables.bicep' = {
     databaseUser: databaseUser
     databasePasswordSecretName: databasePasswordSecretName
     databaseUrlSecretName: databaseUrlSecretName
+    jwtPublicKeySecretName: jwtPublicKeySecretName
+    jwtPrivateKeySecretName: jwtPrivateKeySecretName
     additionalVars: additionalEnvVars
   }
 }
@@ -115,6 +132,8 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    jwtPublicKeySecret: jwtPublicKeySecret
+    jwtPrivateKeySecret: jwtPrivateKeySecret
     defaultEnvVars: environmentVariables.outputs.envVars
     databaseServerName: databaseServerName
     databaseName: databaseName
@@ -141,6 +160,8 @@ module shopwareContainerApp 'container-apps-shopware.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    jwtPublicKeySecret: jwtPublicKeySecret
+    jwtPrivateKeySecret: jwtPrivateKeySecret
     // storageAccountKeySecret: storageAccountKeySecret
   }
 }
