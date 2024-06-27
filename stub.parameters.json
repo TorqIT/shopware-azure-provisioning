@@ -100,11 +100,6 @@
     "storageAccountAccessTier": {
       "value": "Hot"
     },
-    // Whether the Storage Account should have a public CDN placed in front of it. Note that
-    // setting this to true will make the entire Storage Account available on the public internet (albeit protected with keys).
-    "storageAccountCdnAccess": {
-      "value": false
-    },
     // How long in days to keep short-term backups of the Storage Account files. Valid values are 1 through 365.
     "storageAccountBackupRetentionDays": {
       "value": 7
