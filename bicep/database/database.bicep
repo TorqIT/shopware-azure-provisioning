@@ -62,8 +62,8 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
   resource database 'databases' = {
     name: databaseName
     properties: {
-      charset: 'utf8mb4'
-      collation: 'utf8mb4_unicode_ci'
+      charset: 'utf8mb3'
+      collation: 'utf8mb3_general_ci'
     }
   }
 }
