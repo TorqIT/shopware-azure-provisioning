@@ -21,8 +21,8 @@ param databasePasswordSecret object
 param databaseUrlSecret object
 @secure()
 param containerRegistryPasswordSecret object
-// @secure()
-// param storageAccountKeySecret object
+@secure()
+param storageAccountKeySecret object
 @secure()
 param jwtPrivateKeySecret object
 @secure()
@@ -41,7 +41,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
     environmentId: containerAppsEnvironmentId
     configuration: {
       replicaTimeout: 600
-      secrets: [containerRegistryPasswordSecret, databasePasswordSecret, databaseUrlSecret, jwtPrivateKeySecret, jwtPublicKeySecret /*storageAccountKeySecret*/]
+      secrets: [containerRegistryPasswordSecret, databasePasswordSecret, databaseUrlSecret, storageAccountKeySecret, jwtPrivateKeySecret, jwtPublicKeySecret]
       triggerType: 'Manual'
       eventTriggerConfig: {
         scale: {

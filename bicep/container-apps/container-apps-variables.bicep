@@ -1,8 +1,8 @@
 param appDebug string
 param appEnv string
-// param storageAccountName string
-// param storageAccountContainerName string
-// param storageAccountAssetsContainerName string
+param storageAccountName string
+param storageAccountContainerName string
+param storageAccountKeySecretName string
 param databaseServerName string
 param databaseName string
 param databaseUser string
@@ -25,22 +25,18 @@ var defaultEnvVars = [
     name: 'APP_ENV'
     value: appEnv
   }
-  // {
-  //   name: 'AZURE_STORAGE_ACCOUNT_CONTAINER'
-  //   value: storageAccountContainerName
-  // }
-  // {
-  //   name: 'AZURE_STORAGE_ACCOUNT_CONTAINER_ASSETS'
-  //   value: storageAccountAssetsContainerName
-  // }
-  // {
-  //   name: 'AZURE_STORAGE_ACCOUNT_KEY'
-  //   secretRef: 'storage-account-key'
-  // }
-  // {
-  //   name: 'AZURE_STORAGE_ACCOUNT_NAME'
-  //   value: storageAccountName
-  // }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_CONTAINER'
+    value: storageAccountContainerName
+  }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_KEY'
+    secretRef: storageAccountKeySecretName
+  }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_NAME'
+    value: storageAccountName
+  }
   {
     name: 'DATABASE_HOST'
     value: database.properties.fullyQualifiedDomainName 

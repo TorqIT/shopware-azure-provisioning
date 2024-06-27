@@ -2,8 +2,7 @@ param location string = resourceGroup().location
 
 param backupVaultName string
 param storageAccountName string
-param containerName string
-param assetsContainerName string
+param containers array
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
@@ -111,10 +110,7 @@ resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2023-01
       policyParameters: {
         backupDatasourceParametersList: [
           {
-            containersList: [
-              containerName
-              assetsContainerName
-            ]
+            containersList: containers
             objectType: 'BlobBackupDatasourceParameters'
           }
         ]

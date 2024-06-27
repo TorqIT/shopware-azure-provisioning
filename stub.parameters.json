@@ -109,13 +109,9 @@
     "storageAccountBackupRetentionDays": {
       "value": 7
     },
-    // The container in which the majority of Shopware files will be stored, excluding assets.
+    // The container in which persistent Shopware files will be stored
     "storageAccountContainerName": {
       "value": "mystorageaccountcontainer"
-    },
-    // The container in which Shopware assets will be stored
-    "storageAccountAssetsContainerName": {
-      "value": "mystorageaccountassetscontainer"
     },
     // Whether to store long-term backups of the Storage Account containers in the Backup Vault. Default value is true.
     "storageAccountLongTermBackups": {

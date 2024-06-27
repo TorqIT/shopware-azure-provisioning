@@ -17,8 +17,8 @@ param databasePasswordSecret object
 param databaseUrlSecret object
 @secure()
 param containerRegistryPasswordSecret object
-// @secure()
-// param storageAccountKeySecret object
+@secure()
+param storageAccountKeySecret object
 @secure()
 param jwtPrivateKeySecret object
 @secure()
@@ -37,7 +37,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [databasePasswordSecret, containerRegistryPasswordSecret/*, storageAccountKeySecret*/, databaseUrlSecret, jwtPrivateKeySecret, jwtPublicKeySecret]
+var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, jwtPrivateKeySecret, jwtPublicKeySecret]
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName

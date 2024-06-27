@@ -65,45 +65,38 @@ module backupVault 'backup-vault/backup-vault.bicep' = if (databaseLongTermBacku
 }
 
 // Storage Account
-// param storageAccountName string
-// param storageAccountSku string = 'Standard_LRS'
-// param storageAccountKind string = 'StorageV2'
-// param storageAccountAccessTier string = 'Hot'
-// param storageAccountContainerName string = 'shopware'
-// param storageAccountAssetsContainerName string = 'shopware-assets'
-// @allowed(['public', 'partial', 'private'])
-// param storageAccountAssetsContainerAccessLevel string = 'private'
-// param storageAccountFirewallIps array = []
-// param storageAccountCdnAccess bool = false
-// param storageAccountBackupRetentionDays int = 7
-// param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
-// param storageAccountPrivateEndpointNicName string = ''
-// param storageAccountLongTermBackups bool = true
-// module storageAccount 'storage-account/storage-account.bicep' = {
-//   name: 'storage-account'
-//   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
-//   params: {
-//     location: location
-//     storageAccountName: storageAccountName
-//     containerName: storageAccountContainerName
-//     assetsContainerName: storageAccountAssetsContainerName
-//     accessTier: storageAccountAccessTier
-//     kind: storageAccountKind
-//     sku: storageAccountSku
-//     assetsContainerAccessLevel: storageAccountAssetsContainerAccessLevel
-//     firewallIps: storageAccountFirewallIps
-//     cdnAssetAccess: storageAccountCdnAccess
-//     virtualNetworkName: virtualNetworkName
-//     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
-//     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
-//     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
-//     privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
-//     privateEndpointName: storageAccountPrivateEndpointName
-//     privateEndpointNicName: storageAccountPrivateEndpointNicName
-//     longTermBackups: storageAccountLongTermBackups
-//     backupVaultName: backupVaultName
-//   }
-// }
+param storageAccountName string
+param storageAccountSku string = 'Standard_LRS'
+param storageAccountKind string = 'StorageV2'
+param storageAccountAccessTier string = 'Hot'
+param storageAccountContainerName string = 'shopware'
+param storageAccountFirewallIps array = []
+param storageAccountBackupRetentionDays int = 7
+param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
+param storageAccountPrivateEndpointNicName string = ''
+param storageAccountLongTermBackups bool = true
+module storageAccount 'storage-account/storage-account.bicep' = {
+  name: 'storage-account'
+  dependsOn: [virtualNetwork, privateDnsZones, backupVault]
+  params: {
+    location: location
+    storageAccountName: storageAccountName
+    containerName: storageAccountContainerName
+    accessTier: storageAccountAccessTier
+    kind: storageAccountKind
+    sku: storageAccountSku
+    firewallIps: storageAccountFirewallIps
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    shortTermBackupRetentionDays: storageAccountBackupRetentionDays
+    privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
+    privateEndpointName: storageAccountPrivateEndpointName
+    privateEndpointNicName: storageAccountPrivateEndpointNicName
+    longTermBackups: storageAccountLongTermBackups
+    backupVaultName: backupVaultName
+  }
+}
 
 // Database
 param databaseServerName string
@@ -172,7 +165,7 @@ param jwtPublicKeySecretName string = 'jwt-secret-public'
 param jwtPrivateKeySecretName string = 'jwt-secret-private'
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, /*storageAccount,*/ database, logAnalyticsWorkspace]
+  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -197,9 +190,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareContainerAppExternal: shopwareContainerAppExternal
     shopwareContainerAppMinReplicas: shopwareContainerAppMinReplicas
     shopwareContainerAppMaxReplicas: shopwareContainerAppMaxReplicas
-    // storageAccountAssetsContainerName: storageAccountAssetsContainerName
-    // storageAccountContainerName: storageAccountContainerName
-    // storageAccountName: storageAccountName
+    storageAccountContainerName: storageAccountContainerName
+    storageAccountName: storageAccountName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName

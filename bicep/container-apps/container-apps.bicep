@@ -11,9 +11,8 @@ param databaseServerName string
 
 param containerRegistryName string
 
-// param storageAccountName string
-// param storageAccountContainerName string
-// param storageAccountAssetsContainerName string
+param storageAccountName string
+param storageAccountContainerName string
 
 param initContainerAppJobName string
 param initImageName string
@@ -57,22 +56,19 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
   name: containerRegistryName
 }
-// resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
-//   name: storageAccountName
-// }
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: storageAccountName
+}
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
   name: databaseServerName
 }
 
 // Secrets
-var containerRegistryPasswordSecret = {
-  name: 'container-registry-password'
-  value: containerRegistry.listCredentials().passwords[0].value
+var storageAccountKeySecretName = 'storage-account-key'
+var storageAccountKeySecret = {
+  name: storageAccountKeySecretName
+  value: storageAccount.listKeys().keys[0].value  
 }
-// var storageAccountKeySecret = {
-//   name: 'storage-account-key'
-//   value: storageAccount.listKeys().keys[0].value  
-// }
 var databasePasswordSecretName = 'database-password'
 var databasePasswordSecret = {
   name: databasePasswordSecretName
@@ -104,16 +100,24 @@ module environmentVariables 'container-apps-variables.bicep' = {
     databaseUser: databaseUser
     databasePasswordSecretName: databasePasswordSecretName
     databaseUrlSecretName: databaseUrlSecretName
+    storageAccountName: storageAccountName
+    storageAccountContainerName: storageAccountContainerName
+    storageAccountKeySecretName: storageAccountKeySecretName
     jwtPublicKeySecretName: jwtPublicKeySecretName
     jwtPrivateKeySecretName: jwtPrivateKeySecretName
     additionalVars: additionalEnvVars
   }
 }
 
+var containerRegistryPasswordSecretName = 'container-registry-password'
+var containerRegistryPasswordSecret = {
+  name: containerRegistryPasswordSecretName
+  value: containerRegistry.listCredentials().passwords[0].value
+}
 var containerRegistryConfiguration = {
   server: '${containerRegistryName}.azurecr.io'
   username: containerRegistry.listCredentials().username
-  passwordSecretRef: 'container-registry-password'
+  passwordSecretRef: containerRegistryPasswordSecretName
 }
 
 module initContainerAppJob 'container-app-job-init.bicep' = {
@@ -128,10 +132,10 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
-    // storageAccountKeySecret: storageAccountKeySecret
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    storageAccountKeySecret: storageAccountKeySecret
     jwtPublicKeySecret: jwtPublicKeySecret
     jwtPrivateKeySecret: jwtPrivateKeySecret
     defaultEnvVars: environmentVariables.outputs.envVars
@@ -160,8 +164,8 @@ module shopwareContainerApp 'container-apps-shopware.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    storageAccountKeySecret: storageAccountKeySecret
     jwtPublicKeySecret: jwtPublicKeySecret
     jwtPrivateKeySecret: jwtPrivateKeySecret
-    // storageAccountKeySecret: storageAccountKeySecret
   }
 }

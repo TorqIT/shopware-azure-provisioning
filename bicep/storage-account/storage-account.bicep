@@ -5,12 +5,7 @@ param sku string
 param kind string
 param accessTier string
 param containerName string
-param assetsContainerName string
-
-@allowed(['public', 'partial', 'private'])
-param assetsContainerAccessLevel string
 param firewallIps array
-param cdnAssetAccess bool
 
 param shortTermBackupRetentionDays int
 
@@ -36,11 +31,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
     accessTier: accessTier
-    allowBlobPublicAccess: assetsContainerAccessLevel == 'public' || assetsContainerAccessLevel == 'partial'
-    publicNetworkAccess: assetsContainerAccessLevel == 'public' || assetsContainerAccessLevel == 'partial' ? 'Enabled' : 'Disabled'
+    allowBlobPublicAccess: false
+    publicNetworkAccess: 'Disabled'
     networkAcls: {
       ipRules: [for ip in firewallIps: {value: ip}]
-      defaultAction: assetsContainerAccessLevel == 'public' ? 'Allow' : 'Deny'
+      defaultAction: 'Deny'
       bypass: 'None'
     }
     encryption: {
@@ -79,13 +74,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     resource storageAccountContainer 'containers' = {
       name: containerName
     }
-
-    resource storageAccountContainerAssets 'containers' = {
-      name: assetsContainerName
-      properties: {
-        publicAccess: assetsContainerAccessLevel == 'public' || assetsContainerAccessLevel == 'partial' ? 'Blob' : 'None'
-      }
-    }
   }
 }
 
@@ -111,33 +99,6 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
     location: location
     backupVaultName: backupVaultName
     storageAccountName: storageAccountName
-    containerName: containerName
-    assetsContainerName: assetsContainerName
-  }
-}
-
-var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
-resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = if (cdnAssetAccess) {
-  location: location
-  name: storageAccountName
-  sku: {
-    name: 'Standard_Microsoft'
-  }
-
-  resource endpoint 'endpoints' = {
-    location: location
-    name: storageAccountName
-    properties: {
-      originHostHeader: storageAccountDomainName
-      isHttpAllowed: false
-      origins: [
-        {
-          name: storageAccount.name
-          properties: {
-            hostName: storageAccountDomainName
-          } 
-        }
-      ]
-    }
+    containers: [containerName]
   }
 }
