@@ -12,7 +12,8 @@ param databaseServerName string
 param containerRegistryName string
 
 param storageAccountName string
-param storageAccountContainerName string
+param storageAccountPublicContainerName string
+param storageAccountPrivateContainerName string
 
 param initContainerAppJobName string
 param initImageName string
@@ -101,7 +102,8 @@ module environmentVariables 'container-apps-variables.bicep' = {
     databasePasswordSecretName: databasePasswordSecretName
     databaseUrlSecretName: databaseUrlSecretName
     storageAccountName: storageAccountName
-    storageAccountContainerName: storageAccountContainerName
+    storageAccountPublicContainerName: storageAccountPublicContainerName
+    storageAccountPrivateContainerName: storageAccountPrivateContainerName
     storageAccountKeySecretName: storageAccountKeySecretName
     jwtPublicKeySecretName: jwtPublicKeySecretName
     jwtPrivateKeySecretName: jwtPrivateKeySecretName

@@ -69,7 +69,8 @@ param storageAccountName string
 param storageAccountSku string = 'Standard_LRS'
 param storageAccountKind string = 'StorageV2'
 param storageAccountAccessTier string = 'Hot'
-param storageAccountContainerName string = 'shopware'
+param storageAccountPublicContainerName string = 'public'
+param storageAccountPrivateContainerName string = 'private'
 param storageAccountFirewallIps array = []
 param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
@@ -81,7 +82,8 @@ module storageAccount 'storage-account/storage-account.bicep' = {
   params: {
     location: location
     storageAccountName: storageAccountName
-    containerName: storageAccountContainerName
+    publicContainerName: storageAccountPublicContainerName
+    privateContainerName: storageAccountPrivateContainerName
     accessTier: storageAccountAccessTier
     kind: storageAccountKind
     sku: storageAccountSku
@@ -190,7 +192,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareContainerAppExternal: shopwareContainerAppExternal
     shopwareContainerAppMinReplicas: shopwareContainerAppMinReplicas
     shopwareContainerAppMaxReplicas: shopwareContainerAppMaxReplicas
-    storageAccountContainerName: storageAccountContainerName
+    storageAccountPublicContainerName: storageAccountPublicContainerName
+    storageAccountPrivateContainerName: storageAccountPrivateContainerName
     storageAccountName: storageAccountName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName

@@ -1,7 +1,8 @@
 param appDebug string
 param appEnv string
 param storageAccountName string
-param storageAccountContainerName string
+param storageAccountPublicContainerName string
+param storageAccountPrivateContainerName string
 param storageAccountKeySecretName string
 param databaseServerName string
 param databaseName string
@@ -26,8 +27,12 @@ var defaultEnvVars = [
     value: appEnv
   }
   {
-    name: 'AZURE_STORAGE_ACCOUNT_CONTAINER'
-    value: storageAccountContainerName
+    name: 'AZURE_STORAGE_ACCOUNT_PUBLIC_CONTAINER'
+    value: storageAccountPublicContainerName
+  }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_PRIVATE_CONTAINER'
+    value: storageAccountPrivateContainerName
   }
   {
     name: 'AZURE_STORAGE_ACCOUNT_KEY'

@@ -4,7 +4,8 @@ param storageAccountName string
 param sku string
 param kind string
 param accessTier string
-param containerName string
+param publicContainerName string
+param privateContainerName string
 param firewallIps array
 
 param shortTermBackupRetentionDays int
@@ -31,13 +32,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
     accessTier: accessTier
-    allowBlobPublicAccess: false
-    publicNetworkAccess: 'Disabled'
-    networkAcls: {
-      ipRules: [for ip in firewallIps: {value: ip}]
-      defaultAction: 'Deny'
-      bypass: 'None'
-    }
+    allowBlobPublicAccess: true
+    publicNetworkAccess: 'Enabled'
     encryption: {
       services: {
         file: {
@@ -71,8 +67,18 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       }
     }
 
-    resource storageAccountContainer 'containers' = {
-      name: containerName
+    resource privateContainer 'containers' = {
+      name: privateContainerName
+      properties: {
+        publicAccess: 'None'
+      }
+    }
+
+    resource publicContainer 'containers' = {
+      name: publicContainerName
+      properties: {
+        publicAccess: 'Blob'
+      }
     }
   }
 }
@@ -100,6 +106,6 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
     location: location
     backupVaultName: backupVaultName
     storageAccountName: storageAccountName
-    containers: [containerName]
+    containers: [publicContainerName, privateContainerName]
   }
 }
