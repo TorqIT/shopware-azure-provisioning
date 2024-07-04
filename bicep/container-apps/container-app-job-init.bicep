@@ -34,6 +34,8 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
+var environmentVariables = concat(defaultEnvVars, [{name: 'SHOPWARE_SKIP_ASSET_COPY', value: '1'}])
+
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
   name: containerAppJobName
@@ -58,7 +60,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           command: ['/setup']
-          env: defaultEnvVars
+          env: environmentVariables
           name: imageName
           resources: {
             cpu: json(cpuCores)
