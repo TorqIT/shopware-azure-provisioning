@@ -1,5 +1,3 @@
-param appDebug string
-param appEnv string
 param storageAccountName string
 param storageAccountPublicContainerName string
 param storageAccountPrivateContainerName string

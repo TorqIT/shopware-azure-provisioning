@@ -27,8 +27,6 @@ param shopwareWebContainerAppMemory string
 param shopwareWebContainerAppMinReplicas int
 param shopwareWebContainerAppMaxReplicas int
 
-param appDebug string
-param appEnv string
 param additionalEnvVars array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
@@ -61,8 +59,6 @@ var storageAccountKeySecret = {
 module environmentVariables 'container-apps-variables.bicep' = {
   name: 'environment-variables'
   params: {
-    appDebug: appDebug
-    appEnv: appEnv
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountPrivateContainerName: storageAccountPrivateContainerName

@@ -165,8 +165,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
-    appDebug: appDebug
-    appEnv: appEnv
     containerAppsEnvironmentName: containerAppsEnvironmentName
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
