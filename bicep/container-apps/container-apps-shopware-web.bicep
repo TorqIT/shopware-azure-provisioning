@@ -12,17 +12,9 @@ param memory string
 param minReplicas int
 param maxReplicas int
 @secure()
-param databasePasswordSecret object
-@secure()
-param databaseUrlSecret object
-@secure()
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
-@secure()
-param jwtPrivateKeySecret object
-@secure()
-param jwtPublicKeySecret object
 
 var internalCaddyPort = 8000
 
@@ -37,7 +29,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, jwtPrivateKeySecret, jwtPublicKeySecret]
+var secrets = [containerRegistryPasswordSecret, storageAccountKeySecret]
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName

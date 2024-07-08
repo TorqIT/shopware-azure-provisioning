@@ -103,7 +103,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
 // Database
 param databaseServerName string
 param databaseAdminUsername string = 'adminuser'
-param databasePasswordSecretName string = 'databasePassword'
+param databaseAdminPasswordSecretName string = 'database-admin-password'
 param databaseSkuName string = 'Standard_B1ms'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
@@ -117,7 +117,7 @@ module database 'database/database.bicep' = {
   params: {
     location: location
     administratorLogin: databaseAdminUsername
-    administratorPassword: keyVault.getSecret(databasePasswordSecretName)
+    administratorPassword: keyVault.getSecret(databaseAdminPasswordSecretName)
     databaseName: databaseName
     serverName: databaseServerName
     skuName: databaseSkuName
@@ -146,25 +146,22 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
-param initContainerAppJobName string = ''
-param initCpuCores string = '0.5'
-param initMemory string = '1Gi'
-param shopwareContainerAppExternal bool = true
-param shopwareContainerAppName string
-param shopwareImageName string
-// By default, use the same image for both the init and main Shopware apps
-param initImageName string = shopwareImageName
-param shopwareContainerAppCustomDomains array = []
-param shopwareContainerAppCpuCores string = '1.0'
-param shopwareContainerAppMemory string = '2Gi'
-param shopwareContainerAppMinReplicas int = 1
-param shopwareContainerAppMaxReplicas int = 1
+param shopwareInitContainerAppJobName string = ''
+param shopwareInitImageName string
+param shopwareInitContainerAppJobCpuCores string = '0.5'
+param shopwareInitContainerAppJobMemory string = '1Gi'
+param shopwareWebContainerAppExternal bool = true
+param shopwareWebContainerAppName string
+param shopwareWebImageName string
+param shopwareWebContainerAppCustomDomains array = []
+param shopwareWebContainerAppCpuCores string = '1.0'
+param shopwareWebContainerAppMemory string = '2Gi'
+param shopwareWebContainerAppMinReplicas int = 1
+param shopwareWebContainerAppMaxReplicas int = 1
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
 param additionalEnvVars array = []
-param jwtPublicKeySecretName string = 'jwt-secret-public'
-param jwtPrivateKeySecretName string = 'jwt-secret-private'
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
   dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
@@ -176,30 +173,24 @@ module containerApps 'container-apps/container-apps.bicep' = {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
-    databaseName: databaseName
-    databasePassword: keyVault.getSecret(databasePasswordSecretName)
-    databaseServerName: databaseServerName
-    databaseUser: databaseAdminUsername
-    initContainerAppJobName: initContainerAppJobName
-    initImageName: initImageName
-    initContainerAppJobCpuCores: initCpuCores
-    initContainerAppJobMemory: initMemory
-    shopwareContainerAppName: shopwareContainerAppName
-    shopwareContainerAppCustomDomains: shopwareContainerAppCustomDomains
-    shopwareImageName: shopwareImageName
-    shopwareContainerAppCpuCores: shopwareContainerAppCpuCores
-    shopwareContainerAppMemory: shopwareContainerAppMemory
-    shopwareContainerAppExternal: shopwareContainerAppExternal
-    shopwareContainerAppMinReplicas: shopwareContainerAppMinReplicas
-    shopwareContainerAppMaxReplicas: shopwareContainerAppMaxReplicas
+    shopwareInitContainerAppJobName: shopwareInitContainerAppJobName
+    shopwareInitImageName: shopwareInitImageName
+    shopwareInitContainerAppJobCpuCores: shopwareInitContainerAppJobCpuCores
+    shopwareInitContainerAppJobMemory: shopwareInitContainerAppJobMemory
+    shopwareWebContainerAppName: shopwareWebContainerAppName
+    shopwareWebContainerAppCustomDomains: shopwareWebContainerAppCustomDomains
+    shopwareWebImageName: shopwareWebImageName
+    shopwareWebContainerAppCpuCores: shopwareWebContainerAppCpuCores
+    shopwareWebContainerAppMemory: shopwareWebContainerAppMemory
+    shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
+    shopwareWebContainerAppMinReplicas: shopwareWebContainerAppMinReplicas
+    shopwareWebContainerAppMaxReplicas: shopwareWebContainerAppMaxReplicas
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountPrivateContainerName: storageAccountPrivateContainerName
     storageAccountName: storageAccountName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
-    jwtPublicKey: keyVault.getSecret(jwtPublicKeySecretName)
-    jwtPrivateKey: keyVault.getSecret(jwtPrivateKeySecretName)
   }
 }
 

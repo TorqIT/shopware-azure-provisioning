@@ -20,12 +20,6 @@ Follow these steps to provision an environment for the first time:
            - ./azure/parameters.prod.json:/azure/parameters.prod.json:rw
            # Define a volume to hold your login information between container restarts
            - azure:/root/.azure
-         environment:
-           # These vars are required so that the scripts can properly tag and
-           # push the necessary images to Azure. Ensure these images are built
-           # and set the values here to match the image names (can be found by
-           # running docker image ls).
-           - LOCAL_SHOPWARE_IMAGE=${LOCAL_SHOPWARE_IMAGE}
    volumes:
       azure:
    ```
