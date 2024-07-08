@@ -12,7 +12,7 @@ then
   # Container Apps require images to actually be present in the Container Registry in order to complete provisioning,
   # so we push some "Hello World!" ones here
   echo Pushing images to Container Registry...
-  docker pull hello-world
+  docker pull busybox
   az acr login --name $CONTAINER_REGISTRY_NAME
   declare -A IMAGES=( $SHOPWARE_INIT_IMAGE_NAME $SHOPWARE_WEB_IMAGE_NAME )
   for image in "${!IMAGES[@]}"
