@@ -158,9 +158,6 @@ param shopwareWebContainerAppCpuCores string = '1.0'
 param shopwareWebContainerAppMemory string = '2Gi'
 param shopwareWebContainerAppMinReplicas int = 1
 param shopwareWebContainerAppMaxReplicas int = 1
-@allowed(['0', '1'])
-param appDebug string
-param appEnv string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
