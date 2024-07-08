@@ -14,8 +14,8 @@ then
   echo Pushing images to Container Registry...
   docker pull nginx
   az acr login --name $CONTAINER_REGISTRY_NAME
-  declare -A IMAGES=( $SHOPWARE_INIT_IMAGE_NAME $SHOPWARE_WEB_IMAGE_NAME )
-  for image in "${!IMAGES[@]}"
+  declare -a IMAGES=( $SHOPWARE_INIT_IMAGE_NAME $SHOPWARE_WEB_IMAGE_NAME )
+  for image in "${IMAGES[@]}"
   do
     docker tag hello-world $CONTAINER_REGISTRY_NAME.azurecr.io/$image:latest
     docker push $CONTAINER_REGISTRY_NAME.azurecr.io/$image:latest
