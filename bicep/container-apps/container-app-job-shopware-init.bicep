@@ -47,7 +47,6 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
       containers: [
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-          command: ['/setup']
           env: environmentVariables
           name: imageName
           resources: {

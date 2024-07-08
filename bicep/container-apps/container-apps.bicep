@@ -96,7 +96,7 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
   }
 }
 
-module shopwareWebContainerApp 'container-apps-shopware-web.bicep' = {
+module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
   name: 'shopware-web-container-app'
   dependsOn: [containerAppsEnvironment, environmentVariables]
   params: {
