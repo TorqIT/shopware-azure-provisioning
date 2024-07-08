@@ -16,7 +16,7 @@ param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
 
-var internalCaddyPort = 8000
+var internalPort = 80
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -49,7 +49,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
         // Apps Environment, which is not what we want.
         external: true
         allowInsecure: false
-        targetPort: internalCaddyPort
+        targetPort: internalPort
         traffic: [
           {
             latestRevision: true
