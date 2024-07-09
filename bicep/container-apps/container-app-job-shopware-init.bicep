@@ -6,35 +6,19 @@ param imageName string
 param cpuCores string
 param memory string
 
-param defaultEnvVars array
+param environmentVariables array
 
 param containerRegistryName string
 param containerRegistryConfiguration object
 
-param databaseServerName string
-param databaseUser string
-param databaseName string
-
-@secure()
-param databasePasswordSecret object
-@secure()
-param databaseUrlSecret object
 @secure()
 param containerRegistryPasswordSecret object
-@secure()
-param storageAccountKeySecret object
-@secure()
-param jwtPrivateKeySecret object
-@secure()
-param jwtPublicKeySecret object
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
   scope: resourceGroup()
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
-
-var environmentVariables = concat(defaultEnvVars, [{name: 'SHOPWARE_SKIP_ASSET_COPY', value: '1'}])
 
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
@@ -43,7 +27,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
     environmentId: containerAppsEnvironmentId
     configuration: {
       replicaTimeout: 600
-      secrets: [containerRegistryPasswordSecret, databasePasswordSecret, databaseUrlSecret, storageAccountKeySecret, jwtPrivateKeySecret, jwtPublicKeySecret]
+      secrets: [containerRegistryPasswordSecret] 
       triggerType: 'Manual'
       eventTriggerConfig: {
         scale: {
@@ -59,9 +43,8 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
       containers: [
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-          command: ['/setup']
-          env: environmentVariables
           name: imageName
+          env: environmentVariables
           resources: {
             cpu: json(cpuCores)
             memory: memory

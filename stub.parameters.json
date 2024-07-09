@@ -118,10 +118,6 @@
     "databaseAdminUsername": {
       "value": "adminuser"
     },
-    // The name of the secret in the Key Vault where the database password is stored
-    "databasePasswordSecretName": {
-      "value": "my-database-password-secret-name"
-    },
     // The SKU tier to use for the database. A complete list can be found by running
     // az mysql flexible-server list-skus --location <your location>
     "databaseSkuTier": {
@@ -153,28 +149,28 @@
     "containerAppsEnvironmentName": {
       "value": "my-container-apps-environment"
     },
-    "initContainerAppJobName": {
+    "shopwareInitContainerAppJobName": {
       "value": "my-init-container-app-job"
     },
-    "initCpuCores": {
+    "shopwareInitCpuCores": {
       "value": "0.25"
     },
-    "initMemory": {
+    "shopwareInitMemory": {
       "value": "0.5Gi"
     },
     // Whether the web container should be available on the public internet. If false,
     // it will be restricted to be only accessible within the configured Virtual Network.
-    "shopwareContainerAppExternal": {
+    "shopwareWebContainerAppExternal": {
       "value": true
     },
-    "shopwareContainerAppName": {
-      "value": "my-shopware-container-app"
+    "shopwareWebContainerAppName": {
+      "value": "my-shopware-web-container-app"
     },
     // Defines custom domains and their associated managed certificates for the web container app. 
     // When you are initially provisioning your environment, leave the "value" here as an empty array ([]), set up
     // the custom domain(s) in the portal, and add the values back here so that subsequent deployments will keep
     // the custom domains intact. For more information, see the README.
-    "shopwareContainerAppCustomDomains": {
+    "shopwareWebContainerAppCustomDomains": {
       "value": [
         {
           "domainName": "my-custom.domain.com",
@@ -182,38 +178,36 @@
         }
       ]
     },
-    "shopwareImageName": {
-      "value": "my-shopware-image"
+    "shopwareWebImageName": {
+      "value": "my-shopware-web-image"
     },
     // Note that in all Container Apps, the memory must be twice the number of CPU cores (e.g. 0.25 cores and 0.5Gi, or 0.5 cores and 1Gi, etc.)
-    "shopwareContainerAppCpuCores": {
+    "shopwareWebContainerAppCpuCores": {
       "value": "1"
     },
-    "shopwareContainerAppMemory": {
+    "shopwareWebContainerAppMemory": {
       "value": "2Gi"
     },
     // Minimum number of parallel replicas to be running at a time. Default value is 1. Set to 0 to scale-to-zero during inactivity.
-    "shopwareContainerAppMinReplicas": {
+    "shopwareWebContainerAppMinReplicas": {
       "value": 1
     },
     // Maximium number of parallel replicas to be running at a time. Default value is 1. 
-    "shopwareContainerAppMaxReplicas": {
+    "shopwareWebContainerAppMaxReplicas": {
       "value": 2
+    },
+    "appEnv": {
+      "value": "dev"
+    },
+    "appUrl": {
+      "value": "my-app.domain.com"
     },
     // The following values are the common environment variables used by Shopware. Note that
     // values such as database credentials are automatically configured by the script and do not
     // need to be set here.
 
-    // Debug setting for Symfony. Numerical string value of "0" (false) or "1" (true).
-    "appDebug": {
-      "value": "1"
-    },
-    // Symfony environment setting
-    "appEnv": {
-      "value": "dev"
-    },
     // Add any additional environment variables for your Container Apps here. Note that these will be applied
-    // to the Shopware. Also note that environment variables that need to reference secret values should not 
+    // to all of the containers. Also note that environment variables that need to reference secret values should not 
     // be placed here - see additionalSecrets below.
     "additionalEnvVars": {
       "value": [

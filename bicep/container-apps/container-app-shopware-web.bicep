@@ -3,7 +3,6 @@ param location string = resourceGroup().location
 param containerAppsEnvironmentName string
 param containerAppName string
 param imageName string
-param environmentVariables array
 param containerRegistryName string
 param containerRegistryConfiguration object
 param customDomains array
@@ -11,20 +10,12 @@ param cpuCores string
 param memory string
 param minReplicas int
 param maxReplicas int
-@secure()
-param databasePasswordSecret object
-@secure()
-param databaseUrlSecret object
+param environmentVariables array
+
 @secure()
 param containerRegistryPasswordSecret object
-@secure()
-param storageAccountKeySecret object
-@secure()
-param jwtPrivateKeySecret object
-@secure()
-param jwtPublicKeySecret object
 
-var internalCaddyPort = 8000
+var internalPort = 80
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -37,7 +28,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, jwtPrivateKeySecret, jwtPublicKeySecret]
+var secrets = [containerRegistryPasswordSecret]
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
@@ -57,7 +48,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
         // Apps Environment, which is not what we want.
         external: true
         allowInsecure: false
-        targetPort: internalCaddyPort
+        targetPort: internalPort
         traffic: [
           {
             latestRevision: true
