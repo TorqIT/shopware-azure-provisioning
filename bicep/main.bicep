@@ -158,6 +158,9 @@ param shopwareWebContainerAppCpuCores string = '1.0'
 param shopwareWebContainerAppMemory string = '2Gi'
 param shopwareWebContainerAppMinReplicas int = 1
 param shopwareWebContainerAppMaxReplicas int = 1
+@allowed(['dev', 'prod'])
+param appEnv string
+param appUrl string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
@@ -180,9 +183,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
     shopwareWebContainerAppMinReplicas: shopwareWebContainerAppMinReplicas
     shopwareWebContainerAppMaxReplicas: shopwareWebContainerAppMaxReplicas
-    storageAccountPublicContainerName: storageAccountPublicContainerName
-    storageAccountPrivateContainerName: storageAccountPrivateContainerName
-    storageAccountName: storageAccountName
+    appEnv: appEnv
+    appUrl: appUrl
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName

@@ -196,6 +196,12 @@
     "shopwareWebContainerAppMaxReplicas": {
       "value": 2
     },
+    "appEnv": {
+      "value": "dev"
+    },
+    "appUrl": {
+      "value": "my-app.domain.com"
+    },
     // The following values are the common environment variables used by Shopware. Note that
     // values such as database credentials are automatically configured by the script and do not
     // need to be set here.

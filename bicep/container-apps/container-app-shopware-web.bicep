@@ -10,6 +10,8 @@ param cpuCores string
 param memory string
 param minReplicas int
 param maxReplicas int
+param environmentVariables array
+
 @secure()
 param containerRegistryPasswordSecret object
 
@@ -65,6 +67,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
         {
           name: imageName
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
+          env: environmentVariables
           resources: {
             cpu: json(cpuCores)
             memory: memory

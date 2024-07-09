@@ -6,6 +6,8 @@ param imageName string
 param cpuCores string
 param memory string
 
+param environmentVariables array
+
 param containerRegistryName string
 param containerRegistryConfiguration object
 
@@ -42,6 +44,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           name: imageName
+          env: environmentVariables
           resources: {
             cpu: json(cpuCores)
             memory: memory

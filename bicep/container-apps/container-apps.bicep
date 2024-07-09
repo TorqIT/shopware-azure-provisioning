@@ -23,6 +23,8 @@ param shopwareWebContainerAppMemory string
 param shopwareWebContainerAppMinReplicas int
 param shopwareWebContainerAppMaxReplicas int
 
+param appEnv string
+param appUrl string
 param additionalEnvVars array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
@@ -54,6 +56,16 @@ var containerRegistryConfiguration = {
   passwordSecretRef: containerRegistryPasswordSecretName
 }
 
+// Environment variables
+module environmentVariables './container-apps-variables.bicep' = {
+  name: 'container-apps-env-vars'
+  params: {
+    appEnv: appEnv
+    appUrl: appUrl
+    additionalVars: additionalEnvVars
+  }
+}
+
 module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
   name: 'shopware-init-container-app-job'
   dependsOn: [containerAppsEnvironment]
@@ -63,6 +75,7 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
     imageName: shopwareInitImageName
     cpuCores: shopwareInitContainerAppJobCpuCores
     memory: shopwareInitContainerAppJobMemory
+    environmentVariables: environmentVariables.outputs.envVars
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
@@ -84,6 +97,7 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     memory: shopwareWebContainerAppMemory
     minReplicas: shopwareWebContainerAppMinReplicas
     maxReplicas: shopwareWebContainerAppMaxReplicas
+    environmentVariables: environmentVariables.outputs.envVars
     customDomains: shopwareWebContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
   }
