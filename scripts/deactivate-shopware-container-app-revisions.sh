@@ -4,7 +4,7 @@
 # Usage: ./deactivate-shopware-container-app-revisions.sh <path to parameters.json file>
 
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
-SHOPWARE_CONTAINER_APP=$(jq -r '.parameters.shopwareContainerAppName.value' $1)
+SHOPWARE_CONTAINER_APP=$(jq -r '.parameters.shopwareWebContainerAppName.value' $1)
 
 REVISIONS=$(az containerapp revision list --resource-group $RESOURCE_GROUP --name $SHOPWARE_CONTAINER_APP | jq -r '.[].name')
 
