@@ -4,6 +4,7 @@ param appInstallCurrency string
 param appInstallLocale string
 param appSalesChannelName string
 param appInstallCategoryId string
+param databaseUrlSecretName string
 param additionalVars array
 
 var defaultEnvVars = [
@@ -30,6 +31,10 @@ var defaultEnvVars = [
   {
     name: 'APP_INSTALL_CATEGORY_ID'
     value: appInstallCategoryId
+  }
+  {
+    name: 'DATABASE_URL'
+    secretRef: databaseUrlSecretName
   }
 ]
 

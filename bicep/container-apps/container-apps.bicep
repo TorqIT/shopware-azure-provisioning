@@ -87,6 +87,7 @@ module environmentVariables './container-apps-variables.bicep' = {
     appSalesChannelName: appSalesChannelName
     appInstallCategoryId: appInstallCategoryId
     additionalVars: additionalEnvVars
+    databaseUrlSecretName: databaseUrlSecretName
   }
 }
 
