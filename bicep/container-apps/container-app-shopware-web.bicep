@@ -3,8 +3,6 @@ param location string = resourceGroup().location
 param containerAppsEnvironmentName string
 param containerAppName string
 param imageName string
-param containerRegistryName string
-param containerRegistryConfiguration object
 param customDomains array
 param cpuCores string
 param memory string
@@ -12,8 +10,12 @@ param minReplicas int
 param maxReplicas int
 param environmentVariables array
 
+param containerRegistryName string
+param containerRegistryConfiguration object
 @secure()
 param containerRegistryPasswordSecret object
+
+param databaseUrlSecret object
 
 var internalPort = 80
 
@@ -28,7 +30,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [containerRegistryPasswordSecret]
+var secrets = [containerRegistryPasswordSecret, databaseUrlSecret]
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName

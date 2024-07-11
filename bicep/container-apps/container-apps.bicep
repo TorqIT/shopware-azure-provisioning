@@ -126,5 +126,6 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     environmentVariables: environmentVariables.outputs.envVars
     customDomains: shopwareWebContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
+    databaseUrlSecret: databaseUrlSecret
   }
 }
