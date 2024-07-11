@@ -161,6 +161,10 @@ param shopwareWebContainerAppMaxReplicas int = 1
 @allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
+param appInstallCategoryId string = ''
+param appInstallCurrency string = 'CAD'
+param appInstallLocale string = 'en-CA'
+param appSalesChannelName string = 'Storefront'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
@@ -185,9 +189,17 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareWebContainerAppMaxReplicas: shopwareWebContainerAppMaxReplicas
     appEnv: appEnv
     appUrl: appUrl
+    appInstallCategoryId: appInstallCategoryId
+    appInstallCurrency: appInstallCurrency
+    appInstallLocale: appInstallLocale
+    appSalesChannelName: appSalesChannelName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    databaseServerName: databaseServerName
+    databaseUser: databaseAdminUsername
+    databasePassword: keyVault.getSecret(databaseAdminPasswordSecretName)
+    databaseName: databaseName
   }
 }
 

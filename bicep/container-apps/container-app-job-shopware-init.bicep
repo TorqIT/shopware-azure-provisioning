@@ -6,13 +6,14 @@ param imageName string
 param cpuCores string
 param memory string
 
-param environmentVariables array
-
 param containerRegistryName string
 param containerRegistryConfiguration object
-
 @secure()
 param containerRegistryPasswordSecret object
+
+param databaseUrlSecret object
+
+param environmentVariables array
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -27,7 +28,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
     environmentId: containerAppsEnvironmentId
     configuration: {
       replicaTimeout: 600
-      secrets: [containerRegistryPasswordSecret] 
+      secrets: [containerRegistryPasswordSecret, databaseUrlSecret] 
       triggerType: 'Manual'
       eventTriggerConfig: {
         scale: {

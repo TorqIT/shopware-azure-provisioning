@@ -196,15 +196,28 @@
     "shopwareWebContainerAppMaxReplicas": {
       "value": 2
     },
+
+    // The following values are the common environment variables used by Shopware. Note that
+    // values such as database credentials are automatically configured by the script and do not
+    // need to be set here.
     "appEnv": {
       "value": "dev"
     },
     "appUrl": {
       "value": "my-app.domain.com"
     },
-    // The following values are the common environment variables used by Shopware. Note that
-    // values such as database credentials are automatically configured by the script and do not
-    // need to be set here.
+    "appInstallCategoryId": {
+      "value": "018f62358a357230852fd8838c604b60"
+    },
+    "appInstallCurrency": {
+      "value": "CAD"
+    },
+    "appInstallLocale": {
+      "value": "en-CA"
+    },
+    "appSalesChannelName": {
+      "value": "My Sales Channel"
+    },
 
     // Add any additional environment variables for your Container Apps here. Note that these will be applied
     // to all of the containers. Also note that environment variables that need to reference secret values should not 
@@ -221,6 +234,7 @@
         }
       ]
     },
+
     // Add any additional secrets required by your Container Apps here. Note that this requires the secret value to
     // be present in the Resource Group's Key Vault.
     "additionalSecrets": {

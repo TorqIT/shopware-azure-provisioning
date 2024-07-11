@@ -7,6 +7,12 @@ param virtualNetworkName string
 param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
+param databaseServerName string
+param databaseName string
+param databaseUser string
+@secure()
+param databasePassword string
+
 param containerRegistryName string
 
 param shopwareInitContainerAppJobName string
@@ -25,6 +31,10 @@ param shopwareWebContainerAppMaxReplicas int
 
 param appEnv string
 param appUrl string
+param appInstallCurrency string
+param appInstallLocale string
+param appSalesChannelName string
+param appInstallCategoryId string
 param additionalEnvVars array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
@@ -44,6 +54,10 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' e
   name: containerRegistryName
 }
 
+resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
+  name: databaseServerName
+}
+
 // Secrets
 var containerRegistryPasswordSecretName = 'container-registry-password'
 var containerRegistryPasswordSecret = {
@@ -55,6 +69,12 @@ var containerRegistryConfiguration = {
   username: containerRegistry.listCredentials().username
   passwordSecretRef: containerRegistryPasswordSecretName
 }
+var databaseUrlSecretName = 'database-url'
+var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
+var databaseUrlSecret = {
+  name: databaseUrlSecretName
+  value: databaseUrl
+}
 
 // Environment variables
 module environmentVariables './container-apps-variables.bicep' = {
@@ -62,6 +82,10 @@ module environmentVariables './container-apps-variables.bicep' = {
   params: {
     appEnv: appEnv
     appUrl: appUrl
+    appInstallCurrency: appInstallCurrency
+    appInstallLocale: appInstallLocale
+    appSalesChannelName: appSalesChannelName
+    appInstallCategoryId: appInstallCategoryId
     additionalVars: additionalEnvVars
   }
 }
@@ -80,6 +104,7 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
+    databaseUrlSecret: databaseUrlSecret
   }
 }
 
