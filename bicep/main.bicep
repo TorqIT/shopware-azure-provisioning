@@ -150,6 +150,7 @@ param shopwareInitContainerAppJobName string = ''
 param shopwareInitImageName string
 param shopwareInitContainerAppJobCpuCores string = '0.5'
 param shopwareInitContainerAppJobMemory string = '1Gi'
+param shopwareInitContainerAppJobReplicaTimeoutSeconds int = 600
 param shopwareWebContainerAppExternal bool = true
 param shopwareWebContainerAppName string
 param shopwareWebImageName string
@@ -179,6 +180,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareInitImageName: shopwareInitImageName
     shopwareInitContainerAppJobCpuCores: shopwareInitContainerAppJobCpuCores
     shopwareInitContainerAppJobMemory: shopwareInitContainerAppJobMemory
+    shopwareInitContainerAppJobReplicaTimeoutSeconds: shopwareInitContainerAppJobReplicaTimeoutSeconds
     shopwareWebContainerAppName: shopwareWebContainerAppName
     shopwareWebContainerAppCustomDomains: shopwareWebContainerAppCustomDomains
     shopwareWebImageName: shopwareWebImageName

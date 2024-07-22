@@ -5,6 +5,7 @@ param containerAppJobName string
 param imageName string
 param cpuCores string
 param memory string
+param replicaTimeoutSeconds int
 
 param containerRegistryName string
 param containerRegistryConfiguration object
@@ -27,7 +28,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   properties: {
     environmentId: containerAppsEnvironmentId
     configuration: {
-      replicaTimeout: 600
+      replicaTimeout: replicaTimeoutSeconds
       secrets: [containerRegistryPasswordSecret, databaseUrlSecret] 
       triggerType: 'Manual'
       eventTriggerConfig: {

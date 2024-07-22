@@ -19,6 +19,7 @@ param shopwareInitContainerAppJobName string
 param shopwareInitImageName string
 param shopwareInitContainerAppJobCpuCores string
 param shopwareInitContainerAppJobMemory string
+param shopwareInitContainerAppJobReplicaTimeoutSeconds int
 
 param shopwareWebContainerAppExternal bool
 param shopwareWebContainerAppCustomDomains array
@@ -100,6 +101,7 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
     imageName: shopwareInitImageName
     cpuCores: shopwareInitContainerAppJobCpuCores
     memory: shopwareInitContainerAppJobMemory
+    replicaTimeoutSeconds: shopwareInitContainerAppJobReplicaTimeoutSeconds
     environmentVariables: environmentVariables.outputs.envVars
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryConfiguration: containerRegistryConfiguration
