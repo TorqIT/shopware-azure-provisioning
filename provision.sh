@@ -5,7 +5,7 @@ set -e
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 
 KEY_VAULT_NAME=$(jq -r '.parameters.keyVaultName.value' $1)
-KEY_VAULT_RESOURCE_GROUP_NAME=$(jq -r '.parameters.keyVaultResourceGroupName.value' $1)
+KEY_VAULT_RESOURCE_GROUP_NAME=$(jq -r '.parameters.keyVaultResourceGroupName.value // ""' $1)
 if [ "${KEY_VAULT_RESOURCE_GROUP_NAME:-$RESOURCE_GROUP}" == "${RESOURCE_GROUP}" ]; then
   echo "Deploying Key Vault..."
   az deployment group create \
