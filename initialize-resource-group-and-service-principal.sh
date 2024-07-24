@@ -17,7 +17,7 @@ az group create --location $LOCATION --name $RESOURCE_GROUP
 echo Creating service principal $SERVICE_PRINCIPAL_NAME...
 az ad sp create-for-rbac --display-name $SERVICE_PRINCIPAL_NAME
 
-SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name korth-shopware-sp-dev --query "[].{spID:appId}" --output tsv)
+SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:appId}" --output tsv)
 
 echo Assigning AcrPush role on Container Registry to service principal...
 az role assignment create \
