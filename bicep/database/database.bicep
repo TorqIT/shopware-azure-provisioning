@@ -70,6 +70,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
 
 module databaseBackupVault 'database-backup-vault.bicep' = if (longTermBackups) {
   name: 'database-backup-vault'
+  dependsOn: [databaseServer]
   params: {
     backupVaultName: backupVaultName
     databaseServerName: serverName
