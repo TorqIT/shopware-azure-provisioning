@@ -249,9 +249,9 @@ module containerApps 'container-apps/container-apps.bicep' = {
 
 // Optional services Virtual Machine
 param provisionServicesVM bool = false
-param servicesVmSubnetName string
+param servicesVmSubnetName string = ''
 @description('Address space to allocate for the services VM. Note that a subnet of at least /29 is required.')
-param servicesVmSubnetAddressSpace string
+param servicesVmSubnetAddressSpace string = ''
 // TODO configure VM
 
 // Optional n8n provisioning
