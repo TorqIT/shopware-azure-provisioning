@@ -11,6 +11,11 @@ param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
 param databaseSubnetAddressSpace string
 
+param provisionN8N bool
+param n8nDatabaseSubnetName string
+@description('Address space to allocate for the n8n Postgres database subnet. Note that a subnet of at least /28 is required and it must be a delegated subnet occupied exclusively by the database.')
+param n8nDatabaseSubnetAddressSpace string
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName
   location: location
@@ -46,6 +51,20 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           ]
         }
       }
+      (provisionN8N) ? {
+        name: n8nDatabaseSubnetName
+        properties: {
+          addressPrefix: n8nDatabaseSubnetAddressSpace
+          delegations: [
+            {
+              name: 'Microsoft.DBforPostgreSQL/flexibleServers'
+              properties: {
+                serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
+              }
+            }
+          ]
+        }
+      } : {}
     ]
   }
 }

@@ -274,39 +274,6 @@
           }
         ]
       }
-    },
-    // The following parameters are only necessary if you wish to provision an Elasticsearch Container App
-    // (i.e. set provisionElasticsearch to true)
-    "provisionElasticsearch": {
-      "value": false
-    },
-    "elasticsearchContainerAppName": {
-      // It will be possible to access this container using this name from the other Container Apps in your configured environment
-      "value": "my-elasticsearch-container-app"
-    },
-    "elasticsearchCpuCores": {
-      "value": "0.5"
-    },
-    "elasticsearchMemory": {
-      "value": "1Gi"
-    },
-    "elasticsearchNodeName": {
-      "value": "my-elasticsearch-node"
-    },
-    // The following parameters are only necessary if you wish to provision an OpenSearch Container App
-    // (i.e. set provisionOpenSearch to true)
-    "provisionOpenSearch": {
-      "value": false
-    },
-    "openSearchContainerAppName": {
-      // It will be possible to access this container using this name from the other Container Apps in your configured environment
-      "value": "my-open-search-container-app"
-    },
-    "openSearchCpuCores": {
-      "value": "0.5"
-    },
-    "openSearchMemory": {
-      "value": "1Gi"
     }
   }
 }

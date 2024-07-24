@@ -36,6 +36,10 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    // Optional n8n provisioning (see more n8n configuration below)
+    provisionN8N: provisionN8N
+    n8nDatabaseSubnetAddressSpace: n8nVirtualNetworkDatabaseSubnetAddressSpace
+    n8nDatabaseSubnetName: n8nVirtualNetworkDatabaseSubnetName
   }
 }
 
@@ -236,6 +240,66 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+  }
+}
+
+// Optional n8n provisioning
+param provisionN8N bool = false
+param n8nContainerAppName string = ''
+param n8nContainerAppCpuCores string = '0.25'
+param n8nContainerAppMemory string = '0.5Gi'
+param n8nContainerAppCustomDomains array = []
+param n8nContainerAppMinReplicas int = 0
+param n8nContainerAppMaxReplicas int = 1
+param n8nContainerAppStorageMountName string = 'n8n-data'
+param n8nContainerAppVolumeName string = 'n8n-data'
+param n8nDataStorageAccountName string = ''
+param n8nDataStorageAccountAccessTier string = 'Hot'
+param n8nDataStorageAccountKind string = 'StorageV2'
+param n8nDataStorageAccountSku string = 'Standard_LRS'
+param n8nDataStorageAccountFileShareName string = 'n8n-data'
+param n8nDataStorageAccountFileShareAccessTier string = 'Hot'
+param n8nDatabaseServerName string = ''
+param n8nDatabaseName string = 'n8n'
+param n8nDatabaseAdminUser string = 'adminuser'
+param n8nDatabaseAdminPasswordKeyVaultSecretName string = 'n8n-db-password'
+param n8nDatabaseSkuName string = 'Standard_B1ms'
+param n8nDatabaseSkuTier string = 'Burstable'
+param n8nDatabaseStorageSizeGB int = 32
+param n8nDatabaseBackupRetentionDays int = 7
+param n8nVirtualNetworkDatabaseSubnetName string = 'postgres'
+param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.3.0/28'
+module n8n './n8n/n8n.bicep' = if (provisionN8N) {
+  name: 'n8n'
+  dependsOn: [containerApps]
+  params: {
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppsEnvironmentStorageMountName: n8nContainerAppStorageMountName
+    databaseAdminPassword: keyVault.getSecret(n8nDatabaseAdminPasswordKeyVaultSecretName)
+    databaseAdminUser: n8nDatabaseAdminUser
+    databaseServerName: n8nDatabaseServerName
+    databaseName: n8nDatabaseName
+    databaseSkuName: n8nDatabaseSkuName
+    databaseSkuTier: n8nDatabaseSkuTier
+    databaseStorageSizeGB: n8nDatabaseStorageSizeGB
+    databaseBackupRetentionDays: n8nDatabaseBackupRetentionDays
+    n8nContainerAppCpuCores: n8nContainerAppCpuCores
+    n8nContainerAppCustomDomains: n8nContainerAppCustomDomains
+    n8nContainerAppMaxReplicas: n8nContainerAppMaxReplicas
+    n8nContainerAppMemory: n8nContainerAppMemory
+    n8nContainerAppMinReplicas: n8nContainerAppMinReplicas
+    n8nContainerAppName: n8nContainerAppName
+    n8nContainerAppVolumeName: n8nContainerAppVolumeName
+    storageAccountName: n8nDataStorageAccountName
+    storageAccountKind: n8nDataStorageAccountKind
+    storageAccountSku: n8nDataStorageAccountSku
+    storageAccountAccessTier: n8nDataStorageAccountAccessTier
+    storageAccountFileShareName: n8nDataStorageAccountFileShareName
+    storageAccountFileShareAccessTier: n8nDataStorageAccountFileShareAccessTier
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
+    virtualNetworkDatabaseSubnetName: n8nVirtualNetworkDatabaseSubnetName
   }
 }
 
