@@ -36,10 +36,14 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    // Optional services VM provisioning (see configuration below)
+    provisionServicesVM: provisionServicesVM
+    servicesVmSubnetName: servicesVmSubnetName
+    servicesVmSubnetAddressSpace: servicesVmSubnetAddressSpace
     // Optional n8n provisioning (see more n8n configuration below)
     provisionN8N: provisionN8N
-    n8nDatabaseSubnetAddressSpace: n8nVirtualNetworkDatabaseSubnetAddressSpace
     n8nDatabaseSubnetName: n8nVirtualNetworkDatabaseSubnetName
+    n8nDatabaseSubnetAddressSpace: n8nVirtualNetworkDatabaseSubnetAddressSpace
   }
 }
 
@@ -242,6 +246,13 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
   }
 }
+
+// Optional services Virtual Machine
+param provisionServicesVM bool = false
+param servicesVmSubnetName string
+@description('Address space to allocate for the services VM. Note that a subnet of at least /29 is required.')
+param servicesVmSubnetAddressSpace string
+// TODO configure VM
 
 // Optional n8n provisioning
 param provisionN8N bool = false
