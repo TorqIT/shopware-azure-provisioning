@@ -30,52 +30,46 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         virtualNetworkAddressSpace
       ]
     }
-    subnets: [
-      {
-        name: containerAppsSubnetName
-        properties: {
-          addressPrefix: containerAppsSubnetAddressSpace
-          serviceEndpoints: [
-            {
-              service: 'Microsoft.Storage'
-            }
-          ]
+  }
+
+  resource containerAppsSubnet 'subnets' = {
+    name: containerAppsSubnetName
+    properties: {
+      addressPrefix: containerAppsSubnetAddressSpace
+      serviceEndpoints: [
+        {
+          service: 'Microsoft.Storage'
         }
-      }
-      {
-        name: databaseSubnetName
-        properties: {
-          addressPrefix: databaseSubnetAddressSpace
-          delegations: [
-            {
-              name: 'Microsoft.DBforMySQL/flexibleServers'
-              properties: {
-                serviceName: 'Microsoft.DBforMySQL/flexibleServers'
-              }
-            }
-          ]
+      ]
+    }
+  }
+
+  resource databaseSubnet 'subnets' = {
+    name: databaseSubnetName
+    properties: {
+      addressPrefix: databaseSubnetAddressSpace
+      delegations: [
+        {
+          name: 'Microsoft.DBforMySQL/flexibleServers'
+          properties: {
+            serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+          }
         }
-      }
-      (provisionServicesVM) ? {
-        name: servicesVmSubnetName
-        properties: {
-          addressPrefix: servicesVmSubnetAddressSpace
-        }
-      } : {}
-      (provisionN8N) ? {
-        name: n8nDatabaseSubnetName
-        properties: {
-          addressPrefix: n8nDatabaseSubnetAddressSpace
-          delegations: [
-            {
-              name: 'Microsoft.DBforPostgreSQL/flexibleServers'
-              properties: {
-                serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
-              }
-            }
-          ]
-        }
-      } : {}
-    ]
+      ]
+    }
+  }
+
+  resource n8nSubnet 'subnets' = if (provisionN8N) {
+    name: servicesVmSubnetName
+    properties: {
+      addressPrefix: servicesVmSubnetAddressSpace
+    }
+  }
+
+  resource servicesVmSubnet 'subnets' = if (provisionServicesVM) {
+    name: servicesVmSubnetName
+    properties: {
+      addressPrefix: servicesVmSubnetAddressSpace
+    }
   }
 }
