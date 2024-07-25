@@ -32,7 +32,7 @@ az deployment group create \
   --parameters \
     containerRegistryName=$CONTAINER_REGISTRY_NAME \
     sku=$CONTAINER_REGISTRY_SKU
-./bicep/container-registry/deploy-images.sh $1
+./bicep/container-registry/push-images.sh $1
 ./bicep/container-registry/purge-container-registry-task.sh $1
 
 echo "Provisioning the rest of the Azure environment..."
