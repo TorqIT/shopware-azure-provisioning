@@ -249,8 +249,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
 
 // Optional services Virtual Machine
 param provisionServicesVM bool = false
-param servicesVmSubnetName string = ''
-param servicesVmSubnetAddressSpace string = ''
+param servicesVmSubnetName string = 'services-vm'
+param servicesVmSubnetAddressSpace string = '10.0.3.0/29'
 // TODO configure VM
 
 // Optional n8n provisioning
@@ -278,7 +278,7 @@ param n8nDatabaseSkuTier string = 'Burstable'
 param n8nDatabaseStorageSizeGB int = 32
 param n8nDatabaseBackupRetentionDays int = 7
 param n8nVirtualNetworkDatabaseSubnetName string = 'postgres'
-param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.3.0/28'
+param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
 module n8n './n8n/n8n.bicep' = if (provisionN8N) {
   name: 'n8n'
   dependsOn: [containerApps]
