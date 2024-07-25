@@ -47,7 +47,7 @@ var adminPasswordSecret = {
 var initEnvVars = [
   {
     name: 'PIMCORE_INSTALL'
-    value: runPimcoreInstall
+    value: runPimcoreInstall ? 1 : 0
   }
   {
     name: 'PIMCORE_INSTALL_MYSQL_HOST_SOCKET'
