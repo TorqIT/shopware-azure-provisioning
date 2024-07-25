@@ -56,12 +56,12 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           ]
         }
       }
-      {
+      (provisionServicesVM) ? {
         name: servicesVmSubnetName
         properties: {
           addressPrefix: servicesVmSubnetAddressSpace
         }
-      }
+      } : {}
       (provisionN8N) ? {
         name: n8nDatabaseSubnetName
         properties: {
