@@ -8,10 +8,10 @@ PHP_FPM_IMAGE_NAME=$(jq -r '.parameters.phpFpmImageName.value' $1)
 SUPERVISORD_IMAGE_NAME=$(jq -r '.parameters.supervisordImageName.value' $1)
 REDIS_IMAGE_NAME=$(jq -r '.parameters.redisImageName.value' $1)
 
-$IMAGES=($PHP_FPM_IMAGE_NAME $SUPERVISORD_IMAGE_NAME $REDIS_IMAGE_NAME)
+IMAGES=($PHP_FPM_IMAGE_NAME $SUPERVISORD_IMAGE_NAME $REDIS_IMAGE_NAME)
 if [ ! -z $INIT_IMAGE_NAME ];
 then
-  $IMAGES+=($INIT_IMAGE_NAME)
+  IMAGES+=($INIT_IMAGE_NAME)
 fi
 
 EXISTING_REPOSITORIES=$(az acr repository list --name $CONTAINER_REGISTRY_NAME)
