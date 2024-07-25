@@ -17,7 +17,8 @@ param databaseServerName string
 param databaseUser string
 param databaseName string
 
-// Whether to run the pimcore-install command when this job runs
+// Whether to run the pimcore-install command when this job runs. 
+// This should only be set to true on first deployment and set to false on all subsequent deploys.
 param runPimcoreInstall bool
 
 @secure()
