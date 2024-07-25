@@ -70,12 +70,6 @@
     "virtualNetworkDatabaseSubnetAddressSpace": {
       "value": "10.0.2.0/28"
     },
-    // Whether to deploy initial Docker images to the Container Registry during this deployment.
-    // This is necessary when first deploying a Container Apps Environment as its provisioning requires
-    // images to actually be present. After this first deployment, this value can be set to false.
-    "deployImagesToContainerRegistry": {
-      "value": true
-    },
     // Storage Account in which the persistent Pimcore files will be stored (e.g. assets)
     "storageAccountName": {
       "value": "mystorageaccount"
