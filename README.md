@@ -24,14 +24,6 @@ Follow these steps to provision an environment for the first time:
            - ./azure/parameters.prod.json:/azure/parameters.prod.json:rw
            # Define a volume to hold your login information between container restarts
            - azure:/root/.azure
-         environment:
-           # These vars are required so that the scripts can properly tag and
-           # push the necessary images to Azure. Ensure these images are built
-           # and set the values here to match the image names (can be found by
-           # running docker image ls).
-           - LOCAL_PHP_FPM_IMAGE=${LOCAL_PHP_FPM_IMAGE}
-           - LOCAL_SUPERVISORD_IMAGE=${LOCAL_SUPERVISORD_IMAGE}
-           - LOCAL_REDIS_IMAGE=${LOCAL_REDIS_IMAGE}
    volumes:
       azure:
    ```
@@ -42,7 +34,8 @@ Follow these steps to provision an environment for the first time:
 6. Run `./create-key-vault.sh parameters.json` to create a Key Vault in your Resource Group. Once created, navigate to the created Key Vault in the Azure Portal and use the "Access control (IAM)" blade to add yourself to the "Key Vault Secrets Officer" role (the Owner role at the Resource Group will allow you to do this; but it is not itself sufficient to actually manage secrets). Additionally, make sure the Key Vault is using a "Role-based Access Policy" in the "Access configuration" blade. Make up a secure database password and add it as a secret to this vault using either the Azure Portal or CLI (make sure the `databasePasswordSecretName` value matches the secret name in the vault). Add any other secrets your Container App will need to this vault as well (see `stub.parameters.jsonc` for details on how to reference these).
    1. NOTE: There is an open issue to improve the Key Vault scripting (see [#50](https://github.com/TorqIT/pimcore-azure-provisioning/issues/50))
 8. Run `./provision.sh parameters.json` to provision the Azure environment.
-9. Once provisioned, follow these steps to seed the database with the Pimcore schema:
+9. Use whatever method you prefer to push your Docker images to the Container Registry. Refer to the steps in the section below for pushing via CI/CD (GitHub Actions).
+9. (ONLY REQUIRED IF YOU ARE NOT DEPLOYING AN INIT CONTAINER) Once provisioned and deployed, follow these steps to seed the database with the Pimcore schema:
    1. Make up a secure password that you will use to log into the Pimcore admin panel and save it somewhere secure such as a password manager, or within the key vault you created earlier. Note that symbols such as % and # will not work with the bash command below, so a long alphanumeric password should be used.
    2. Ensure that your PHP-FPM image contains the SSL certificate required for communicating with the database (can be downloaded from https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem). The command below assumes the file is present at `/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem`. Additionally, your Symfony database connection string (usually present in `config/database.yaml`) must be configured to use the certificate (e.g. `options: !php/const:PDO::MYSQL_ATTR_SSL_CA: '/var/www/html/config/db/DigiCertGlobalRootCA.crt.pem'`). If this is not properly set, the command below will fail with "Connections using insecure transport are prohibited".
    3. Run `az containerapp exec --resource-group <your-resource-group> --name <your-php-fpm-container-app> --command bash` to enter the Container App's shell.
