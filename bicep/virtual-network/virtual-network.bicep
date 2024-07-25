@@ -30,42 +30,44 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         virtualNetworkAddressSpace
       ]
     }
-  }
-
-  resource containerAppsSubnet 'subnets' = {
-    name: containerAppsSubnetName
-    properties: {
-      addressPrefix: containerAppsSubnetAddressSpace
-      serviceEndpoints: [
-        {
-          service: 'Microsoft.Storage'
+    subnets: [
+      {
+        name: containerAppsSubnetName
+        properties: {
+          addressPrefix: containerAppsSubnetAddressSpace
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.Storage'
+            }
+          ]
         }
-      ]
-    }
-  }
-
-  resource databaseSubnet 'subnets' = {
-    name: databaseSubnetName
-    properties: {
-      addressPrefix: databaseSubnetAddressSpace
-      delegations: [
-        {
-          name: 'Microsoft.DBforMySQL/flexibleServers'
-          properties: {
-            serviceName: 'Microsoft.DBforMySQL/flexibleServers'
-          }
+      }
+      {
+        name: databaseSubnetName
+        properties: {
+          addressPrefix: databaseSubnetAddressSpace
+          delegations: [
+            {
+              name: 'Microsoft.DBforMySQL/flexibleServers'
+              properties: {
+                serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+              }
+            }
+          ]
         }
-      ]
-    }
+      }
+      
+    ]
   }
 
+  // We deploy these subnets as resources instead of as part of the properties above,
+  // as there is no way to deploy conditionally using the above pattern
   resource n8nSubnet 'subnets' = if (provisionN8N) {
     name: servicesVmSubnetName
     properties: {
       addressPrefix: servicesVmSubnetAddressSpace
     }
   }
-
   resource servicesVmSubnet 'subnets' = if (provisionServicesVM) {
     name: servicesVmSubnetName
     properties: {
