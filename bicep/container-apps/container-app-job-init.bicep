@@ -5,7 +5,7 @@ param containerAppJobName string
 param imageName string
 param cpuCores string
 param memory string
-param replicaTimeout int
+param replicaTimeoutSeconds int
 
 // Environment variables shared with the PHP and supervisord Container Apps
 param defaultEnvVars array
@@ -89,7 +89,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   properties: {
     environmentId: containerAppsEnvironmentId
     configuration: {
-      replicaTimeout: replicaTimeout
+      replicaTimeout: replicaTimeoutSeconds
       secrets: [containerRegistryPasswordSecret, databasePasswordSecret, storageAccountKeySecret, adminPasswordSecret]
       triggerType: 'Manual'
       eventTriggerConfig: {

@@ -128,7 +128,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = if (provisionInit) {
     imageName: initContainerAppJobImageName
     cpuCores: initContainerAppJobCpuCores
     memory: initContainerAppJobMemory
-    replicaTimeout: initContainerAppJobReplicaTimeoutSeconds
+    replicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
