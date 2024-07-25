@@ -21,6 +21,7 @@ param initContainerAppJobImageName string
 param initContainerAppJobCpuCores string
 param initContainerAppJobMemory string
 param initContainerAppJobRunPimcoreInstall bool
+param initContainerAppJobReplicaTimeoutSeconds int
 @secure()
 param pimcoreAdminPassword string
 
@@ -127,6 +128,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = if (provisionInit) {
     imageName: initContainerAppJobImageName
     cpuCores: initContainerAppJobCpuCores
     memory: initContainerAppJobMemory
+    replicaTimeout: initContainerAppJobReplicaTimeoutSeconds
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName

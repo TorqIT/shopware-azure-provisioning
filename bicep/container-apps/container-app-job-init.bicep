@@ -5,6 +5,7 @@ param containerAppJobName string
 param imageName string
 param cpuCores string
 param memory string
+param replicaTimeout
 
 // Environment variables shared with the PHP and supervisord Container Apps
 param defaultEnvVars array
@@ -46,7 +47,7 @@ var adminPasswordSecret = {
 var initEnvVars = [
   {
     name: 'PIMCORE_INSTALL'
-    value: '${runPimcoreInstall}'
+    value: runPimcoreInstall
   }
   {
     name: 'PIMCORE_INSTALL_MYSQL_HOST_SOCKET'
@@ -88,7 +89,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   properties: {
     environmentId: containerAppsEnvironmentId
     configuration: {
-      replicaTimeout: 300
+      replicaTimeout: replicaTimeout
       secrets: [containerRegistryPasswordSecret, databasePasswordSecret, storageAccountKeySecret, adminPasswordSecret]
       triggerType: 'Manual'
       eventTriggerConfig: {
