@@ -32,7 +32,7 @@ do
     echo "Setting secret $secretRef in Container App Job $initContainerAppJobName..."
     az containerapp job secret set --resource-group $resourceGroup --name $initContainerAppJobName --secrets $secretRef=$secretValue
     echo "Setting environment variable $secretEnvVarName to reference $secretRef in $initContainerAppJobName..."
-    az containerapp job update --resource-group $resourceGroup --name $supervisordContainerAppName --set-env-vars "$secretEnvVarName=secretref:$secretRef"
+    az containerapp job update --resource-group $resourceGroup --name $initContainerAppJobName --set-env-vars "$secretEnvVarName=secretref:$secretRef"
   fi
 done
 
