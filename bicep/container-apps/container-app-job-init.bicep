@@ -5,7 +5,7 @@ param containerAppJobName string
 param imageName string
 param cpuCores string
 param memory string
-param replicaTimeout
+param replicaTimeout int
 
 // Environment variables shared with the PHP and supervisord Container Apps
 param defaultEnvVars array
