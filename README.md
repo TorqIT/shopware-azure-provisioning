@@ -49,7 +49,8 @@ Follow these steps to provision an environment for the first time:
         --mysql-username=$DATABASE_USER \
         --mysql-password=$DATABASE_PASSWORD \
         --mysql-ssl-cert-path=config/db/DigiCertGlobalRootCA.crt.pem \
-        --skip-database-config
+        --skip-database-config \
+        --no-interaction
       # If you are still on Pimcore 10.x, add the --ignore-existing-config flag
       ```
 
