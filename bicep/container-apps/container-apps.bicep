@@ -41,7 +41,6 @@ param supervisordCpuCores string
 param supervisordMemory string
 
 param redisContainerAppName string
-param redisImageName string
 param redisCpuCores string
 param redisMemory string
 
@@ -193,10 +192,6 @@ module redisContainerApp 'container-apps-redis.bicep' = {
     location: location
     containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
     containerAppName: redisContainerAppName
-    imageName: redisImageName
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
-    containerRegistryConfiguration: containerRegistryConfiguration
-    containerRegistryName: containerRegistryName
     cpuCores: redisCpuCores
     memory: redisMemory
   }

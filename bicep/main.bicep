@@ -175,18 +175,17 @@ param phpFpmContainerAppName string
 param phpFpmImageName string
 param phpFpmContainerAppUseProbes bool = false
 param phpFpmContainerAppCustomDomains array = []
-param phpFpmCpuCores string = '1.0'
-param phpFpmMemory string = '2Gi'
+param phpFpmCpuCores string = '0.5'
+param phpFpmMemory string = '1Gi'
 param phpFpmScaleToZero bool = false
 param phpFpmMaxReplicas int = 1
 param supervisordContainerAppName string
 param supervisordImageName string
 param supervisordCpuCores string = '0.25'
-param supervisordMemory string = '250Mi'
+param supervisordMemory string = '0.5Gi'
 param redisContainerAppName string
-param redisImageName string
 param redisCpuCores string = '0.25'
-param redisMemory string = '1Gi'
+param redisMemory string = '0.5Gi'
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
@@ -232,7 +231,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     pimcoreEnvironment: pimcoreEnvironment
     redisContainerAppName: redisContainerAppName
     redisDb: redisDb
-    redisImageName: redisImageName
     redisSessionDb: redisSessionDb
     redisCpuCores: redisCpuCores
     redisMemory: redisMemory
@@ -327,3 +325,4 @@ param deployImagesToContainerRegistry bool = false //deprecated
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
+param redisImageName string = '' //deprecated
