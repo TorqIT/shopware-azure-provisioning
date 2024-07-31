@@ -7,8 +7,7 @@ RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 KEY_VAULT_NAME=$(jq -r '.parameters.keyVaultName.value' $1)
 KEY_VAULT_RESOURCE_GROUP_NAME=$(jq -r '.parameters.keyVaultResourceGroupName.value // ""' $1)
 WAIT_FOR_KEY_VAULT_MANUAL_INTERVENTION=$(jq -r '.parameters.waitForKeyVaultManualIntervention.value' $1)
-if [ "${WAIT_FOR_KEY_VAULT_MANUAL_INTERVENTION:-false}" = true ]
-    && [ "${KEY_VAULT_RESOURCE_GROUP_NAME:-$RESOURCE_GROUP}" == "${RESOURCE_GROUP}" ]
+if [ "${WAIT_FOR_KEY_VAULT_MANUAL_INTERVENTION:-false}" = true ] && [ "${KEY_VAULT_RESOURCE_GROUP_NAME:-$RESOURCE_GROUP}" == "${RESOURCE_GROUP}" ]
 then
   echo "Deploying Key Vault..."
   az deployment group create \
