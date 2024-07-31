@@ -4,7 +4,7 @@ param containerRegistryName string
 
 // Key Vault
 param keyVaultName string
-// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
+// If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
 param keyVaultResourceGroupName string = resourceGroup().name
 module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
   name: 'key-vault'
@@ -25,7 +25,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 // Virtual Network
 param virtualNetworkName string
 param virtualNetworkAddressSpace string = '10.0.0.0/16'
-// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
+// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist in that Resource Group
 param virtualNetworkResourceGroupName string = resourceGroup().name
 param virtualNetworkContainerAppsSubnetName string = 'pimcore-container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
