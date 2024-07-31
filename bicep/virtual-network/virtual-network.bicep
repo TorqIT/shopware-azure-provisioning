@@ -21,6 +21,55 @@ param servicesVmSubnetName string
 @description('Address space to allocate for the services VM. Note that a subnet of at least /29 is required.')
 param servicesVmSubnetAddressSpace string
 
+var defaultSubnets = [
+  {
+    name: containerAppsSubnetName
+    properties: {
+      addressPrefix: containerAppsSubnetAddressSpace
+      serviceEndpoints: [
+        {
+          service: 'Microsoft.Storage'
+        }
+      ]
+    }
+  }
+  {
+    name: databaseSubnetName
+    properties: {
+      addressPrefix: databaseSubnetAddressSpace
+      delegations: [
+        {
+          name: 'Microsoft.DBforMySQL/flexibleServers'
+          properties: {
+            serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+          }
+        }
+      ]
+    }
+  }
+]
+var n8nPostgresSubnet = provisionN8N ? [{
+  name: n8nDatabaseSubnetName
+  properties: {
+    addressPrefix: n8nDatabaseSubnetAddressSpace
+    delegations: [
+      {
+        name: 'Microsoft.DBforPostgreSQL/flexibleServers'
+        properties: {
+          serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
+        }
+      }
+    ]
+  }
+}] : []
+var servicesVmSubnet = provisionServicesVM ? [{
+  name: servicesVmSubnetName
+  properties: {
+    addressPrefix: servicesVmSubnetAddressSpace
+  }
+}] : []
+var subnets = concat(defaultSubnets, n8nPostgresSubnet, servicesVmSubnet)
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName
   location: location
@@ -30,48 +79,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         virtualNetworkAddressSpace
       ]
     }
-    subnets: [
-      {
-        name: containerAppsSubnetName
-        properties: {
-          addressPrefix: containerAppsSubnetAddressSpace
-          serviceEndpoints: [
-            {
-              service: 'Microsoft.Storage'
-            }
-          ]
-        }
-      }
-      {
-        name: databaseSubnetName
-        properties: {
-          addressPrefix: databaseSubnetAddressSpace
-          delegations: [
-            {
-              name: 'Microsoft.DBforMySQL/flexibleServers'
-              properties: {
-                serviceName: 'Microsoft.DBforMySQL/flexibleServers'
-              }
-            }
-          ]
-        }
-      }
-      
-    ]
-  }
-
-  // We deploy these subnets as resources instead of as part of the properties above,
-  // as there is no way to deploy conditionally using the above pattern
-  resource n8nSubnet 'subnets' = if (provisionN8N) {
-    name: servicesVmSubnetName
-    properties: {
-      addressPrefix: servicesVmSubnetAddressSpace
-    }
-  }
-  resource servicesVmSubnet 'subnets' = if (provisionServicesVM) {
-    name: servicesVmSubnetName
-    properties: {
-      addressPrefix: servicesVmSubnetAddressSpace
-    }
+    subnets: subnets
   }
 }

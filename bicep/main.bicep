@@ -247,11 +247,29 @@ module containerApps 'container-apps/container-apps.bicep' = {
   }
 }
 
-// Optional services Virtual Machine
+// Optional Virtual Machine for running side services
 param provisionServicesVM bool = false
+param servicesVmName string = ''
 param servicesVmSubnetName string = 'services-vm'
 param servicesVmSubnetAddressSpace string = '10.0.3.0/29'
-// TODO configure VM
+param servicesVmAdminUsername string = 'azureuser'
+param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
+param servicesVmSize string = 'Standard_B2s'
+param servicesVmUbuntuOSVersion string = 'Ubuntu-2204'
+module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (provisionServicesVM) {
+  name: 'services-virtual-machine'
+  dependsOn: [virtualNetwork]
+  params: {
+    name: servicesVmName
+    adminPublicSshKey: keyVault.getSecret(servicesVmPublicKeyKeyVaultSecretName)
+    adminUsername: servicesVmAdminUsername
+    size: servicesVmSize
+    ubuntuOSVersion: servicesVmUbuntuOSVersion
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkSubnetName: servicesVmSubnetName
+  }
+}
 
 // Optional n8n provisioning
 param provisionN8N bool = false
@@ -319,7 +337,8 @@ module n8n './n8n/n8n.bicep' = if (provisionN8N) {
 // is ever fixed, these can be removed.
 param subscriptionId string = ''
 param resourceGroupName string = ''
-param tenantName string = ''
+param tenantName string = '' //deprecated
+param tenantId string = ''
 param servicePrincipalName string = ''
 param deployImagesToContainerRegistry bool = false //deprecated
 param additionalSecrets object = {}

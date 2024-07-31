@@ -5,8 +5,8 @@
     "subscriptionId": {
       "value": "my-subscription-id"
     },
-    "tenantName": {
-      "value": "my-tenant-name"
+    "tenantId": {
+      "value": "azure-tenant-directory-id"
     },
     "resourceGroupName": {
       "value": "my-resource-group"
