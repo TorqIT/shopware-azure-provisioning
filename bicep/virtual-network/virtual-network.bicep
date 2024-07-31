@@ -11,7 +11,12 @@ param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
 param databaseSubnetAddressSpace string
 
-var subnets = [
+param provisionServicesVM bool
+param servicesVmSubnetName string
+@description('Address space to allocate for the services VM. Note that a subnet of at least /29 is required.')
+param servicesVmSubnetAddressSpace string
+
+var defaultSubnets = [
   {
     name: containerAppsSubnetName
     properties: {
@@ -38,6 +43,13 @@ var subnets = [
     }
   }
 ]
+var servicesVmSubnet = provisionServicesVM ? [{
+  name: servicesVmSubnetName
+  properties: {
+    addressPrefix: servicesVmSubnetAddressSpace
+  }
+}] : []
+var subnets = concat(defaultSubnets, servicesVmSubnet)
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName

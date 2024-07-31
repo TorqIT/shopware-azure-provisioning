@@ -45,6 +45,10 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    // Optional services VM provisioning (see configuration below)
+    provisionServicesVM: provisionServicesVM
+    servicesVmSubnetName: servicesVmSubnetName
+    servicesVmSubnetAddressSpace: servicesVmSubnetAddressSpace
   }
 }
 
@@ -217,6 +221,30 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseName: databaseName
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
+  }
+}
+
+// Optional Virtual Machine for running side services
+param provisionServicesVM bool = false
+param servicesVmName string = ''
+param servicesVmSubnetName string = 'services-vm'
+param servicesVmSubnetAddressSpace string = '10.0.3.0/29'
+param servicesVmAdminUsername string = 'azureuser'
+param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
+param servicesVmSize string = 'Standard_B2s'
+param servicesVmUbuntuOSVersion string = 'Ubuntu-2204'
+module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (provisionServicesVM) {
+  name: 'services-virtual-machine'
+  dependsOn: [virtualNetwork]
+  params: {
+    name: servicesVmName
+    adminPublicSshKey: keyVault.getSecret(servicesVmPublicKeyKeyVaultSecretName)
+    adminUsername: servicesVmAdminUsername
+    size: servicesVmSize
+    ubuntuOSVersion: servicesVmUbuntuOSVersion
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkSubnetName: servicesVmSubnetName
   }
 }
 
