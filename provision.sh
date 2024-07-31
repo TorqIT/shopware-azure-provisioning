@@ -25,7 +25,7 @@ fi
 # main Bicep file.
 echo "Deploying Container Registry..."
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
-CONTAINER_REGISTRY_SKU=$(jq -r '.parameters.containerRegistrySku.value // Basic' $1)
+CONTAINER_REGISTRY_SKU=$(jq -r '.parameters.containerRegistrySku.value // empty' $1)
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file ./bicep/container-registry/container-registry.bicep \
