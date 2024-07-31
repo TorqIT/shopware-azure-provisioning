@@ -197,7 +197,7 @@ param redisSessionDb string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -244,6 +244,22 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    // Optional n8n Container App (see more configuration below)
+    provisionN8N: provisionN8N
+    n8nContainerAppName: n8nContainerAppName
+    n8nContainerAppCpuCores: n8nContainerAppCpuCores
+    n8nContainerAppMemory: n8nContainerAppMemory
+    n8nContainerAppMaxReplicas: n8nContainerAppMaxReplicas
+    n8nContainerAppMinReplicas: n8nContainerAppMinReplicas
+    n8nContainerAppCustomDomains: n8nContainerAppCustomDomains
+    n8nContainerAppsEnvironmentStorageMountName: n8nContainerAppStorageMountName
+    n8nDatabaseServerName: n8nDatabaseServerName
+    n8nDatabaseName: n8nDatabaseName
+    n8nDatabaseAdminUser: n8nDatabaseAdminUser
+    n8nDatabaseAdminPassword: keyVault.getSecret(n8nDatabaseAdminPasswordKeyVaultSecretName)
+    n8nStorageAccountName: n8nDataStorageAccountName
+    n8nStorageAccountFileShareName: n8nDataStorageAccountFileShareName
+    n8nContainerAppVolumeName: n8nContainerAppVolumeName
   }
 }
 
@@ -299,10 +315,7 @@ param n8nVirtualNetworkDatabaseSubnetName string = 'postgres'
 param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
 module n8n './n8n/n8n.bicep' = if (provisionN8N) {
   name: 'n8n'
-  dependsOn: [containerApps]
   params: {
-    containerAppsEnvironmentName: containerAppsEnvironmentName
-    containerAppsEnvironmentStorageMountName: n8nContainerAppStorageMountName
     databaseAdminPassword: keyVault.getSecret(n8nDatabaseAdminPasswordKeyVaultSecretName)
     databaseAdminUser: n8nDatabaseAdminUser
     databaseServerName: n8nDatabaseServerName
@@ -311,13 +324,6 @@ module n8n './n8n/n8n.bicep' = if (provisionN8N) {
     databaseSkuTier: n8nDatabaseSkuTier
     databaseStorageSizeGB: n8nDatabaseStorageSizeGB
     databaseBackupRetentionDays: n8nDatabaseBackupRetentionDays
-    n8nContainerAppCpuCores: n8nContainerAppCpuCores
-    n8nContainerAppCustomDomains: n8nContainerAppCustomDomains
-    n8nContainerAppMaxReplicas: n8nContainerAppMaxReplicas
-    n8nContainerAppMemory: n8nContainerAppMemory
-    n8nContainerAppMinReplicas: n8nContainerAppMinReplicas
-    n8nContainerAppName: n8nContainerAppName
-    n8nContainerAppVolumeName: n8nContainerAppVolumeName
     storageAccountName: n8nDataStorageAccountName
     storageAccountKind: n8nDataStorageAccountKind
     storageAccountSku: n8nDataStorageAccountSku

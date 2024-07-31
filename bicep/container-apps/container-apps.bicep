@@ -56,6 +56,24 @@ param additionalEnvVars array
 @secure()
 param databasePassword string
 
+// Optional n8n Container App
+param provisionN8N bool
+param n8nContainerAppName string
+param n8nContainerAppCpuCores string
+param n8nContainerAppMemory string
+param n8nContainerAppMinReplicas int
+param n8nContainerAppMaxReplicas int
+param n8nContainerAppCustomDomains array
+param n8nContainerAppsEnvironmentStorageMountName string
+param n8nStorageAccountFileShareName string
+param n8nContainerAppVolumeName string
+param n8nStorageAccountName string
+param n8nDatabaseServerName string
+param n8nDatabaseName string
+param n8nDatabaseAdminUser string
+@secure()
+param n8nDatabaseAdminPassword string
+
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
   params: {
@@ -194,5 +212,28 @@ module redisContainerApp 'container-apps-redis.bicep' = {
     containerAppName: redisContainerAppName
     cpuCores: redisCpuCores
     memory: redisMemory
+  }
+}
+
+// Optional n8n Container App
+module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
+  name: 'n8n-container-app'
+  dependsOn: [containerAppsEnvironment]
+  params: {
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppsEnvironmentStorageMountName: n8nContainerAppsEnvironmentStorageMountName
+    n8nContainerAppCpuCores: n8nContainerAppCpuCores
+    n8nContainerAppCustomDomains: n8nContainerAppCustomDomains
+    n8nContainerAppMaxReplicas: n8nContainerAppMaxReplicas
+    n8nContainerAppMemory: n8nContainerAppMemory
+    n8nContainerAppMinReplicas: n8nContainerAppMinReplicas
+    n8nContainerAppName: n8nContainerAppName
+    n8nContainerAppVolumeName: n8nContainerAppVolumeName
+    storageAccountName: n8nStorageAccountName
+    storageAccountFileShareName: n8nStorageAccountFileShareName
+    databaseServerName: n8nDatabaseServerName
+    databaseName: n8nDatabaseName
+    databaseUser: n8nDatabaseAdminUser
+    databasePassword: n8nDatabaseAdminPassword
   }
 }
