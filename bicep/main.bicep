@@ -2,10 +2,18 @@ param location string = resourceGroup().location
 
 param containerRegistryName string
 
-// Key Vault (assumed to have been created prior to this)
+// Key Vault
 param keyVaultName string
+// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
 param keyVaultResourceGroupName string = resourceGroup().name
-resource keyVault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
+module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
+  name: 'key-vault'
+  scope: resourceGroup(keyVaultResourceGroupName)
+  params: {
+    name: keyVaultName
+  }
+}
+resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   name: keyVaultName
   scope: resourceGroup(keyVaultResourceGroupName)
 }
