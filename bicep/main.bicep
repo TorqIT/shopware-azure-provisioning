@@ -11,6 +11,7 @@ module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupN
   scope: resourceGroup(keyVaultResourceGroupName)
   params: {
     name: keyVaultName
+    localIpAddress: localIpAddress
   }
 }
 resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
@@ -359,3 +360,4 @@ param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
 param redisImageName string = '' //deprecated
+param localIpAddress string = ''
