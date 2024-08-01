@@ -1,5 +1,8 @@
 FROM mcr.microsoft.com/azure-cli
 
+# Ensure Bicep extension is up-to-date
+RUN az bicep upgrade
+
 # Install cURL
 RUN apk update -qq && \
     apk add curl

@@ -6,9 +6,10 @@ echo Setting up scheduled task to purge all but the latest 10 containers...
 
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
-SHOPWARE_IMAGE_NAME=$(jq -r '.parameters.shopwareImageName.value' $1)
+SHOPWARE_INIT_IMAGE_NAME=$(jq -r '.parameters.shopwareInitImageName.value' $1)
+SHOPWARE_WEB_IMAGE_NAME=$(jq -r '.parameters.shopwareWebImageName.value' $1)
 
-CONTAINER_REGISTRY_REPOSITORIES=($SHOPWARE_IMAGE_NAME)
+CONTAINER_REGISTRY_REPOSITORIES=($SHOPWARE_INIT_IMAGE_NAME $SHOPWARE_WEB_IMAGE_NAME)
 
 PURGE_CMD="acr purge "
 for repository in ${CONTAINER_REGISTRY_REPOSITORIES[@]}

@@ -11,6 +11,34 @@ param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
 param databaseSubnetAddressSpace string
 
+var subnets = [
+  {
+    name: containerAppsSubnetName
+    properties: {
+      addressPrefix: containerAppsSubnetAddressSpace
+      serviceEndpoints: [
+        {
+          service: 'Microsoft.Storage'
+        }
+      ]
+    }
+  }
+  {
+    name: databaseSubnetName
+    properties: {
+      addressPrefix: databaseSubnetAddressSpace
+      delegations: [
+        {
+          name: 'Microsoft.DBforMySQL/flexibleServers'
+          properties: {
+            serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+          }
+        }
+      ]
+    }
+  }
+]
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName
   location: location
@@ -20,32 +48,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         virtualNetworkAddressSpace
       ]
     }
-    subnets: [
-      {
-        name: containerAppsSubnetName
-        properties: {
-          addressPrefix: containerAppsSubnetAddressSpace
-          serviceEndpoints: [
-            {
-              service: 'Microsoft.Storage'
-            }
-          ]
-        }
-      }
-      {
-        name: databaseSubnetName
-        properties: {
-          addressPrefix: databaseSubnetAddressSpace
-          delegations: [
-            {
-              name: 'Microsoft.DBforMySQL/flexibleServers'
-              properties: {
-                serviceName: 'Microsoft.DBforMySQL/flexibleServers'
-              }
-            }
-          ]
-        }
-      }
-    ]
+    subnets: subnets
   }
 }

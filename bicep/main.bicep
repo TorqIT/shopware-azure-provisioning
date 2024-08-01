@@ -2,10 +2,19 @@ param location string = resourceGroup().location
 
 param containerRegistryName string
 
-// Key Vault (assumed to have been created prior to this)
+// Key Vault
 param keyVaultName string
+// If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
 param keyVaultResourceGroupName string = resourceGroup().name
-resource keyVault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
+module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
+  name: 'key-vault'
+  scope: resourceGroup(keyVaultResourceGroupName)
+  params: {
+    name: keyVaultName
+    localIpAddress: localIpAddress
+  }
+}
+resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   name: keyVaultName
   scope: resourceGroup(keyVaultResourceGroupName)
 }
@@ -17,7 +26,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 // Virtual Network
 param virtualNetworkName string
 param virtualNetworkAddressSpace string = '10.0.0.0/16'
-// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
+// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist in that Resource Group
 param virtualNetworkResourceGroupName string = resourceGroup().name
 param virtualNetworkContainerAppsSubnetName string = 'container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
@@ -169,7 +178,7 @@ param appSalesChannelName string = 'Storefront'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -211,9 +220,12 @@ module containerApps 'container-apps/container-apps.bicep' = {
 // is ever fixed, these can be removed.
 param subscriptionId string = ''
 param resourceGroupName string = ''
-param tenantName string = ''
+param tenantName string = '' //deprecated
+param tenantId string = ''
 param servicePrincipalName string = ''
-param deployImagesToContainerRegistry bool = false
+param deployImagesToContainerRegistry bool = false //deprecated
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
+param redisImageName string = '' //deprecated
+param localIpAddress string = ''
