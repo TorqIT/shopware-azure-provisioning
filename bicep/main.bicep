@@ -170,6 +170,7 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
+// Init Container App
 // TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
 param provisionInit bool = false
 param initContainerAppJobName string = ''
@@ -179,22 +180,23 @@ param initMemory string = '1Gi'
 param initContainerAppJobReplicaTimeoutSeconds int = 600
 param initContainerAppJobRunPimcoreInstall bool = false
 param pimcoreAdminPasswordSecretName string = 'pimcore-admin-password'
-param phpFpmContainerAppExternal bool = true
-param phpFpmContainerAppName string
-param phpFpmImageName string
-param phpFpmContainerAppUseProbes bool = false
-param phpFpmContainerAppCustomDomains array = []
-param phpFpmCpuCores string = '0.5'
-param phpFpmMemory string = '1Gi'
-param phpFpmScaleToZero bool = false
-param phpFpmMaxReplicas int = 1
+// PHP ("web") Container App 
+param phpContainerAppExternal bool = true
+param phpContainerAppName string
+param phpContainerAppImageName string
+param phpContainerAppUseProbes bool = false
+param phpContainerAppCustomDomains array = []
+param phpContainerAppCpuCores string = '0.5'
+param phpContainerAppMemory string = '1Gi'
+param phpContainerAppMinReplicas int = 1
+param phpContainerAppMaxReplicas int = 1
 param supervisordContainerAppName string
-param supervisordImageName string
-param supervisordCpuCores string = '0.25'
-param supervisordMemory string = '0.5Gi'
+param supervisordContainerAppImageName string
+param supervisordContainerAppCpuCores string = '0.25'
+param supervisordContainerAppMemory string = '0.5Gi'
 param redisContainerAppName string
-param redisCpuCores string = '0.25'
-param redisMemory string = '0.5Gi'
+param redisContainerAppCpuCores string = '0.25'
+param redisContainerAppMemory string = '0.5Gi'
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
@@ -227,29 +229,29 @@ module containerApps 'container-apps/container-apps.bicep' = {
     initContainerAppJobReplicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
     initContainerAppJobRunPimcoreInstall: initContainerAppJobRunPimcoreInstall
     pimcoreAdminPassword: provisionInit ? keyVault.getSecret(pimcoreAdminPasswordSecretName) : ''
-    phpFpmContainerAppName: phpFpmContainerAppName
-    phpFpmContainerAppCustomDomains: phpFpmContainerAppCustomDomains
-    phpFpmImageName: phpFpmImageName
-    phpFpmCpuCores: phpFpmCpuCores
-    phpFpmMemory: phpFpmMemory
-    phpFpmContainerAppExternal: phpFpmContainerAppExternal
-    phpFpmContainerAppUseProbes: phpFpmContainerAppUseProbes
-    phpFpmScaleToZero: phpFpmScaleToZero
-    phpFpmMaxReplicas: phpFpmMaxReplicas
+    phpContainerAppName: phpContainerAppName
+    phpContainerAppCustomDomains: phpContainerAppCustomDomains
+    phpContainerAppImageName: phpContainerAppImageName
+    phpContainerAppCpuCores: phpContainerAppCpuCores
+    phpContainerAppMemory: phpContainerAppMemory
+    phpContainerAppExternal: phpContainerAppExternal
+    phpContainerAppUseProbes: phpContainerAppUseProbes
+    phpContainerAppMinReplicas: phpContainerAppMinReplicas
+    phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
     pimcoreDev: pimcoreDev
     pimcoreEnvironment: pimcoreEnvironment
     redisContainerAppName: redisContainerAppName
     redisDb: redisDb
     redisSessionDb: redisSessionDb
-    redisCpuCores: redisCpuCores
-    redisMemory: redisMemory
+    redisContainerAppCpuCores: redisContainerAppCpuCores
+    redisContainerAppMemory: redisContainerAppMemory
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
     storageAccountContainerName: storageAccountContainerName
     storageAccountName: storageAccountName
     supervisordContainerAppName: supervisordContainerAppName
-    supervisordImageName: supervisordImageName
-    supervisordCpuCores: supervisordCpuCores
-    supervisordMemory: supervisordMemory
+    supervisordContainerAppImageName: supervisordContainerAppImageName
+    supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
+    supervisordContainerAppMemory: supervisordContainerAppMemory
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
@@ -269,6 +271,11 @@ module containerApps 'container-apps/container-apps.bicep' = {
     n8nStorageAccountName: n8nDataStorageAccountName
     n8nStorageAccountFileShareName: n8nDataStorageAccountFileShareName
     n8nContainerAppVolumeName: n8nContainerAppVolumeName
+    n8nContainerAppProvisionCronScaleRule: n8nContainerAppProvisionCronScaleRule
+    n8nContainerAppCronScaleRuleDesiredReplicas: n8nContainerAppCronScaleRuleDesiredReplicas
+    n8nContainerAppCronScaleRuleEndSchedule: n8nContainerAppCronScaleRuleEndSchedule
+    n8nContainerAppCronScaleRuleStartSchedule: n8nContainerAppCronScaleRuleStartSchedule
+    n8nContainerAppCronScaleRuleTimezone: n8nContainerAppCronScaleRuleTimezone
   }
 }
 
@@ -302,8 +309,13 @@ param n8nContainerAppName string = ''
 param n8nContainerAppCpuCores string = '0.25'
 param n8nContainerAppMemory string = '0.5Gi'
 param n8nContainerAppCustomDomains array = []
-param n8nContainerAppMinReplicas int = 0
+param n8nContainerAppMinReplicas int = 1
 param n8nContainerAppMaxReplicas int = 1
+param n8nContainerAppProvisionCronScaleRule bool = false 
+param n8nContainerAppCronScaleRuleDesiredReplicas int = 1
+param n8nContainerAppCronScaleRuleTimezone string = 'Etc/UTC'
+param n8nContainerAppCronScaleRuleStartSchedule string = '0 7 * * *'
+param n8nContainerAppCronScaleRuleEndSchedule string = '0 18 * * *'
 param n8nContainerAppStorageMountName string = 'n8n-data'
 param n8nContainerAppVolumeName string = 'n8n-data'
 param n8nDataStorageAccountName string = ''
@@ -359,5 +371,4 @@ param deployImagesToContainerRegistry bool = false //deprecated
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
-param redisImageName string = '' //deprecated
 param localIpAddress string = ''

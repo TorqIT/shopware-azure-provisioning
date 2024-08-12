@@ -5,20 +5,26 @@ param storageAccountFileShareName string
 
 param containerAppsEnvironmentName string
 param containerAppsEnvironmentStorageMountName string
+param volumeName string
 
-param n8nContainerAppName string
-param n8nContainerAppCpuCores string
-param n8nContainerAppMemory string
-param n8nContainerAppMinReplicas int
-param n8nContainerAppMaxReplicas int
-param n8nContainerAppCustomDomains array
-param n8nContainerAppVolumeName string
+param containerAppName string
+param cpuCores string
+param memory string
+param minReplicas int
+param maxReplicas int
+param customDomains array
 
 param databaseServerName string
 param databaseName string
 param databaseUser string
 @secure()
 param databasePassword string
+
+param provisionCronScaleRule bool
+param cronScaleRuleDesiredReplicas int
+param cronScaleRuleStartSchedule string
+param cronScaleRuleEndSchedule string
+param cronScaleRuleTimezone string
 
 resource database 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' existing = {
   name: databaseServerName
@@ -45,7 +51,7 @@ resource storageMount 'Microsoft.App/managedEnvironments/storages@2023-11-02-pre
   }
 }
 
-resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@2022-11-01-preview' existing = [for customDomain in n8nContainerAppCustomDomains: {
+resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@2022-11-01-preview' existing = [for customDomain in customDomains: {
   parent: containerAppsEnvironment
   name: customDomain.certificateName
 }]
@@ -55,8 +61,23 @@ var databasePasswordSecret = {
   value: databasePassword
 }
 
-resource n8nContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
-  name: n8nContainerAppName
+var defaultScaleRules = []
+module cronScaleRule './scale-rules/container-app-cron-scale-rule.bicep' = if (provisionCronScaleRule) {
+  name: 'cron-scale-rule'
+  params: {
+    desiredReplicas: cronScaleRuleDesiredReplicas
+    start: cronScaleRuleStartSchedule
+    end: cronScaleRuleEndSchedule
+    timezone: cronScaleRuleTimezone
+  }
+}
+var scaleRules = concat(
+  defaultScaleRules, 
+  provisionCronScaleRule ? [cronScaleRule.outputs.cronScaleRule] : []
+)
+
+resource n8nContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+  name: containerAppName
   dependsOn: [storageMount]
   location: location
   properties: {
@@ -67,8 +88,8 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
         external: true
         allowInsecure: false
         targetPort: 5678
-        customDomains: [for i in range(0, length(n8nContainerAppCustomDomains)): {
-            name: n8nContainerAppCustomDomains[i].domainName
+        customDomains: [for i in range(0, length(customDomains)): {
+            name: customDomains[i].domainName
             bindingType: 'SniEnabled'
             certificateId: certificates[i].id
         }]
@@ -81,8 +102,8 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           name: 'n8n'
           image: 'n8nio/n8n:latest'
           resources: {
-            cpu: json(n8nContainerAppCpuCores)
-            memory: n8nContainerAppMemory
+            cpu: json(cpuCores)
+            memory: memory
           }
           env: [
             {
@@ -117,21 +138,22 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
           volumeMounts: [
             {
               mountPath: '/home/node/.n8n'
-              volumeName: n8nContainerAppVolumeName
+              volumeName: volumeName
             }
           ]
         }
       ]
       volumes: [
         {
-          name: n8nContainerAppVolumeName
+          name: volumeName
           storageName: containerAppsEnvironmentStorageMountName
           storageType: 'AzureFile'
         }
       ]
       scale: {
-        minReplicas: n8nContainerAppMinReplicas
-        maxReplicas: n8nContainerAppMaxReplicas
+        minReplicas: minReplicas
+        maxReplicas: maxReplicas
+        rules: scaleRules
       }
     }
   }

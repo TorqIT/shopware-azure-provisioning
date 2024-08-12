@@ -151,19 +151,19 @@
     "containerAppsEnvironmentName": {
       "value": "my-container-apps-environment"
     },
-    // Whether the PHP-FPM (web) container should be available on the public internet. If false,
+    // Whether the PHP (web) container should be available on the public internet. If false,
     // it will be restricted to be only accessible within the configured Virtual Network.
-    "phpFpmContainerAppExternal": {
+    "phpContainerAppExternal": {
       "value": true
     },
-    "phpFpmContainerAppName": {
-      "value": "my-php-fpm-container-app"
+    "phpContainerAppName": {
+      "value": "my-web-container-app"
     },
     // Defines custom domains and their associated managed certificates for the PHP-FPM container app (the "web" container).
     // When you are initially provisioning your environment, leave the "value" here as an empty array ([]), set up
     // the custom domain(s) in the portal, and add the values back here so that subsequent deployments will keep
     // the custom domains intact. For more information, see the README.
-    "phpFpmContainerAppCustomDomains": {
+    "phpContainerAppCustomDomains": {
       "value": [
         {
           "domainName": "my-custom.domain.com",
@@ -172,46 +172,47 @@
       ]
     },
     // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
-    "phpFpmContainerAppUseProbes": {
+    "phpContainerAppUseProbes": {
       "value": false
     },
     "phpFpmImageName": {
       "value": "my-php-fpm-image"
     },
     // Note that in all Container Apps, the memory must be twice the number of CPU cores (e.g. 0.25 cores and 0.5Gi, or 0.5 cores and 1Gi, etc.)
-    "phpFpmCpuCores": {
+    "phpContainerAppCpuCores": {
       "value": "1"
     },
-    "phpFpmMemory": {
+    "phpContainerAppMemory": {
       "value": "2Gi"
     },
-    // Set to true if the webapp can be scaled to zero during inactivity. This may be desirable for dev/testing applications as a cost-saving measure.
-    "phpFpmScaleToZero": {
-      "value": false
+    // The number of minimum replicas to run at any given time. Set to 0 to enable "scale-to-zero" behavior. Default value is 1.
+    "phpContainerAppMinReplicas": {
+      "value": 1
+    },
+    // The number of maximum replicas to run at any given time. Default value is 1.
+    "phpContainerAppMaxReplicas": {
+      "value": 1
     },
     "supervisordContainerAppName": {
       "value": "my-supervisord-container-app"
     },
-    "supervisordImageName": {
+    "supervisordContainerAppImageName": {
       "value": "my-supervisord-image"
     },
-    "supervisordCpuCores": {
+    "supervisordContainerAppCpuCores": {
       "value": "0.25"
     },
-    "supervisordMemory": {
+    "supervisordContainerAppMemory": {
       "value": "0.5Gi"
     },
     "redisContainerAppName": {
       // It will be possible to access this container using this name from the other Container Apps in your configured environment
       "value": "my-redis-container-app"
     },
-    "redisImageName": {
-      "value": "my-redis-image"
-    },
-    "redisCpuCores": {
+    "redisContainerAppCpuCores": {
       "value": "0.25"
     },
-    "redisMemory": {
+    "redisContainerAppMemory": {
       "value": "0.5Gi"
     },
     // The following values are the common environment variables used by Pimcore. These will

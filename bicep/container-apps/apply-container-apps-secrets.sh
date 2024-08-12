@@ -4,7 +4,7 @@ set -e
 
 resourceGroup=$(jq -r '.parameters.resourceGroupName.value' $1)
 keyVaultName=$(jq -r '.parameters.keyVaultName.value' $1)
-phpFpmContainerAppName=$(jq -r '.parameters.phpFpmContainerAppName.value' $1)
+phpFpmContainerAppName=$(jq -r '.parameters.phpContainerAppName.value' $1)
 supervisordContainerAppName=$(jq -r '.parameters.supervisordContainerAppName.value' $1)
 initContainerAppJobName=$(jq -r '.parameters.initContainerAppJobName.value // empty' $1)
 

@@ -4,7 +4,7 @@
 # Usage: ./deactivate-php-fpm-container-app-revisions.sh <path to parameters.json file>
 
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
-PHP_FPM_CONTAINER_APP=$(jq -r '.parameters.phpFpmContainerAppName.value' $1)
+PHP_FPM_CONTAINER_APP=$(jq -r '.parameters.phpContainerAppName.value' $1)
 
 REVISIONS=$(az containerapp revision list --resource-group $RESOURCE_GROUP --name $PHP_FPM_CONTAINER_APP | jq -r '.[].name')
 

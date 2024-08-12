@@ -25,24 +25,24 @@ param initContainerAppJobReplicaTimeoutSeconds int
 @secure()
 param pimcoreAdminPassword string
 
-param phpFpmContainerAppExternal bool
-param phpFpmContainerAppCustomDomains array
-param phpFpmContainerAppName string
-param phpFpmImageName string
-param phpFpmContainerAppUseProbes bool
-param phpFpmCpuCores string
-param phpFpmMemory string
-param phpFpmScaleToZero bool
-param phpFpmMaxReplicas int
+param phpContainerAppExternal bool
+param phpContainerAppCustomDomains array
+param phpContainerAppName string
+param phpContainerAppImageName string
+param phpContainerAppUseProbes bool
+param phpContainerAppCpuCores string
+param phpContainerAppMemory string
+param phpContainerAppMinReplicas int
+param phpContainerAppMaxReplicas int
 
 param supervisordContainerAppName string
-param supervisordImageName string
-param supervisordCpuCores string
-param supervisordMemory string
+param supervisordContainerAppImageName string
+param supervisordContainerAppCpuCores string
+param supervisordContainerAppMemory string
 
 param redisContainerAppName string
-param redisCpuCores string
-param redisMemory string
+param redisContainerAppCpuCores string
+param redisContainerAppMemory string
 
 param appDebug string
 param appEnv string
@@ -73,13 +73,18 @@ param n8nDatabaseName string
 param n8nDatabaseAdminUser string
 @secure()
 param n8nDatabaseAdminPassword string
+param n8nContainerAppProvisionCronScaleRule bool
+param n8nContainerAppCronScaleRuleDesiredReplicas int
+param n8nContainerAppCronScaleRuleStartSchedule string
+param n8nContainerAppCronScaleRuleEndSchedule string
+param n8nContainerAppCronScaleRuleTimezone string
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
   params: {
     location: location
     name: containerAppsEnvironmentName
-    phpFpmContainerAppExternal: phpFpmContainerAppExternal
+    phpFpmContainerAppExternal: phpContainerAppExternal
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
@@ -167,17 +172,17 @@ module phpFpmContainerApp 'container-apps-php-fpm.bicep' = {
   params: {
     location: location
     containerAppsEnvironmentName: containerAppsEnvironmentName
-    containerAppName: phpFpmContainerAppName
-    imageName: phpFpmImageName
+    containerAppName: phpContainerAppName
+    imageName: phpContainerAppImageName
     environmentVariables: environmentVariables.outputs.envVars
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
-    cpuCores: phpFpmCpuCores
-    memory: phpFpmMemory
-    useProbes: phpFpmContainerAppUseProbes
-    scaleToZero: phpFpmScaleToZero
-    maxReplicas: phpFpmMaxReplicas
-    customDomains: phpFpmContainerAppCustomDomains
+    cpuCores: phpContainerAppCpuCores
+    memory: phpContainerAppMemory
+    useProbes: phpContainerAppUseProbes
+    minReplicas: phpContainerAppMinReplicas
+    maxReplicas: phpContainerAppMaxReplicas
+    customDomains: phpContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
@@ -191,13 +196,13 @@ module supervisordContainerApp 'container-apps-supervisord.bicep' = {
     location: location
     containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
     containerAppName: supervisordContainerAppName
-    imageName: supervisordImageName
+    imageName: supervisordContainerAppImageName
     environmentVariables: environmentVariables.outputs.envVars
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
-    cpuCores: supervisordCpuCores
-    memory: supervisordMemory
+    cpuCores: supervisordContainerAppCpuCores
+    memory: supervisordContainerAppMemory
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
   }
@@ -210,8 +215,8 @@ module redisContainerApp 'container-apps-redis.bicep' = {
     location: location
     containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
     containerAppName: redisContainerAppName
-    cpuCores: redisCpuCores
-    memory: redisMemory
+    cpuCores: redisContainerAppCpuCores
+    memory: redisContainerAppMemory
   }
 }
 
@@ -222,18 +227,24 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
   params: {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppsEnvironmentStorageMountName: n8nContainerAppsEnvironmentStorageMountName
-    n8nContainerAppCpuCores: n8nContainerAppCpuCores
-    n8nContainerAppCustomDomains: n8nContainerAppCustomDomains
-    n8nContainerAppMaxReplicas: n8nContainerAppMaxReplicas
-    n8nContainerAppMemory: n8nContainerAppMemory
-    n8nContainerAppMinReplicas: n8nContainerAppMinReplicas
-    n8nContainerAppName: n8nContainerAppName
-    n8nContainerAppVolumeName: n8nContainerAppVolumeName
+    containerAppName: n8nContainerAppName
+    cpuCores: n8nContainerAppCpuCores
+    memory: n8nContainerAppMemory
+    minReplicas: n8nContainerAppMinReplicas
+    maxReplicas: n8nContainerAppMaxReplicas
+    customDomains: n8nContainerAppCustomDomains
+    volumeName: n8nContainerAppVolumeName
     storageAccountName: n8nStorageAccountName
     storageAccountFileShareName: n8nStorageAccountFileShareName
     databaseServerName: n8nDatabaseServerName
     databaseName: n8nDatabaseName
     databaseUser: n8nDatabaseAdminUser
     databasePassword: n8nDatabaseAdminPassword
+    // Optional scaling rules
+    provisionCronScaleRule: n8nContainerAppProvisionCronScaleRule
+    cronScaleRuleDesiredReplicas: n8nContainerAppCronScaleRuleDesiredReplicas
+    cronScaleRuleStartSchedule: n8nContainerAppCronScaleRuleStartSchedule
+    cronScaleRuleEndSchedule: n8nContainerAppCronScaleRuleEndSchedule
+    cronScaleRuleTimezone: n8nContainerAppCronScaleRuleTimezone
   }
 }
