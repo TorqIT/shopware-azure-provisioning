@@ -159,7 +159,7 @@
     "phpContainerAppName": {
       "value": "my-web-container-app"
     },
-    // Defines custom domains and their associated managed certificates for the PHP-FPM container app (the "web" container).
+    // Defines custom domains and their associated managed certificates for the PHP container app (the "web" container).
     // When you are initially provisioning your environment, leave the "value" here as an empty array ([]), set up
     // the custom domain(s) in the portal, and add the values back here so that subsequent deployments will keep
     // the custom domains intact. For more information, see the README.
@@ -171,12 +171,12 @@
         }
       ]
     },
-    // Whether to use startup/readiness/liveness probes with the PHP-FPM Container App.
+    // Whether to use startup/readiness/liveness probes with the PHP Container App.
     "phpContainerAppUseProbes": {
       "value": false
     },
-    "phpFpmImageName": {
-      "value": "my-php-fpm-image"
+    "phpContainerAppImageName": {
+      "value": "my-php-image"
     },
     // Note that in all Container Apps, the memory must be twice the number of CPU cores (e.g. 0.25 cores and 0.5Gi, or 0.5 cores and 1Gi, etc.)
     "phpContainerAppCpuCores": {
@@ -216,7 +216,7 @@
       "value": "0.5Gi"
     },
     // The following values are the common environment variables used by Pimcore. These will
-    // be applied to both the PHP-FPM and supervisord containers.
+    // be applied to both the PHP and supervisord containers.
 
     // Debug setting for Symfony. Numerical string value of "0" (false) or "1" (true).
     "appDebug": {
@@ -243,7 +243,7 @@
       "value": "14"
     },
     // Add any additional environment variables for your Container Apps here. Note that these will be applied
-    // to both the PHP-FPM and supervisord containers. Also note that environment variables that need to
+    // to both the PHP and supervisord containers. Also note that environment variables that need to
     // reference secret values should not be placed here - see additionalSecrets below.
     "additionalEnvVars": {
       "value": [

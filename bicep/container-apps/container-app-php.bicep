@@ -12,12 +12,19 @@ param memory string
 param useProbes bool
 param minReplicas int
 param maxReplicas int
+
 @secure()
 param databasePasswordSecret object
 @secure()
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
+
+param provisionCronScaleRule bool
+param cronScaleRuleDesiredReplicas int
+param cronScaleRuleStartSchedule string
+param cronScaleRuleEndSchedule string
+param cronScaleRuleTimezone string
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
@@ -32,7 +39,18 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
 
 var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 
-resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
+module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
+  name: 'container-app-scale-rules'
+  params: {
+    provisionCronScaleRule: provisionCronScaleRule
+    cronScaleRuleTimezone: cronScaleRuleTimezone
+    cronScaleRuleStartSchedule: cronScaleRuleStartSchedule
+    cronScaleRuleEndSchedule: cronScaleRuleEndSchedule
+    cronScaleRuleDesiredReplicas: cronScaleRuleDesiredReplicas
+  }
+}
+
+resource phpContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
   location: location
   properties: {
@@ -95,16 +113,7 @@ resource phpFpmContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
-        rules: [
-          {
-            name: 'http-scaling'
-            http: {
-              metadata: {
-               concurrentRequests: '30'
-              }
-            }
-          }
-        ]
+        rules: scaleRules.outputs.scaleRules
       }
     }
   }

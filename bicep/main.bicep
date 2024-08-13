@@ -170,13 +170,13 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
-// Init Container App
+// Init Container App Job
 // TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
 param provisionInit bool = false
 param initContainerAppJobName string = ''
-param initImageName string = ''
-param initCpuCores string = '0.5'
-param initMemory string = '1Gi'
+param initContainerAppJobImageName string = ''
+param initContainerAppJobCpuCores string = '0.5'
+param initContainerAppJobMemory string = '1Gi'
 param initContainerAppJobReplicaTimeoutSeconds int = 600
 param initContainerAppJobRunPimcoreInstall bool = false
 param pimcoreAdminPasswordSecretName string = 'pimcore-admin-password'
@@ -190,13 +190,21 @@ param phpContainerAppCpuCores string = '0.5'
 param phpContainerAppMemory string = '1Gi'
 param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
+param phpContainerAppProvisionCronScaleRule bool = false
+param phpContainerAppCronScaleRuleDesiredReplicas int = 1
+param phpContainerAppCronScaleRuleStartSchedule string = '0 7 * * *'
+param phpContainerAppCronScaleRuleEndSchedule string = '0 18 * * *'
+param phpContainerAppCronScaleRuleTimezone string = 'Etc/UTC'
+// Supervisord Container App
 param supervisordContainerAppName string
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string = '0.25'
 param supervisordContainerAppMemory string = '0.5Gi'
+// Redis Container App
 param redisContainerAppName string
 param redisContainerAppCpuCores string = '0.25'
 param redisContainerAppMemory string = '0.5Gi'
+// Symfony/Pimcore runtime variables
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
@@ -223,9 +231,9 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseUser: databaseAdminUsername
     provisionInit: provisionInit
     initContainerAppJobName: initContainerAppJobName
-    initContainerAppJobImageName: initImageName
-    initContainerAppJobCpuCores: initCpuCores
-    initContainerAppJobMemory: initMemory
+    initContainerAppJobImageName: initContainerAppJobImageName
+    initContainerAppJobCpuCores: initContainerAppJobCpuCores
+    initContainerAppJobMemory: initContainerAppJobMemory
     initContainerAppJobReplicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
     initContainerAppJobRunPimcoreInstall: initContainerAppJobRunPimcoreInstall
     pimcoreAdminPassword: provisionInit ? keyVault.getSecret(pimcoreAdminPasswordSecretName) : ''
@@ -238,6 +246,11 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppUseProbes: phpContainerAppUseProbes
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
+    phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
+    phpContainerAppCronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
+    phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
+    phpContainerAppCronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
+    phpContainerAppCronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
     pimcoreDev: pimcoreDev
     pimcoreEnvironment: pimcoreEnvironment
     redisContainerAppName: redisContainerAppName

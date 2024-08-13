@@ -4,10 +4,10 @@ set -e
 
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
 INIT_IMAGE_NAME=$(jq -r '.parameters.initImageName.value // empty' $1)
-PHP_FPM_IMAGE_NAME=$(jq -r '.parameters.phpFpmImageName.value' $1)
-SUPERVISORD_IMAGE_NAME=$(jq -r '.parameters.supervisordImageName.value' $1)
+PHP_IMAGE_NAME=$(jq -r '.parameters.phpContainerAppImageName.value' $1)
+SUPERVISORD_IMAGE_NAME=$(jq -r '.parameters.supervisordContainerAppImageName.value' $1)
 
-IMAGES=($PHP_FPM_IMAGE_NAME $SUPERVISORD_IMAGE_NAME)
+IMAGES=($PHP_IMAGE_NAME $SUPERVISORD_IMAGE_NAME)
 if [ ! -z $INIT_IMAGE_NAME ];
 then
   IMAGES+=($INIT_IMAGE_NAME)

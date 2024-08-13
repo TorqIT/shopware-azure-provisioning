@@ -1,7 +1,7 @@
 param location string = resourceGroup().location
 
 param name string
-param phpFpmContainerAppExternal bool
+param phpContainerAppExternal bool
 
 param virtualNetworkName string
 param virtualNetworkResourceGroup string
@@ -28,7 +28,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
   location: location
   properties: {
     vnetConfiguration: {
-      internal: !phpFpmContainerAppExternal
+      internal: !phpContainerAppExternal
       infrastructureSubnetId: subnetId
     }
     appLogsConfiguration: {
@@ -46,7 +46,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
 // module is necessary here as Bicep will complain about the Environment needing to be fully deployed
 // before its properties can be used for the zone's name. For some reason, a separate module eliminates
 // that error.
-module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!phpFpmContainerAppExternal) {
+module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!phpContainerAppExternal) {
   name: 'private-dns-zone'
   params: {
     name: containerAppsEnvironment.properties.defaultDomain

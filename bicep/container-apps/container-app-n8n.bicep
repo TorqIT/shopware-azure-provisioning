@@ -61,20 +61,16 @@ var databasePasswordSecret = {
   value: databasePassword
 }
 
-var defaultScaleRules = []
-module cronScaleRule './scale-rules/container-app-cron-scale-rule.bicep' = if (provisionCronScaleRule) {
-  name: 'cron-scale-rule'
+module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
+  name: 'container-app-scale-rules'
   params: {
-    desiredReplicas: cronScaleRuleDesiredReplicas
-    start: cronScaleRuleStartSchedule
-    end: cronScaleRuleEndSchedule
-    timezone: cronScaleRuleTimezone
+    provisionCronScaleRule: provisionCronScaleRule
+    cronScaleRuleTimezone: cronScaleRuleTimezone
+    cronScaleRuleStartSchedule: cronScaleRuleStartSchedule
+    cronScaleRuleEndSchedule: cronScaleRuleEndSchedule
+    cronScaleRuleDesiredReplicas: cronScaleRuleDesiredReplicas
   }
 }
-var scaleRules = concat(
-  defaultScaleRules, 
-  provisionCronScaleRule ? [cronScaleRule.outputs.cronScaleRule] : []
-)
 
 resource n8nContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
@@ -153,7 +149,7 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
-        rules: scaleRules
+        rules: scaleRules.outputs.scaleRules
       }
     }
   }

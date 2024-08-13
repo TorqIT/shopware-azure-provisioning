@@ -8,7 +8,7 @@ LOCATION=$(jq -r '.parameters.location.value' $1)
 SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
 INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.initContainerAppJobName.value // ""' $1)
-PHP_FPM_CONTAINER_APP_NAME=$(jq -r '.parameters.phpFpmContainerAppName.value' $1)
+PHP_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value' $1)
 SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.supervisordContainerAppName.value' $1)
 KEY_VAULT_NAME=$(jq -r '.parameters.keyVaultName.value' $1)
 
@@ -39,7 +39,7 @@ echo Assigning Contributor role on PHP Container App to service principal...
 az role assignment create \
     --assignee $SERVICE_PRINCIPAL_ID \
     --role "Contributor" \
-    --scope "/subscriptions/$SUBSCRIPTION_ID/resourcegroups/$RESOURCE_GROUP/providers/Microsoft.App/containerapps/$PHP_FPM_CONTAINER_APP_NAME"
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourcegroups/$RESOURCE_GROUP/providers/Microsoft.App/containerapps/$PHP_CONTAINER_APP_NAME"
 
 echo Assigning Contributor role on supervisord Container App to service principal...
 az role assignment create \
