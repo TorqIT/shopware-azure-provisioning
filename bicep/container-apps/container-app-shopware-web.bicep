@@ -9,6 +9,7 @@ param memory string
 param minReplicas int
 param maxReplicas int
 param environmentVariables array
+param internalPort int
 
 param containerRegistryName string
 param containerRegistryConfiguration object
@@ -17,7 +18,6 @@ param containerRegistryPasswordSecret object
 
 param databaseUrlSecret object
 
-var internalPort = 80
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName

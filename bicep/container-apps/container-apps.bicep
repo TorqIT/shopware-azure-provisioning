@@ -29,6 +29,7 @@ param shopwareWebContainerAppCpuCores string
 param shopwareWebContainerAppMemory string
 param shopwareWebContainerAppMinReplicas int
 param shopwareWebContainerAppMaxReplicas int
+param shopwareWebContainerAppInternalPort int
 
 param appEnv string
 param appUrl string
@@ -129,5 +130,6 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     customDomains: shopwareWebContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    internalPort: shopwareWebContainerAppInternalPort
   }
 }

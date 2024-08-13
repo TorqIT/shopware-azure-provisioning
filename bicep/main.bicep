@@ -168,6 +168,7 @@ param shopwareWebContainerAppCpuCores string = '1.0'
 param shopwareWebContainerAppMemory string = '2Gi'
 param shopwareWebContainerAppMinReplicas int = 1
 param shopwareWebContainerAppMaxReplicas int = 1
+param shopwareWebContainerAppInternalPort int = 80
 @allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
@@ -198,6 +199,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
     shopwareWebContainerAppMinReplicas: shopwareWebContainerAppMinReplicas
     shopwareWebContainerAppMaxReplicas: shopwareWebContainerAppMaxReplicas
+    shopwareWebContainerAppInternalPort: shopwareWebContainerAppInternalPort
     appEnv: appEnv
     appUrl: appUrl
     appInstallCategoryId: appInstallCategoryId
