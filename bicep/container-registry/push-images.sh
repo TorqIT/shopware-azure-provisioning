@@ -3,7 +3,7 @@
 set -e
 
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
-INIT_IMAGE_NAME=$(jq -r '.parameters.initImageName.value // empty' $1)
+INIT_IMAGE_NAME=$(jq -r '.parameters.initContainerAppJobImageName.value // empty' $1)
 PHP_IMAGE_NAME=$(jq -r '.parameters.phpContainerAppImageName.value' $1)
 SUPERVISORD_IMAGE_NAME=$(jq -r '.parameters.supervisordContainerAppImageName.value' $1)
 

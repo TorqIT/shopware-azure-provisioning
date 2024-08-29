@@ -349,7 +349,9 @@ param n8nVirtualNetworkDatabaseSubnetName string = 'postgres'
 param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
 module n8n './n8n/n8n.bicep' = if (provisionN8N) {
   name: 'n8n'
+  dependsOn: [virtualNetwork]
   params: {
+    // Note that the n8n Container App is provisioned above as part of the containerApps module
     databaseAdminPassword: keyVault.getSecret(n8nDatabaseAdminPasswordKeyVaultSecretName)
     databaseAdminUser: n8nDatabaseAdminUser
     databaseServerName: n8nDatabaseServerName
