@@ -11,8 +11,10 @@ param containerRegistryName string
 param containerRegistryConfiguration object
 @secure()
 param containerRegistryPasswordSecret object
-
+@secure()
 param databaseUrlSecret object
+@secure()
+param appSecretSecret object
 
 param environmentVariables array
 
@@ -22,6 +24,8 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
+var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, appSecretSecret]
+
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
   name: containerAppJobName
@@ -29,7 +33,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
     environmentId: containerAppsEnvironmentId
     configuration: {
       replicaTimeout: replicaTimeoutSeconds
-      secrets: [containerRegistryPasswordSecret, databaseUrlSecret] 
+      secrets: secrets
       triggerType: 'Manual'
       eventTriggerConfig: {
         scale: {

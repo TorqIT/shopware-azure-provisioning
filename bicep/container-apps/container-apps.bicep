@@ -37,6 +37,8 @@ param appInstallCurrency string
 param appInstallLocale string
 param appSalesChannelName string
 param appInstallCategoryId string
+@secure()
+param appSecret string
 param additionalEnvVars array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
@@ -77,6 +79,11 @@ var databaseUrlSecret = {
   name: databaseUrlSecretName
   value: databaseUrl
 }
+var appSecretSecretname = 'app-secret'
+var appSecretSecret = {
+  name: appSecretSecretname
+  value: appSecret
+}
 
 // Environment variables
 module environmentVariables './container-apps-variables.bicep' = {
@@ -84,6 +91,7 @@ module environmentVariables './container-apps-variables.bicep' = {
   params: {
     appEnv: appEnv
     appUrl: appUrl
+    appSecretSecretName: appSecretSecretname
     appInstallCurrency: appInstallCurrency
     appInstallLocale: appInstallLocale
     appSalesChannelName: appSalesChannelName
@@ -109,6 +117,7 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
     containerRegistryName: containerRegistryName
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    appSecretSecret: appSecretSecret
   }
 }
 
@@ -130,6 +139,7 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     customDomains: shopwareWebContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    appSecretSecret: appSecretSecret
     internalPort: shopwareWebContainerAppInternalPort
   }
 }

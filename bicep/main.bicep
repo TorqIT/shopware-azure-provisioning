@@ -172,6 +172,7 @@ param shopwareWebContainerAppInternalPort int = 80
 @allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
+param appSecretSecretName string = 'app-secret'
 param appInstallCategoryId string = ''
 param appInstallCurrency string = 'CAD'
 param appInstallLocale string = 'en-CA'
@@ -202,6 +203,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     shopwareWebContainerAppInternalPort: shopwareWebContainerAppInternalPort
     appEnv: appEnv
     appUrl: appUrl
+    appSecret: keyVault.getSecret(appSecretSecretName)
     appInstallCategoryId: appInstallCategoryId
     appInstallCurrency: appInstallCurrency
     appInstallLocale: appInstallLocale
