@@ -14,6 +14,8 @@ param containerRegistryPasswordSecret object
 @secure()
 param databaseUrlSecret object
 @secure()
+param storageAccountKeySecret object
+@secure()
 param appSecretSecret object
 
 param environmentVariables array
@@ -24,7 +26,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, appSecretSecret]
+var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location

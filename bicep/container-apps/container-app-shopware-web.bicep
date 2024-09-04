@@ -19,6 +19,8 @@ param containerRegistryPasswordSecret object
 @secure()
 param databaseUrlSecret object
 @secure()
+param storageAccountKeySecret object
+@secure()
 param appSecretSecret object
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
@@ -32,7 +34,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, appSecretSecret]
+var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 
 resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName

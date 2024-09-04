@@ -13,6 +13,9 @@ param databaseUser string
 @secure()
 param databasePassword string
 
+param storageAccountName string
+param storageAccountPublicContainerName string
+
 param containerRegistryName string
 
 param shopwareInitContainerAppJobName string
@@ -57,9 +60,11 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
   name: containerRegistryName
 }
-
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
   name: databaseServerName
+}
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: storageAccountName
 }
 
 // Secrets
@@ -78,6 +83,11 @@ var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServer.
 var databaseUrlSecret = {
   name: databaseUrlSecretName
   value: databaseUrl
+}
+var storageAccountKeySecretName = 'storage-account-key'
+var storageAccountKeySecret = {
+  name: storageAccountKeySecretName
+  value: storageAccount.listKeys().keys[0].value
 }
 var appSecretSecretname = 'app-secret'
 var appSecretSecret = {
@@ -98,6 +108,12 @@ module environmentVariables './container-apps-variables.bicep' = {
     appInstallCategoryId: appInstallCategoryId
     additionalVars: additionalEnvVars
     databaseUrlSecretName: databaseUrlSecretName
+    databaseServerName: databaseServerName
+    databaseName: databaseName
+    databaseUser: databaseUser
+    storageAccountName: storageAccountName
+    storageAccountPublicContainerName: storageAccountPublicContainerName
+    storageAccountKeySecretName: storageAccountKeySecretName
   }
 }
 
@@ -117,6 +133,7 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
     containerRegistryName: containerRegistryName
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
   }
 }
@@ -139,6 +156,7 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     customDomains: shopwareWebContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
+    storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     internalPort: shopwareWebContainerAppInternalPort
   }
