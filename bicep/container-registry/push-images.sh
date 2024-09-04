@@ -6,6 +6,8 @@ CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
 SHOPWARE_INIT_IMAGE_NAME=$(jq -r '.parameters.shopwareInitImageName.value' $1)
 SHOPWARE_WEB_IMAGE_NAME=$(jq -r '.parameters.shopwareWebImageName.value' $1)
 
+IMAGES=($SHOPWARE_INIT_IMAGE_NAME $SHOPWARE_WEB_IMAGE_NAME)
+
 EXISTING_REPOSITORIES=$(az acr repository list --name $CONTAINER_REGISTRY_NAME --output tsv)
 if [ -z "$EXISTING_REPOSITORIES" ];
 then
