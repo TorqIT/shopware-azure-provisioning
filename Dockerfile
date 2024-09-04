@@ -1,11 +1,7 @@
 FROM mcr.microsoft.com/azure-cli
 
-# Ensure Bicep extension is up-to-date
-RUN az bicep upgrade
-
-# Install cURL
-RUN apk update -qq && \
-    apk add curl
+# Install required packages
+RUN tdnf install -y curl tar
 
 # Install Docker
 ENV DOCKER_CHANNEL=stable
@@ -21,6 +17,9 @@ RUN az config set bicep.use_binary_from_path=false
 RUN az bicep install
 RUN az extension add -n containerapp
 RUN az extension add -n storage-preview
+
+# Ensure Bicep extension is up-to-date
+RUN az bicep upgrade
 
 # Add Bicep templates and scripts
 RUN mkdir -p azure/bicep && mkdir -p azure/scripts
