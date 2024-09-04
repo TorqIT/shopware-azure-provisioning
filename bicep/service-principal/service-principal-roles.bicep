@@ -2,7 +2,6 @@ param location string = resourceGroup().location
 
 param servicePrincipalId string
 param containerRegistryName string
-param provisionInit bool
 param shopwareInitContainerAppJobName string
 param shopwareWebContainerAppName string
 
@@ -34,7 +33,7 @@ resource containerRegistryRoleAssignment 'Microsoft.Authorization/roleAssignment
   }
 }
 
-resource initContainerAppJobRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (provisionInit) {
+resource initContainerAppJobRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: initContainerAppJob
   name: guid(initContainerAppJob.id, servicePrincipalId, contributorRoleDefinition.id)
   properties: {

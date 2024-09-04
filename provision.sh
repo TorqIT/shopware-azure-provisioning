@@ -64,7 +64,7 @@ then
   SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
 fi
 
-SHOPWARE_INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.shopwareInitContainerAppJobName.value // empty' $1)
+SHOPWARE_INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.shopwareInitContainerAppJobName.value' $1)
 SHOPWARE_WEB_CONTAINER_APP_NAME=$(jq -r '.parameters.shopwareWebContainerAppName.value' $1)
 echo "Assigning roles for service principal..."
 az deployment group create \
@@ -73,7 +73,6 @@ az deployment group create \
   --parameters \
     servicePrincipalId=$SERVICE_PRINCIPAL_ID \
     containerRegistryName=$CONTAINER_REGISTRY_NAME \
-    provisionInit=${PROVISION_INIT:-false} \
     shopwareInitContainerAppJobName=$SHOPWARE_INIT_CONTAINER_APP_JOB_NAME \
     shopwareWebContainerAppName=$SHOPWARE_WEB_CONTAINER_APP_NAME \
 
