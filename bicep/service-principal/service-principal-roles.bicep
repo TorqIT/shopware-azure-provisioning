@@ -8,7 +8,7 @@ param shopwareWebContainerAppName string
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' existing = {
   name: containerRegistryName
 }
-resource initContainerAppJob 'Microsoft.App/jobs@2024-03-01' existing = if (provisionInit) {
+resource initContainerAppJob 'Microsoft.App/jobs@2024-03-01' existing = {
   name: shopwareInitContainerAppJobName
 }
 resource webContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
