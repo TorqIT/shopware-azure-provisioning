@@ -17,6 +17,9 @@ param additionalVars array
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
   name: databaseServerName
 }
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: storageAccountName
+}
 
 var defaultEnvVars = [
   {
@@ -90,7 +93,7 @@ var defaultEnvVars = [
   }
   {
     name: 'AZURE_CDN_URL'
-    value: 'https://${storageAccountName}.blob.core.windows.net/${storageAccountPublicContainerName}'
+    value: storageAccount.properties.primaryEndpoints.web
   }
   // TODO unsure how necessary the following values are
   {
