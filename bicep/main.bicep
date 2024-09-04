@@ -179,7 +179,7 @@ param appSalesChannelName string = 'Storefront'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -229,5 +229,4 @@ param deployImagesToContainerRegistry bool = false //deprecated
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
-param redisImageName string = '' //deprecated
 param localIpAddress string = ''

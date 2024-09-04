@@ -13,11 +13,11 @@ param internalPort int
 
 param containerRegistryName string
 param containerRegistryConfiguration object
+
 @secure()
 param containerRegistryPasswordSecret object
 
 param databaseUrlSecret object
-
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
