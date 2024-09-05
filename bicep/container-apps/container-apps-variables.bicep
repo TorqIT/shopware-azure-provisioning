@@ -144,7 +144,7 @@ var opensearchVars = enableOpensearch ? [
   }
   {
     name: 'ADMIN_OPENSEARCH_URL'
-    value: 'opensearch:9200' 
+    value: opensearchUrl
   }
   {
     name: 'SHOPWARE_ADMIN_ES_ENABLED'
