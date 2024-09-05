@@ -181,6 +181,9 @@ param appInstallCategoryId string = ''
 param appInstallCurrency string = 'CAD'
 param appInstallLocale string = 'en-CA'
 param appSalesChannelName string = 'Storefront'
+param enableOpensearch bool = false
+// By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
+param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
@@ -221,10 +224,12 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseName: databaseName
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
+    enableOpensearch: enableOpensearch
+    opensearchUrl: opensearchUrl
   }
 }
 
-// Optional Virtual Machine for running side services
+// Optional Virtual Machine for running side services (e.g. Opensearch)
 param provisionServicesVM bool = false
 param servicesVmName string = ''
 param servicesVmSubnetName string = 'services-vm'

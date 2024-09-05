@@ -42,6 +42,8 @@ param appSalesChannelName string
 param appInstallCategoryId string
 @secure()
 param appSecret string
+param enableOpensearch bool
+param opensearchUrl string
 param additionalEnvVars array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
@@ -106,7 +108,8 @@ module environmentVariables './container-apps-variables.bicep' = {
     appInstallLocale: appInstallLocale
     appSalesChannelName: appSalesChannelName
     appInstallCategoryId: appInstallCategoryId
-    additionalVars: additionalEnvVars
+    enableOpensearch: enableOpensearch
+    opensearchUrl: opensearchUrl
     databaseUrlSecretName: databaseUrlSecretName
     databaseServerName: databaseServerName
     databaseName: databaseName
@@ -114,6 +117,7 @@ module environmentVariables './container-apps-variables.bicep' = {
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountKeySecretName: storageAccountKeySecretName
+    additionalVars: additionalEnvVars
   }
 }
 

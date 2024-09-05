@@ -5,13 +5,19 @@ param appInstallCurrency string
 param appInstallLocale string
 param appSalesChannelName string
 param appInstallCategoryId string
+
+param enableOpensearch bool
+param opensearchUrl string
+
 param storageAccountName string
 param storageAccountPublicContainerName string
 param storageAccountKeySecretName string
-param databaseUrlSecretName string
+
 param databaseServerName string
 param databaseName string
 param databaseUser string
+param databaseUrlSecretName string
+
 param additionalVars array
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
@@ -115,4 +121,43 @@ var defaultEnvVars = [
   }
 ]
 
-output envVars array = concat(defaultEnvVars, additionalVars)
+var opensearchVars = enableOpensearch ? [
+  {
+    name: 'SHOPWARE_ES_ENABLED'
+    value: '1'
+  }
+  {
+    name: 'OPENSEARCH_URL'
+    value: opensearchUrl
+  }
+  {
+    name: 'SHOPWARE_ES_INDEXING_ENABLED'
+    value: '1'
+  }
+  {
+    name: 'SHOPWARE_ES_INDEX_PREFIX'
+    value: 'sw'
+  }
+  {
+    name: 'SHOPWARE_ES_THROW_EXCEPTION'
+    value: '1'
+  }
+  {
+    name: 'ADMIN_OPENSEARCH_URL'
+    value: 'opensearch:9200' 
+  }
+  {
+    name: 'SHOPWARE_ADMIN_ES_ENABLED'
+    value: '1'
+  }
+  {
+    name: 'SHOPWARE_ADMIN_ES_REFRESH_INDICES'
+    value: '1'
+  }
+  {
+    name: 'SHOPWARE_ADMIN_ES_INDEX_PREFIX'
+    value: 'sw-admin'
+  }
+]: []
+
+output envVars array = concat(defaultEnvVars, opensearchVars, additionalVars)
