@@ -301,6 +301,7 @@ param servicesVmAdminUsername string = 'azureuser'
 param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
 param servicesVmSize string = 'Standard_B2s'
 param servicesVmUbuntuOSVersion string = 'Ubuntu-2204'
+param servicesVmFirewallIpsForSsh array = []
 module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (provisionServicesVM) {
   name: 'services-virtual-machine'
   dependsOn: [virtualNetwork]
@@ -313,6 +314,7 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: servicesVmSubnetName
+    firewallIpsForSsh: servicesVmFirewallIpsForSsh
   }
 }
 

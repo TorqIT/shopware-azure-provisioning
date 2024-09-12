@@ -14,6 +14,8 @@ param virtualNetworkName string
 param virtualNetworkSubnetName string
 param virtualNetworkResourceGroupName string
 
+param firewallIpsForSsh array
+
 var imageReference = {
   'Ubuntu-2204': {
     publisher: 'Canonical'
@@ -63,15 +65,14 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-0
   name: networkSecurityGroupName
   location: location
   properties: {
-    securityRules: [
-      {
+    securityRules: [for ip in firewallIpsForSsh: {
         name: 'SSH'
         properties: {
           priority: 1000
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: subnet.properties.addressPrefix
+          sourceAddressPrefix: ip
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '22'
