@@ -51,6 +51,7 @@ az deployment group create \
   --template-file ./bicep/main.bicep \
   --parameters @$1
 
+PROVISION_SERVICE_PRINCIPAL=$(jq -r '.parameters.provisionServicePrincipal.value // empty' $1)
 if [ "${PROVISION_SERVICE_PRINCIPAL:-true}" = true ]
 then
   SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
