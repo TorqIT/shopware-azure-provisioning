@@ -51,31 +51,34 @@ az deployment group create \
   --template-file ./bicep/main.bicep \
   --parameters @$1
 
-SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
-SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
-if [ -z $SERVICE_PRINCIPAL_ID ]
+if [ "${PROVISION_SERVICE_PRINCIPAL:-true}" = true ]
 then
-  echo "Creating service principal $SERVICE_PRINCIPAL_NAME..."
-  az ad sp create-for-rbac --display-name $SERVICE_PRINCIPAL_NAME
-  echo "IMPORTANT: Note the appId and password returned above!"
+  SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
   SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
-fi
+  if [ -z $SERVICE_PRINCIPAL_ID ]
+  then
+    echo "Creating service principal $SERVICE_PRINCIPAL_NAME..."
+    az ad sp create-for-rbac --display-name $SERVICE_PRINCIPAL_NAME
+    echo "IMPORTANT: Note the appId and password returned above!"
+    SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
+  fi
 
-PROVISION_INIT=$(jq -r '.parameters.provisionInit.value // empty' $1)
-INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.initContainerAppJobName.value // empty' $1)
-PHP_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value' $1)
-SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.supervisordContainerAppName.value' $1)
-echo "Assigning roles for service principal..."
-az deployment group create \
-  --resource-group $RESOURCE_GROUP \
-  --template-file ./bicep/service-principal/service-principal-roles.bicep \
-  --parameters \
-    servicePrincipalId=$SERVICE_PRINCIPAL_ID \
-    containerRegistryName=$CONTAINER_REGISTRY_NAME \
-    provisionInit=${PROVISION_INIT:-false} \
-    initContainerAppJobName=$INIT_CONTAINER_APP_JOB_NAME \
-    phpContainerAppName=$PHP_CONTAINER_APP_NAME \
-    supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME
+  PROVISION_INIT=$(jq -r '.parameters.provisionInit.value // empty' $1)
+  INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.initContainerAppJobName.value // empty' $1)
+  PHP_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value' $1)
+  SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.supervisordContainerAppName.value' $1)
+  echo "Assigning roles for service principal..."
+  az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --template-file ./bicep/service-principal/service-principal-roles.bicep \
+    --parameters \
+      servicePrincipalId=$SERVICE_PRINCIPAL_ID \
+      containerRegistryName=$CONTAINER_REGISTRY_NAME \
+      provisionInit=${PROVISION_INIT:-false} \
+      initContainerAppJobName=$INIT_CONTAINER_APP_JOB_NAME \
+      phpContainerAppName=$PHP_CONTAINER_APP_NAME \
+      supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME
+fi
 
 ./bicep/container-apps/apply-container-apps-secrets.sh $1
 
