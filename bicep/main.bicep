@@ -100,7 +100,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     accessTier: storageAccountAccessTier
     kind: storageAccountKind
     sku: storageAccountSku
-    firewallIps: storageAccountFirewallIps
+    firewallIps: concat([localIpAddress], storageAccountFirewallIps)
     virtualNetworkName: virtualNetworkName
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
@@ -238,6 +238,7 @@ param servicesVmAdminUsername string = 'azureuser'
 param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
 param servicesVmSize string = 'Standard_B2s'
 param servicesVmUbuntuOSVersion string = 'Ubuntu-2204'
+param servicesVmFirewallIpsForSsh array = []
 module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (provisionServicesVM) {
   name: 'services-virtual-machine'
   dependsOn: [virtualNetwork]
@@ -250,6 +251,7 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: servicesVmSubnetName
+    firewallIpsForSsh: concat([localIpAddress], servicesVmFirewallIpsForSsh)
   }
 }
 
@@ -259,11 +261,10 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
 // is ever fixed, these can be removed.
 param subscriptionId string = ''
 param resourceGroupName string = ''
-param tenantName string = '' //deprecated
 param tenantId string = ''
 param servicePrincipalName string = ''
-param deployImagesToContainerRegistry bool = false //deprecated
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
 param localIpAddress string = ''
+param provisionServicePrincipal bool = true

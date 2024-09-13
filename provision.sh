@@ -54,26 +54,30 @@ az deployment group create \
 # TODO reconfigure for Shopware
 #./bicep/container-apps/apply-container-apps-secrets.sh $1
 
-SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
-SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
-if [ -z $SERVICE_PRINCIPAL_ID ]
+PROVISION_SERVICE_PRINCIPAL=$(jq -r '.parameters.provisionServicePrincipal.value' $1) #alternative operator (//) does not work here because "false" makes it always execute
+if [ "${PROVISION_SERVICE_PRINCIPAL}" != "null" ] || [ "${PROVISION_SERVICE_PRINCIPAL}" = true ]
 then
-  echo "Creating service principal $SERVICE_PRINCIPAL_NAME..."
-  az ad sp create-for-rbac --display-name $SERVICE_PRINCIPAL_NAME
-  echo "IMPORTANT: Note the appId and password returned above!"
+  SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
   SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
-fi
+  if [ -z $SERVICE_PRINCIPAL_ID ]
+  then
+    echo "Creating service principal $SERVICE_PRINCIPAL_NAME..."
+    az ad sp create-for-rbac --display-name $SERVICE_PRINCIPAL_NAME
+    echo "IMPORTANT: Note the appId and password returned above!"
+    SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
+  fi
 
-SHOPWARE_INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.shopwareInitContainerAppJobName.value' $1)
-SHOPWARE_WEB_CONTAINER_APP_NAME=$(jq -r '.parameters.shopwareWebContainerAppName.value' $1)
-echo "Assigning roles for service principal..."
-az deployment group create \
-  --resource-group $RESOURCE_GROUP \
-  --template-file ./bicep/service-principal/service-principal-roles.bicep \
-  --parameters \
-    servicePrincipalId=$SERVICE_PRINCIPAL_ID \
-    containerRegistryName=$CONTAINER_REGISTRY_NAME \
-    shopwareInitContainerAppJobName=$SHOPWARE_INIT_CONTAINER_APP_JOB_NAME \
-    shopwareWebContainerAppName=$SHOPWARE_WEB_CONTAINER_APP_NAME \
+  SHOPWARE_INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.shopwareInitContainerAppJobName.value' $1)
+  SHOPWARE_WEB_CONTAINER_APP_NAME=$(jq -r '.parameters.shopwareWebContainerAppName.value' $1)
+  echo "Assigning roles for service principal..."
+  az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --template-file ./bicep/service-principal/service-principal-roles.bicep \
+    --parameters \
+      servicePrincipalId=$SERVICE_PRINCIPAL_ID \
+      containerRegistryName=$CONTAINER_REGISTRY_NAME \
+      shopwareInitContainerAppJobName=$SHOPWARE_INIT_CONTAINER_APP_JOB_NAME \
+      shopwareWebContainerAppName=$SHOPWARE_WEB_CONTAINER_APP_NAME
+fi
 
 echo "Done!"
