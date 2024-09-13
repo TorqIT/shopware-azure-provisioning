@@ -27,7 +27,15 @@ then
     --parameters \
       name=$KEY_VAULT_NAME \
       localIpAddress=$(curl ipinfo.io/ip)
-  read -p "Use the Azure Portal to update the Key Vault's access policies (e.g. give yourself the ability to add secrets), and to add any keys/secrets needed for the rest of the resources (e.g. a database password). Then, press Enter to continue... "
+  echo "Assigning Key Vault Secrets Officer role to current user..."
+  $PRINCIPAL_ID=$(az ad signed-in-user show --query id --output tsv)
+  az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --template-file ./bicep/key-vault/key-vault-roles.bicep \
+    --parameters \
+      keyVaultName=$KEY_VAULT_NAME \
+      principalId=$PRINCIPAL_ID
+  read -p "Use the Azure Portal to add any keys/secrets needed for the rest of the resources (e.g. a database password). Then, press Enter to continue... "
 fi
 
 # Because we need to run some non-Bicep scripts after deploying the Container Registry (but before
