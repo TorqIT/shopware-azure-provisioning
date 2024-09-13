@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/azure-cli
 
 # Install required packages
-RUN tdnf install -y curl tar jq
+RUN tdnf install -y curl tar jq vim
 
 # Install Docker
 ENV DOCKER_CHANNEL=stable
