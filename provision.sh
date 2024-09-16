@@ -28,7 +28,7 @@ then
       name=$KEY_VAULT_NAME \
       localIpAddress=$(curl ipinfo.io/ip)
   echo "Assigning Key Vault Secrets Officer role to current user..."
-  $PRINCIPAL_ID=$(az ad signed-in-user show --query id --output tsv)
+  PRINCIPAL_ID=$(az ad signed-in-user show --query id --output tsv)
   az deployment group create \
     --resource-group $RESOURCE_GROUP \
     --template-file ./bicep/key-vault/key-vault-roles.bicep \
