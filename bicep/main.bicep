@@ -98,6 +98,7 @@ param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = true
+param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
@@ -121,6 +122,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     privateEndpointNicName: storageAccountPrivateEndpointNicName
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
+    longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
   }
 }
 
@@ -132,9 +134,11 @@ param databaseSkuName string = 'Standard_B1ms'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
 param databaseName string = 'pimcore'
-param databaseBackupRetentionDays int = 7
+param databaseBackupRetentionDays int = 7 //deprecated in favor of renamed param below
+param databaseShortTermBackupRetentionDays int = databaseBackupRetentionDays
 param databaseGeoRedundantBackup bool = false
 param databaseLongTermBackups bool = true
+param databaseLongTermBackupRetentionPeriod string = 'P365D'
 module database 'database/database.bicep' = {
   name: 'database'
   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
@@ -151,10 +155,11 @@ module database 'database/database.bicep' = {
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
     virtualNetworkStorageAccountPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
-    backupRetentionDays: databaseBackupRetentionDays
+    shortTermBackupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
-    longTermBackups: databaseLongTermBackups
     backupVaultName: backupVaultName
+    longTermBackups: databaseLongTermBackups
+    longTermBackupRetentionPeriod: databaseLongTermBackupRetentionPeriod
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
     privateDnsZoneForStorageAccountsId: privateDnsZones.outputs.zoneIdForStorageAccounts
   }

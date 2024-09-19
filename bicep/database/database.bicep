@@ -10,13 +10,14 @@ param skuName string
 param skuTier string
 param storageSizeGB int
 
-param backupRetentionDays int
+param shortTermBackupRetentionDays int
 param geoRedundantBackup bool
 
 param databaseName string
 
 param longTermBackups bool
 param backupVaultName string
+param longTermBackupRetentionPeriod string
 
 param virtualNetworkResourceGroupName string
 param virtualNetworkName string
@@ -54,7 +55,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
       privateDnsZoneResourceId: privateDnsZoneForDatabaseId
     }
     backup: {
-      backupRetentionDays: backupRetentionDays
+      backupRetentionDays: shortTermBackupRetentionDays
       geoRedundantBackup: geoRedundantBackup ? 'Enabled' : 'Disabled'
     }
   }
@@ -74,5 +75,6 @@ module databaseBackupVault 'database-backup-vault.bicep' = if (longTermBackups) 
   params: {
     backupVaultName: backupVaultName
     databaseServerName: serverName
+    retentionPeriod: longTermBackupRetentionPeriod
   }
 }

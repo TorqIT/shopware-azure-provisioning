@@ -2,6 +2,7 @@ param location string = resourceGroup().location
 
 param backupVaultName string
 param databaseServerName string
+param retentionPeriod string
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
   name: databaseServerName
@@ -28,7 +29,7 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2024-04-01
           {
             deleteAfter: {
                 objectType: 'AbsoluteDeleteOption'
-                duration: 'P365D'
+                duration: retentionPeriod
             }
             targetDataStoreCopySettings: []
             sourceDataStore: {
