@@ -93,6 +93,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 // We use a Private Endpoint (and Private DNS Zone) to integrate with the Virtual Network
 module storageAccountPrivateEndpoint './storage-account-private-endpoint.bicep' = {
   name: 'storage-account-private-endpoint'
+  dependsOn: [storageAccount]
   params: {
     location: location
     storageAccountName: storageAccountName
