@@ -11,8 +11,8 @@ param logAnalyticsWorkspaceName string
 
 param provisionForPortalEngine bool
 param portalEngineStorageAccountName string
-param portalEngineStorageAccountPublicFileShareName string
-param portalEnginePublicStorageMountName string
+param portalEngineStorageAccountPublicBuildFileShareName string
+param portalEnginePublicBuildStorageMountName string
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroup)
@@ -60,18 +60,12 @@ module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!php
   }
 }
 
-resource portalEngineStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = if (provisionForPortalEngine) {
-  name: portalEngineStorageAccountName
-}
-resource portalEngineStorageMount 'Microsoft.App/managedEnvironments/storages@2024-03-01' = if (provisionForPortalEngine) {
-  parent: containerAppsEnvironment
-  name: portalEnginePublicStorageMountName
-  properties: {
-    azureFile: {
-      accountName: portalEngineStorageAccountName
-      accountKey: portalEngineStorageAccount.listKeys().keys[0].value
-      shareName: portalEngineStorageAccountPublicFileShareName
-      accessMode: 'ReadWrite'
-    }
+module portalEngineStorageMount './container-apps-environment-portal-engine-mount.bicep' = if (provisionForPortalEngine) {
+  name: 'portal-engine-storage-mount'
+  params: {
+    containerAppsEnvironmentName: name
+    portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+    portalEngineStorageAccountName: portalEngineStorageAccountName
+    portalEngineStorageAccountPublicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
   }
 }

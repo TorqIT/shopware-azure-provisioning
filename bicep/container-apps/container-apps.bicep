@@ -103,11 +103,11 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkSubnetName: virtualNetworkSubnetName
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
 
-    // Optional Portale Engine storage mount
+    // Optional Portal Engine storage mount
     provisionForPortalEngine: provisionForPortalEngine
     portalEngineStorageAccountName: portalEngineStorageAccountName
-    portalEngineStorageAccountPublicFileShareName: portalEngineStorageAccountPublicBuildFileShareName
-    portalEnginePublicStorageMountName: portalEnginePublicBuildStorageMountName
+    portalEngineStorageAccountPublicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
+    portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
   }
 }
 
