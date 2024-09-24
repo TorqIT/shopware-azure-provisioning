@@ -30,20 +30,41 @@ param storageAccountKeySecret object
 @secure()
 param pimcoreAdminPassword string
 
+// Optional Portal Engine provisioning
+param provisionForPortalEngine bool
+param portalEnginePublicBuildStorageMountName string
+@secure()
+param portalEngineStorageAccountKeySecret object
+
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
   name: containerAppsEnvironmentName
-  scope: resourceGroup()
 }
-var containerAppsEnvironmentId = containerAppsEnvironment.id
-
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
   name: databaseServerName
 }
 
+// Secrets
 var adminPasswordSecret = {
   name: 'admin-psswd'
   value: pimcoreAdminPassword
 }
+var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, adminPasswordSecret]
+var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
+var secrets = concat(defaultSecrets, portalEngineSecrets)
+
+// Volume mounts
+module portalEngineVolumeMounts './portal-engine/container-app-portal-engine-volume-mounts.bicep' = if (provisionForPortalEngine) {
+  name: 'portal-engine-volume-mounts'
+  params: {
+    portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+  }
+}
+var defaultVolumes = []
+var portalEngineVolume = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolume] : []
+var volumes = concat(defaultVolumes, portalEngineVolume)
+var defaultVolumeMounts = []
+var portalEngineVolumeMount = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolumeMount] : []
+var volumeMounts = concat(defaultVolumeMounts, portalEngineVolumeMount)
 
 var initEnvVars = [
   {
@@ -83,15 +104,16 @@ var initEnvVars = [
     secretRef: 'admin-psswd'
   }
 ]
+var envVars = concat(defaultEnvVars, initEnvVars)
 
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
   name: containerAppJobName
   properties: {
-    environmentId: containerAppsEnvironmentId
+    environmentId: containerAppsEnvironment.id
     configuration: {
       replicaTimeout: replicaTimeoutSeconds
-      secrets: [containerRegistryPasswordSecret, databasePasswordSecret, storageAccountKeySecret, adminPasswordSecret]
+      secrets: secrets
       triggerType: 'Manual'
       eventTriggerConfig: {
         scale: {
@@ -107,14 +129,16 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
       containers: [
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-          env: concat(defaultEnvVars, initEnvVars)
+          env: envVars
           name: imageName
           resources: {
             cpu: json(cpuCores)
             memory: memory
           }
+          volumeMounts: volumeMounts
         }
       ]
+      volumes: volumes
     }
   }
 }

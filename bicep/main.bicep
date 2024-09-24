@@ -195,6 +195,7 @@ param phpContainerAppCpuCores string = '0.5'
 param phpContainerAppMemory string = '1Gi'
 param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
+// Optional scaling rules
 param phpContainerAppProvisionCronScaleRule bool = false
 param phpContainerAppCronScaleRuleDesiredReplicas int = 1
 param phpContainerAppCronScaleRuleStartSchedule string = '0 7 * * *'
@@ -221,7 +222,7 @@ param redisSessionDb string
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database, portalEngineStorageAccount]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -251,6 +252,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppUseProbes: phpContainerAppUseProbes
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
+
+    // Optional scaling rules
     phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
     phpContainerAppCronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
     phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
@@ -273,6 +276,14 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+
+    // Optional Portal Engine provisioning
+    provisionForPortalEngine: provisionForPortalEngine
+    portalEngineStorageAccountName: portalEngineStorageAccountName
+    portalEngineStorageAccountDownloadsContainerName: portalEngineStorageAccountDownloadsContainerName
+    portalEngineStorageAccountPublicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
+    portalEnginePublicBuildStorageMountName: portalEngineStorageAccountPublicBuildStorageMountName
+
     // Optional n8n Container App (see more configuration below)
     provisionN8N: provisionN8N
     n8nContainerAppName: n8nContainerAppName
@@ -294,6 +305,32 @@ module containerApps 'container-apps/container-apps.bicep' = {
     n8nContainerAppCronScaleRuleEndSchedule: n8nContainerAppCronScaleRuleEndSchedule
     n8nContainerAppCronScaleRuleStartSchedule: n8nContainerAppCronScaleRuleStartSchedule
     n8nContainerAppCronScaleRuleTimezone: n8nContainerAppCronScaleRuleTimezone
+  }
+}
+
+// Optional Portal Engine provisioning
+param provisionForPortalEngine bool = false
+param portalEngineStorageAccountName string = ''
+param portalEngineStorageAccountAccessTier string = 'Hot'
+param portalEngineStorageAccountKind string = 'StorageV2'
+param portalEngineStorageAccountSku string = 'Standard_LRS'
+param portalEngineStorageAccountDownloadsContainerName string = 'downloads'
+param portalEngineStorageAccountPublicBuildFileShareName string = 'public-build'
+param portalEngineStorageAccountPublicBuildFileShareAccessTier string = 'Hot'
+param portalEngineStorageAccountPublicBuildStorageMountName string = 'portal-engine-public-build'
+module portalEngineStorageAccount './portal-engine/portal-engine-storage-account.bicep' = if (provisionForPortalEngine) {
+  name: 'portal-engine-storage-account'
+  params: {
+    storageAccountName: portalEngineStorageAccountName
+    accessTier: portalEngineStorageAccountAccessTier
+    kind: portalEngineStorageAccountKind
+    sku: portalEngineStorageAccountSku
+    downloadsContainerName: portalEngineStorageAccountDownloadsContainerName
+    publicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
+    publicBuildFileShareAccessTier: n8nDataStorageAccountFileShareAccessTier
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
   }
 }
 

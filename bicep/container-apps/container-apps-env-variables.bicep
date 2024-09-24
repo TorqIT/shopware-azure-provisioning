@@ -11,7 +11,12 @@ param pimcoreEnvironment string
 param redisDb string
 param redisHost string
 param redisSessionDb string
-param additionalVars array
+param additionalEnvVars array
+
+// Optional Portal Engine provisioning
+param provisionPortalEngine bool
+param portalEngineStorageAccountName string
+param portalEngineStorageAccountDownloadsContainerName string
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
   name: databaseServerName
@@ -80,4 +85,19 @@ var defaultEnvVars = [
   }
 ]
 
-output envVars array = concat(defaultEnvVars, additionalVars)
+var portalEngineEnvVars = provisionPortalEngine ? [
+  {
+    name: 'PORTAL_ENGINE_STORAGE_ACCOUNT'
+    value: portalEngineStorageAccountName
+  }
+  {
+    name: 'PORTAL_ENGINE_STORAGE_ACCOUNT_DOWNLOADS_CONTAINER'
+    value: portalEngineStorageAccountDownloadsContainerName
+  }
+  {
+    name: 'PORTAL_ENGINE_STORAGE_ACCOUNT_KEY'
+    secretRef: 'portal-engine-storage-account-key'
+  }
+]: []
+
+output envVars array = concat(defaultEnvVars, additionalEnvVars, portalEngineEnvVars)

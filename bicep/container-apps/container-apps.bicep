@@ -62,6 +62,13 @@ param additionalEnvVars array
 @secure()
 param databasePassword string
 
+// Optional Portal Engine provisioning
+param provisionForPortalEngine bool
+param portalEngineStorageAccountName string
+param portalEngineStorageAccountPublicBuildFileShareName string
+param portalEnginePublicBuildStorageMountName string
+param portalEngineStorageAccountDownloadsContainerName string
+
 // Optional n8n Container App
 param provisionN8N bool
 param n8nContainerAppName string
@@ -95,20 +102,25 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+
+    // Optional Portale Engine storage mount
+    provisionForPortalEngine: provisionForPortalEngine
+    portalEngineStorageAccountName: portalEngineStorageAccountName
+    portalEngineStorageAccountPublicFileShareName: portalEngineStorageAccountPublicBuildFileShareName
+    portalEnginePublicStorageMountName: portalEnginePublicBuildStorageMountName
   }
 }
 
+// Set up common secrets for the PHP and supervisord Container Apps
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
   name: containerRegistryName
 }
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
-  name: storageAccountName
-}
-
-// Set up common secrets for the PHP and supervisord Container Apps
 var containerRegistryPasswordSecret = {
   name: 'container-registry-password'
   value: containerRegistry.listCredentials().passwords[0].value
+}
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: storageAccountName
 }
 var storageAccountKeySecret = {
   name: 'storage-account-key'
@@ -118,9 +130,17 @@ var databasePasswordSecret = {
   name: 'database-password'
   value: databasePassword
 }
+// Optional Portal Engine provisioning
+resource portalEngineStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = if (provisionForPortalEngine) {
+  name: portalEngineStorageAccountName
+}
+var portalEngineStorageAccountKeySecret = (provisionForPortalEngine) ? {
+  name: 'portal-engine-storage-account-key'
+  value: portalEngineStorageAccount.listKeys().keys[0].value
+} : {}
 
 // Set up common environment variables for the PHP and supervisord Container Apps
-module environmentVariables 'container-apps-variables.bicep' = {
+module environmentVariables 'container-apps-env-variables.bicep' = {
   name: 'environment-variables'
   params: {
     appDebug: appDebug
@@ -136,7 +156,12 @@ module environmentVariables 'container-apps-variables.bicep' = {
     storageAccountName: storageAccountName
     storageAccountContainerName: storageAccountContainerName
     storageAccountAssetsContainerName: storageAccountAssetsContainerName
-    additionalVars: additionalEnvVars
+    additionalEnvVars: additionalEnvVars
+
+    // Optional Portal Engine provisioning
+    provisionPortalEngine: provisionForPortalEngine
+    portalEngineStorageAccountName: portalEngineStorageAccountName
+    portalEngineStorageAccountDownloadsContainerName: portalEngineStorageAccountDownloadsContainerName
   }
 }
 
@@ -169,6 +194,11 @@ module initContainerAppJob 'container-app-job-init.bicep' = if (provisionInit) {
     databaseUser: databaseUser
     runPimcoreInstall: initContainerAppJobRunPimcoreInstall
     pimcoreAdminPassword: pimcoreAdminPassword
+
+    // Optional Portal Engine provisioning
+    provisionForPortalEngine: provisionForPortalEngine
+    portalEngineStorageAccountKeySecret: portalEngineStorageAccountKeySecret
+    portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
   }
 }
 
@@ -192,6 +222,12 @@ module phpContainerApp 'container-app-php.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
+
+    // Optional Portal Engine provisioning
+    provisionForPortalEngine: provisionForPortalEngine
+    portalEngineStorageAccountKeySecret: portalEngineStorageAccountKeySecret
+    portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+
     // Optional scaling rules
     provisionCronScaleRule: phpContainerAppProvisionCronScaleRule
     cronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
@@ -206,7 +242,7 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
   dependsOn: [containerAppsEnvironment, environmentVariables]
   params: {
     location: location
-    containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
+    containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppName: supervisordContainerAppName
     imageName: supervisordContainerAppImageName
     environmentVariables: environmentVariables.outputs.envVars
@@ -217,6 +253,10 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     memory: supervisordContainerAppMemory
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
+
+    // Optional Portal Engine provisioning
+    provisionForPortalEngine: provisionForPortalEngine
+    portalEngineStorageAccountKeySecret: portalEngineStorageAccountKeySecret
   }
 }
 
@@ -225,7 +265,7 @@ module redisContainerApp 'container-app-redis.bicep' = {
   dependsOn: [containerAppsEnvironment]
   params: {
     location: location
-    containerAppsEnvironmentId: containerAppsEnvironment.outputs.id
+    containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppName: redisContainerAppName
     cpuCores: redisContainerAppCpuCores
     memory: redisContainerAppMemory
@@ -252,6 +292,7 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
     databaseName: n8nDatabaseName
     databaseUser: n8nDatabaseAdminUser
     databasePassword: n8nDatabaseAdminPassword
+
     // Optional scaling rules
     provisionCronScaleRule: n8nContainerAppProvisionCronScaleRule
     cronScaleRuleDesiredReplicas: n8nContainerAppCronScaleRuleDesiredReplicas

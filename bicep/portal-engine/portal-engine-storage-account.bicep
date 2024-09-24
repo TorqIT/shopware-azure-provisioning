@@ -1,11 +1,14 @@
 param location string = resourceGroup().location
 
 param storageAccountName string
-param storageAccountSku string
-param storageAccountKind string
-param storageAccountAccessTier string
-param storageAccountFileShareName string
-param storageAccountFileShareAccessTier string
+param sku string
+param kind string
+param accessTier string
+
+param downloadsContainerName string
+
+param publicBuildFileShareName string
+param publicBuildFileShareAccessTier string
 
 param virtualNetworkName string
 param virtualNetworkResourceGroupName string
@@ -24,18 +27,17 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
   sku: {
-    name: storageAccountSku
+    name: sku
   }
-  kind: storageAccountKind
+  kind: kind
   properties: {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
     allowBlobPublicAccess: false
     publicNetworkAccess: 'Enabled'
-    accessTier: storageAccountAccessTier
+    accessTier: accessTier
     networkAcls: {
-      // Container App volume mounts do not currently work with Private Endpoints, so we use a firewall instead.
-      // See cotnainer-apps.bicep for the provisioning of the Container App and volume mounts.
+      // Container App volume mounts do not currently work with Private Endpoints, so we use a firewall instead
       virtualNetworkRules: [
         {
           action: 'Allow'
@@ -60,13 +62,21 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     }
   }
 
+  resource blobService 'blobServices' = {
+    name: 'default'
+
+    resource storageAccountContainer 'containers' = {
+      name: downloadsContainerName
+    }
+  }
+
   resource fileServices 'fileServices' = {
     name: 'default'
 
     resource fileShare 'shares' = {
-      name: storageAccountFileShareName
+      name: publicBuildFileShareName
       properties: {
-        accessTier: storageAccountFileShareAccessTier
+        accessTier: publicBuildFileShareAccessTier
       }
     }
   }

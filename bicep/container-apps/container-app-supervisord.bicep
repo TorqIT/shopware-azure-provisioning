@@ -1,6 +1,6 @@
 param location string = resourceGroup().location
 
-param containerAppsEnvironmentId string
+param containerAppsEnvironmentName string
 param containerAppName string
 param imageName string
 param environmentVariables array
@@ -15,7 +15,19 @@ param databasePasswordSecret object
 @secure()
 param storageAccountKeySecret object
 
-var secrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
+// Optional Portal Engine provisioning
+param provisionForPortalEngine bool
+@secure()
+param portalEngineStorageAccountKeySecret object
+
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+  name: containerAppsEnvironmentName
+}
+var containerAppsEnvironmentId = containerAppsEnvironment.id
+
+var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
+var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
+var secrets = concat(defaultSecrets, portalEngineSecrets)
 
 resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName

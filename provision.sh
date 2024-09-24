@@ -60,7 +60,7 @@ az deployment group create \
   --parameters @$1
 
 PROVISION_SERVICE_PRINCIPAL=$(jq -r '.parameters.provisionServicePrincipal.value' $1) #alternative operator (//) does not work here because "false" makes it always execute
-if [ "${PROVISION_SERVICE_PRINCIPAL}" != "null" ] || [ "${PROVISION_SERVICE_PRINCIPAL}" = true ]
+if [ "${PROVISION_SERVICE_PRINCIPAL}" = "null" ] || [ "${PROVISION_SERVICE_PRINCIPAL}" = true ]
 then
   SERVICE_PRINCIPAL_NAME=$(jq -r '.parameters.servicePrincipalName.value' $1)
   SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)

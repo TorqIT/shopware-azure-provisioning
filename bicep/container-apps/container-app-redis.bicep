@@ -1,9 +1,14 @@
 param location string = resourceGroup().location
 
-param containerAppsEnvironmentId string
+param containerAppsEnvironmentName string
 param containerAppName string
 param cpuCores string
 param memory string
+
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+  name: containerAppsEnvironmentName
+}
+var containerAppsEnvironmentId = containerAppsEnvironment.id
 
 resource redisContainerApp 'Microsoft.App/containerApps@2022-10-01' = {
   name: containerAppName

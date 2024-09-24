@@ -9,6 +9,11 @@ param virtualNetworkSubnetName string
 
 param logAnalyticsWorkspaceName string
 
+param provisionForPortalEngine bool
+param portalEngineStorageAccountName string
+param portalEngineStorageAccountPublicFileShareName string
+param portalEnginePublicStorageMountName string
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroup)
   name: virtualNetworkName
@@ -55,4 +60,18 @@ module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!php
   }
 }
 
-output id string = containerAppsEnvironment.id
+resource portalEngineStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = if (provisionForPortalEngine) {
+  name: portalEngineStorageAccountName
+}
+resource portalEngineStorageMount 'Microsoft.App/managedEnvironments/storages@2024-03-01' = if (provisionForPortalEngine) {
+  parent: containerAppsEnvironment
+  name: portalEnginePublicStorageMountName
+  properties: {
+    azureFile: {
+      accountName: portalEngineStorageAccountName
+      accountKey: portalEngineStorageAccount.listKeys().keys[0].value
+      shareName: portalEngineStorageAccountPublicFileShareName
+      accessMode: 'ReadWrite'
+    }
+  }
+}
