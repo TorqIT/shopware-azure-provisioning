@@ -26,7 +26,14 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name
   location: location
+  kind: ''
   properties: {
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
     vnetConfiguration: {
       internal: !shopwareWebContainerAppExternal
       infrastructureSubnetId: subnetId

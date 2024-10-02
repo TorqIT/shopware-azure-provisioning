@@ -35,6 +35,11 @@ param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 // As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
 // subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
+// Optional provisioning of NAT Gateway for static outbound IP address for Container Apps Environment
+param provisionStaticOutboundIp bool = false
+param natGatewayName string = '${resourceGroupName}-nat-gateway'
+param natGatewayPublicIpName string = '${containerAppsEnvironmentName}-outbound-ip'
+param natGatewayPublicIpSku string = 'Basic'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
@@ -45,6 +50,11 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    // Optional NAT Gateway provisioning for static outbound IP
+    provisionStaticOutboundIp: provisionStaticOutboundIp
+    natGatewayName: natGatewayName
+    natGatewayPublicIpName: natGatewayPublicIpName
+    natGatewayPublicIpSku: natGatewayPublicIpSku
     // Optional services VM provisioning (see configuration below)
     provisionServicesVM: provisionServicesVM
     servicesVmSubnetName: servicesVmSubnetName

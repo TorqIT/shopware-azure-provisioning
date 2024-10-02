@@ -11,10 +11,25 @@ param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
 param databaseSubnetAddressSpace string
 
+// Optional provisioning of subnet for services VM
 param provisionServicesVM bool
 param servicesVmSubnetName string
 @description('Address space to allocate for the services VM. Note that a subnet of at least /29 is required.')
 param servicesVmSubnetAddressSpace string
+
+// Optional provisioning of NAT Gateway for static outbound IP address
+param provisionStaticOutboundIp bool
+param natGatewayName string
+param natGatewayPublicIpName string
+param natGatewayPublicIpSku string
+module natGateway './nat-gateway.bicep' = if (provisionStaticOutboundIp) {
+  name: 'nat-gateway'
+  params: {
+    gatewayName: natGatewayName
+    publicIpName: natGatewayPublicIpName
+    publicIpSku: natGatewayPublicIpSku
+  }
+}
 
 var defaultSubnets = [
   {
@@ -26,6 +41,9 @@ var defaultSubnets = [
           service: 'Microsoft.Storage'
         }
       ]
+      natGateway: (provisionStaticOutboundIp) ? {
+        id: natGateway.outputs.id
+      }: null
     }
   }
   {
