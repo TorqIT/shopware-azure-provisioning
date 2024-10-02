@@ -72,6 +72,7 @@ var subnets = concat(defaultSubnets, servicesVmSubnet)
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName
   location: location
+  dependsOn: [natGateway]
   properties: {
     addressSpace: {
       addressPrefixes: [
