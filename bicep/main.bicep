@@ -39,7 +39,7 @@ param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerA
 param provisionStaticOutboundIp bool = false
 param natGatewayName string = '${resourceGroupName}-nat-gateway'
 param natGatewayPublicIpName string = '${containerAppsEnvironmentName}-outbound-ip'
-param natGatewayPublicIpSku string = 'Basic'
+param natGatewayPublicIpSku string = 'Standard'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
