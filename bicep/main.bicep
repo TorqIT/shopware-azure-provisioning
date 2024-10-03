@@ -31,9 +31,9 @@ param virtualNetworkResourceGroupName string = resourceGroup().name
 param virtualNetworkDefaultSubnetName string = 'default'
 param virtualNetworkDefaultSubnetAddressSpace string = '10.0.0.0/24'
 param virtualNetworkContainerAppsSubnetName string = 'container-apps'
-param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.1.0/23'
+param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.2.0/23'
 param virtualNetworkDatabaseSubnetName string = 'database'
-param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.3.0/28'
+param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
 // As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
 // subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
@@ -247,7 +247,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
 param provisionServicesVM bool = false
 param servicesVmName string = ''
 param servicesVmSubnetName string = 'services-vm'
-param servicesVmSubnetAddressSpace string = '10.0.4.0/29'
+param servicesVmSubnetAddressSpace string = '10.0.5.0/29'
 param servicesVmAdminUsername string = 'azureuser'
 param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
 param servicesVmSize string = 'Standard_B2s'
