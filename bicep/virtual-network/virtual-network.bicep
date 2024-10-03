@@ -42,7 +42,7 @@ var defaultSubnets = [
       addressPrefix: defaultSubnetAddressSpace
       serviceEndpoints: [
         {
-          // Allow Storage Accounts Private Endpoints to use this subnet
+          // Allow Storage Account Private Endpoints to use this subnet
           service: 'Microsoft.Storage'
         }
       ]
