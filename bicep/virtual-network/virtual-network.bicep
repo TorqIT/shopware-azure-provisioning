@@ -51,6 +51,14 @@ var defaultSubnets = [
     name: containerAppsSubnetName
     properties: {
       addressPrefix: containerAppsSubnetAddressSpace
+      delegations: [
+        {
+          name: 'Microsoft.App/environments'
+          properties: {
+            serviceName: 'Microsoft.App/environments'
+          }
+        }
+      ]
       natGateway: (provisionStaticOutboundIp) ? {
         id: natGateway.outputs.id
       }: null
