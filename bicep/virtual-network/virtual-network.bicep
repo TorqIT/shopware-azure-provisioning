@@ -3,6 +3,10 @@ param location string = resourceGroup().location
 param virtualNetworkName string
 param virtualNetworkAddressSpace string
 
+param defaultSubnetName string
+@description('Address space to allocate for the default subnet')
+param defaultSubnetAddressSpace string
+
 param containerAppsSubnetName string
 @description('Address space to allocate for the Container Apps subnet. Note that a subnet of at least /23 is required, and it must occupied exclusively by the Container Apps Environment and its Apps.')
 param containerAppsSubnetAddressSpace string
@@ -33,14 +37,20 @@ module natGateway './nat-gateway.bicep' = if (provisionStaticOutboundIp) {
 
 var defaultSubnets = [
   {
-    name: containerAppsSubnetName
+    name: defaultSubnetName
     properties: {
-      addressPrefix: containerAppsSubnetAddressSpace
+      addressPrefix: defaultSubnetAddressSpace
       serviceEndpoints: [
         {
           service: 'Microsoft.Storage'
         }
       ]
+    }
+  }
+  {
+    name: containerAppsSubnetName
+    properties: {
+      addressPrefix: containerAppsSubnetAddressSpace
       natGateway: (provisionStaticOutboundIp) ? {
         id: natGateway.outputs.id
       }: null
