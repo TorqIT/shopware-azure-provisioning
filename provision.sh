@@ -6,10 +6,11 @@ RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 LOCATION=$(jq -r '.parameters.location.value' $1)
 
 if [ $(az group exists --name $RESOURCE_GROUP) = false ]; then
-  echo "Deploying Resource Group..."
+  echo "Creating Resource Group $RESOURCE_GROUP..."
   az deployment sub create \
     --location $LOCATION \
     --template-file ./bicep/resource-group/resource-group.bicep \
+    --name $RESOURCE_GROUP-$(date +%s) \
     --parameters \
       name=$RESOURCE_GROUP \
       location=$LOCATION
@@ -20,7 +21,7 @@ KEY_VAULT_RESOURCE_GROUP_NAME=$(jq -r '.parameters.keyVaultResourceGroupName.val
 WAIT_FOR_KEY_VAULT_MANUAL_INTERVENTION=$(jq -r '.parameters.waitForKeyVaultManualIntervention.value' $1)
 if [ "${WAIT_FOR_KEY_VAULT_MANUAL_INTERVENTION:-false}" = true ] && [ "${KEY_VAULT_RESOURCE_GROUP_NAME:-$RESOURCE_GROUP}" == "${RESOURCE_GROUP}" ]
 then
-  echo "Deploying Key Vault..."
+  echo "Creating Key Vault $KEY_VAULT_NAME..."
   az deployment group create \
     --resource-group $RESOURCE_GROUP \
     --template-file ./bicep/key-vault/key-vault.bicep \

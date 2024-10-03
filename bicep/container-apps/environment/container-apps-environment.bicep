@@ -9,11 +9,11 @@ param virtualNetworkSubnetName string
 
 param logAnalyticsWorkspaceName string
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-01-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroup)
   name: virtualNetworkName
 }
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-01-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkSubnetName
 }
@@ -27,6 +27,12 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
   name: name
   location: location
   properties: {
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
     vnetConfiguration: {
       internal: !shopwareWebContainerAppExternal
       infrastructureSubnetId: subnetId

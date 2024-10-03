@@ -28,23 +28,34 @@ param virtualNetworkName string
 param virtualNetworkAddressSpace string = '10.0.0.0/16'
 // If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist in that Resource Group
 param virtualNetworkResourceGroupName string = resourceGroup().name
+param virtualNetworkDefaultSubnetName string = 'default'
+param virtualNetworkDefaultSubnetAddressSpace string = '10.0.0.0/24'
 param virtualNetworkContainerAppsSubnetName string = 'container-apps'
-param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
+param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.2.0/23'
 param virtualNetworkDatabaseSubnetName string = 'database'
-param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
-// As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
-// subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
-param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
+param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
+// Optional provisioning of NAT Gateway for static outbound IP address for Container Apps Environment
+param provisionStaticOutboundIp bool = false
+param natGatewayName string = '${resourceGroupName}-nat-gateway'
+param natGatewayPublicIpName string = '${containerAppsEnvironmentName}-outbound-ip'
+param natGatewayPublicIpSku string = 'Standard'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
     location: location
     virtualNetworkName: virtualNetworkName
     virtualNetworkAddressSpace: virtualNetworkAddressSpace
+    defaultSubnetName: virtualNetworkDefaultSubnetName
+    defaultSubnetAddressSpace: virtualNetworkDefaultSubnetAddressSpace
     containerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    // Optional NAT Gateway provisioning for static outbound IP
+    provisionStaticOutboundIp: provisionStaticOutboundIp
+    natGatewayName: natGatewayName
+    natGatewayPublicIpName: natGatewayPublicIpName
+    natGatewayPublicIpSku: natGatewayPublicIpSku
     // Optional services VM provisioning (see configuration below)
     provisionServicesVM: provisionServicesVM
     servicesVmSubnetName: servicesVmSubnetName
@@ -102,7 +113,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     sku: storageAccountSku
     firewallIps: concat([localIpAddress], storageAccountFirewallIps)
     virtualNetworkName: virtualNetworkName
-    virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
+    virtualNetworkPrivateEndpointSubnetName: virtualNetworkDefaultSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
     privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
@@ -139,13 +150,11 @@ module database 'database/database.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
-    virtualNetworkStorageAccountPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     backupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
     longTermBackups: databaseLongTermBackups
     backupVaultName: backupVaultName
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
-    privateDnsZoneForStorageAccountsId: privateDnsZones.outputs.zoneIdForStorageAccounts
   }
 }
 
@@ -233,7 +242,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
 param provisionServicesVM bool = false
 param servicesVmName string = ''
 param servicesVmSubnetName string = 'services-vm'
-param servicesVmSubnetAddressSpace string = '10.0.3.0/29'
+param servicesVmSubnetAddressSpace string = '10.0.5.0/29'
 param servicesVmAdminUsername string = 'azureuser'
 param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
 param servicesVmSize string = 'Standard_B2s'

@@ -23,20 +23,20 @@ param storageAccountKeySecret object
 @secure()
 param appSecretSecret object
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: containerAppsEnvironmentName
   scope: resourceGroup()
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@2022-11-01-preview' existing = [for customDomain in customDomains: {
+resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@2024-03-01' existing = [for customDomain in customDomains: {
   parent: containerAppsEnvironment
   name: customDomain.certificateName
 }]
 
 var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 
-resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
+resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
   properties: {
