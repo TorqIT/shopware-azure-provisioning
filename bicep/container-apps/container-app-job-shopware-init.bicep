@@ -20,7 +20,7 @@ param appSecretSecret object
 
 param environmentVariables array
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: containerAppsEnvironmentName
   scope: resourceGroup()
 }
@@ -28,7 +28,7 @@ var containerAppsEnvironmentId = containerAppsEnvironment.id
 
 var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 
-resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
+resource containerAppJob 'Microsoft.App/jobs@2024-03-01' = {
   location: location
   name: containerAppJobName
   properties: {

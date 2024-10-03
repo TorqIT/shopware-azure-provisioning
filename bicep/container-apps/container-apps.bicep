@@ -65,7 +65,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' e
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
   name: databaseServerName
 }
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: storageAccountName
 }
 
