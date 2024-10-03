@@ -6,7 +6,7 @@ RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 LOCATION=$(jq -r '.parameters.location.value' $1)
 
 if [ $(az group exists --name $RESOURCE_GROUP) = false ]; then
-  echo "Deploying Resource Group..."
+  echo "Creating Resource Group $RESOURCE_GROUP..."
   az deployment sub create \
     --location $LOCATION \
     --template-file ./bicep/resource-group/resource-group.bicep \
