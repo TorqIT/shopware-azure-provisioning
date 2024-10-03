@@ -34,9 +34,6 @@ param virtualNetworkContainerAppsSubnetName string = 'container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.2.0/23'
 param virtualNetworkDatabaseSubnetName string = 'database'
 param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
-// As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
-// subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
-param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
 // Optional provisioning of NAT Gateway for static outbound IP address for Container Apps Environment
 param provisionStaticOutboundIp bool = false
 param natGatewayName string = '${resourceGroupName}-nat-gateway'
@@ -116,7 +113,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     sku: storageAccountSku
     firewallIps: concat([localIpAddress], storageAccountFirewallIps)
     virtualNetworkName: virtualNetworkName
-    virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
+    virtualNetworkPrivateEndpointSubnetName: virtualNetworkDefaultSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
     privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
@@ -153,13 +150,11 @@ module database 'database/database.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
-    virtualNetworkStorageAccountPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     backupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
     longTermBackups: databaseLongTermBackups
     backupVaultName: backupVaultName
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
-    privateDnsZoneForStorageAccountsId: privateDnsZones.outputs.zoneIdForStorageAccounts
   }
 }
 
@@ -230,7 +225,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     appInstallLocale: appInstallLocale
     appSalesChannelName: appSalesChannelName
     virtualNetworkName: virtualNetworkName
-    virtualNetworkSubnetName: virtualNetworkDefaultSubnetName
+    virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
