@@ -64,6 +64,10 @@ var defaultEnvVars = [
     secretRef: 'database-password'
   }
   {
+    name: 'DATABASE_SERVER_VERSION'
+    value: database.properties.version
+  }
+  {
     name: 'PIMCORE_DEV'
     value: pimcoreDev
   }
