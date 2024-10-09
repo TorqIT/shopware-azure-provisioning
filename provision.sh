@@ -9,6 +9,7 @@ if [ $(az group exists --name $RESOURCE_GROUP) = false ]; then
   echo "Deploying Resource Group..."
   az deployment sub create \
     --location $LOCATION \
+    --name $RESOURCE_GROUP-$(date +%s) \
     --template-file ./bicep/resource-group/resource-group.bicep \
     --parameters \
       name=$RESOURCE_GROUP \
