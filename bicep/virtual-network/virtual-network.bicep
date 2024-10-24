@@ -11,6 +11,10 @@ param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
 param databaseSubnetAddressSpace string
 
+param privateEndpointsSubnetName string
+@description('Address space to allocate for Private Endpoints')
+param privateEndpointsSubnetAddressSpace string
+
 param provisionN8N bool
 param n8nDatabaseSubnetName string
 @description('Address space to allocate for the n8n Postgres database subnet. Note that a subnet of at least /28 is required and it must be a delegated subnet occupied exclusively by the database.')
@@ -26,11 +30,21 @@ var defaultSubnets = [
     name: containerAppsSubnetName
     properties: {
       addressPrefix: containerAppsSubnetAddressSpace
-      serviceEndpoints: [
+      delegations: [
+        {
+          name: 'Microsoft.App/environments'
+          properties: {
+            serviceName: 'Microsoft.App/environments'
+          }
+        }
+      ]
+      // TODO this is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
+      // that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
+      serviceEndpoints: (privateEndpointsSubnetName == containerAppsSubnetName) ? [
         {
           service: 'Microsoft.Storage'
         }
-      ]
+      ]: []
     }
   }
   {
@@ -48,6 +62,14 @@ var defaultSubnets = [
     }
   }
 ]
+// TODO this is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
+// that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
+var privateEndpointsSubnet = (privateEndpointsSubnetName != containerAppsSubnetName) ? [{
+  name: privateEndpointsSubnetName
+  properties: {
+    addressPrefix: privateEndpointsSubnetAddressSpace
+  }
+}]: []
 var n8nPostgresSubnet = provisionN8N ? [{
   name: n8nDatabaseSubnetName
   properties: {
@@ -68,7 +90,7 @@ var servicesVmSubnet = provisionServicesVM ? [{
     addressPrefix: servicesVmSubnetAddressSpace
   }
 }] : []
-var subnets = concat(defaultSubnets, n8nPostgresSubnet, servicesVmSubnet)
+var subnets = concat(defaultSubnets, privateEndpointsSubnet, n8nPostgresSubnet, servicesVmSubnet)
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: virtualNetworkName

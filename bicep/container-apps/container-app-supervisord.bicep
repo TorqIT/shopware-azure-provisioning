@@ -20,7 +20,7 @@ param provisionForPortalEngine bool
 @secure()
 param portalEngineStorageAccountKeySecret object
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: containerAppsEnvironmentName
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
@@ -29,7 +29,7 @@ var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, s
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
 var secrets = concat(defaultSecrets, portalEngineSecrets)
 
-resource supervisordContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
+resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
   properties: {

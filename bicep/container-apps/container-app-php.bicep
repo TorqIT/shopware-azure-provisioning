@@ -33,7 +33,7 @@ param cronScaleRuleStartSchedule string
 param cronScaleRuleEndSchedule string
 param cronScaleRuleTimezone string
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: containerAppsEnvironmentName
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
@@ -73,7 +73,7 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   }
 }
 
-resource phpContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
+resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
   properties: {

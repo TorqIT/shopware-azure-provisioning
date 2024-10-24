@@ -35,6 +35,7 @@ param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 // As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
 // subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
+param virtualNetworkPrivateEndpointsSubnetAddressSpace string = virtualNetworkContainerAppsSubnetAddressSpace
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
@@ -45,6 +46,8 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    privateEndpointsSubnetName: virtualNetworkPrivateEndpointsSubnetName
+    privateEndpointsSubnetAddressSpace: virtualNetworkPrivateEndpointsSubnetAddressSpace
     // Optional services VM provisioning (see configuration below)
     provisionServicesVM: provisionServicesVM
     servicesVmSubnetName: servicesVmSubnetName
@@ -175,6 +178,7 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
+param containerAppsEnvironmentUseWorkloadProfiles bool = false
 // Init Container App Job
 // TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
 param provisionInit bool = false
@@ -229,6 +233,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     appDebug: appDebug
     appEnv: appEnv
     containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     databaseName: databaseName
