@@ -45,6 +45,7 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     virtualNetworkAddressSpace: virtualNetworkAddressSpace
     containerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
+    containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
     privateEndpointsSubnetName: virtualNetworkPrivateEndpointsSubnetName

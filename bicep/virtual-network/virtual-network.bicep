@@ -6,6 +6,7 @@ param virtualNetworkAddressSpace string
 param containerAppsSubnetName string
 @description('Address space to allocate for the Container Apps subnet. Note that a subnet of at least /23 is required, and it must occupied exclusively by the Container Apps Environment and its Apps.')
 param containerAppsSubnetAddressSpace string
+param containerAppsEnvironmentUseWorkloadProfiles bool
 
 param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
@@ -30,21 +31,23 @@ var defaultSubnets = [
     name: containerAppsSubnetName
     properties: {
       addressPrefix: containerAppsSubnetAddressSpace
-      delegations: [
+      // When using workload profiles with Container Apps requires the subnet to be delegated to Microsoft.App/environments;
+      // for some reason, using a Consumption-only plan does not work with this setup
+      delegations: containerAppsEnvironmentUseWorkloadProfiles ? [
         {
           name: 'Microsoft.App/environments'
           properties: {
             serviceName: 'Microsoft.App/environments'
           }
         }
-      ]
+      ] : []
       // TODO this is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
       // that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
       serviceEndpoints: (privateEndpointsSubnetName == containerAppsSubnetName) ? [
         {
           service: 'Microsoft.Storage'
         }
-      ]: []
+      ] : []
     }
   }
   {
