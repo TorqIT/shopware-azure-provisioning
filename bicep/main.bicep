@@ -32,10 +32,11 @@ param virtualNetworkContainerAppsSubnetName string = 'pimcore-container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
 param virtualNetworkDatabaseSubnetName string = 'pimcore-database'
 param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
-// As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
-// subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
+// TODO legacy applications place Private Endpoints in the same subnet as the Container Apps, but this
+// is incorrect as such a subnet should be only occupied by the Container Apps. This setup works fine for
+// Consumption plan CAs but not workload profiles, and in general should be avoided
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
-param virtualNetworkPrivateEndpointsSubnetAddressSpace string = virtualNetworkContainerAppsSubnetAddressSpace
+param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/29'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
