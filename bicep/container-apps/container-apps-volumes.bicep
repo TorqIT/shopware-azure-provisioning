@@ -17,7 +17,7 @@ var enterpriseVolume = !empty(pimcoreEnterpriseTokenSecret) ? [{
   name: 'pimcore-enterprise-token'
   secrets: [
     {
-      path: '/run/secrets/pimcore-enterprise-token'
+      path: 'pimcore-enterprise-token'
       secretRef: 'pimcore-enterprise-token'
     }
   ]
@@ -28,7 +28,7 @@ output volumes array = concat(defaultVolumes, portalEngineVolume, enterpriseVolu
 var defaultVolumeMounts = []
 var portalEngineVolumeMount = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolumeMount] : []
 var enterpriseVolumeMount = !empty(pimcoreEnterpriseTokenSecret) ? [{
-  mountPath: '/run/secrets/pimcore-enterprise-token'
+  mountPath: '/run/secrets'
   volumeName: 'pimcore-enterprise-token'
 }] : []
 output volumeMounts array = concat(defaultVolumeMounts, portalEngineVolumeMount, enterpriseVolumeMount)
