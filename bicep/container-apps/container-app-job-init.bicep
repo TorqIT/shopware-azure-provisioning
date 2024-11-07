@@ -29,6 +29,8 @@ param containerRegistryPasswordSecret object
 param storageAccountKeySecret object
 @secure()
 param pimcoreAdminPassword string
+@secure()
+param pimcoreEnterpriseTokenSecret object
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -50,21 +52,17 @@ var adminPasswordSecret = {
 }
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, adminPasswordSecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var secrets = concat(defaultSecrets, portalEngineSecrets)
+var enterpiseSecrets = !empty(pimcoreEnterpriseTokenSecret) ? [pimcoreEnterpriseTokenSecret]: []
+var secrets = concat(defaultSecrets, portalEngineSecrets, enterpiseSecrets)
 
-// Volume mounts
-module portalEngineVolumeMounts './portal-engine/container-app-portal-engine-volume-mounts.bicep' = if (provisionForPortalEngine) {
-  name: 'portal-engine-volume-mounts'
+module volumesModule './container-apps-volumes.bicep' = {
+  name: 'container-apps-volumes'
   params: {
+    pimcoreEnterpriseTokenSecret: pimcoreEnterpriseTokenSecret
+    provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
   }
 }
-var defaultVolumes = []
-var portalEngineVolume = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolume] : []
-var volumes = concat(defaultVolumes, portalEngineVolume)
-var defaultVolumeMounts = []
-var portalEngineVolumeMount = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolumeMount] : []
-var volumeMounts = concat(defaultVolumeMounts, portalEngineVolumeMount)
 
 var initEnvVars = [
   {
@@ -135,10 +133,10 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
             cpu: json(cpuCores)
             memory: memory
           }
-          volumeMounts: volumeMounts
+          volumeMounts: volumesModule.outputs.volumeMounts
         }
       ]
-      volumes: volumes
+      volumes: volumesModule.outputs.volumes
     }
   }
 }

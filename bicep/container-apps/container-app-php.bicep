@@ -19,6 +19,8 @@ param databasePasswordSecret object
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
+@secure()
+param pimcoreEnterpriseTokenSecret object
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -46,21 +48,17 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
 // Secrets
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var secrets = concat(defaultSecrets, portalEngineSecrets)
+var enterpiseSecrets = !empty(pimcoreEnterpriseTokenSecret) ? [pimcoreEnterpriseTokenSecret]: []
+var secrets = concat(defaultSecrets, portalEngineSecrets, enterpiseSecrets)
 
-// Volume mounts
-module portalEngineVolumeMounts './portal-engine/container-app-portal-engine-volume-mounts.bicep' = if (provisionForPortalEngine) {
-  name: 'portal-engine-volume-mounts'
+module volumesModule './container-apps-volumes.bicep' = {
+  name: 'volumes'
   params: {
+    pimcoreEnterpriseTokenSecret: pimcoreEnterpriseTokenSecret
+    provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
   }
 }
-var defaultVolumes = []
-var portalEngineVolume = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolume] : []
-var volumes = concat(defaultVolumes, portalEngineVolume)
-var defaultVolumeMounts = []
-var portalEngineVolumeMount = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolumeMount] : []
-var volumeMounts = concat(defaultVolumeMounts, portalEngineVolumeMount)
 
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   name: 'container-app-scale-rules'
@@ -131,10 +129,10 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
               }
             }
           ]: []
-          volumeMounts: volumeMounts
+          volumeMounts: volumesModule.outputs.volumeMounts
         }
       ]
-      volumes: volumes
+      volumes: volumesModule.outputs.volumes
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
