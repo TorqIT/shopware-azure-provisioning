@@ -53,7 +53,7 @@ var enterpiseSecrets = !empty(pimcoreEnterpriseTokenSecret) ? [pimcoreEnterprise
 var secrets = concat(defaultSecrets, portalEngineSecrets, enterpiseSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
-  name: 'volumes'
+  name: 'container-app-php-volumes'
   params: {
     pimcoreEnterpriseTokenSecret: pimcoreEnterpriseTokenSecret
     provisionForPortalEngine: provisionForPortalEngine
