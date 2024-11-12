@@ -41,13 +41,11 @@ var defaultSubnets = [
           }
         }
       ] : []
-      // TODO this is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
-      // that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
-      serviceEndpoints: (privateEndpointsSubnetName == containerAppsSubnetName) ? [
+      serviceEndpoints: [
         {
           service: 'Microsoft.Storage'
         }
-      ] : []
+      ]
     }
   }
   {
@@ -71,11 +69,6 @@ var privateEndpointsSubnet = (privateEndpointsSubnetName != containerAppsSubnetN
   name: privateEndpointsSubnetName
   properties: {
     addressPrefix: privateEndpointsSubnetAddressSpace
-    serviceEndpoints: [
-      {
-        service: 'Microsoft.Storage'
-      }
-    ]
   }
 }]: []
 var n8nPostgresSubnet = provisionN8N ? [{
