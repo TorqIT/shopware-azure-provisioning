@@ -12,6 +12,7 @@ param memory string
 param useProbes bool
 param minReplicas int
 param maxReplicas int
+param ipSecurityRestrictions array
 
 @secure()
 param databasePasswordSecret object
@@ -101,6 +102,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
             bindingType: 'SniEnabled'
             certificateId: certificates[i].id
         }]
+        ipSecurityRestrictions: ipSecurityRestrictions
       }
     }
     template: {

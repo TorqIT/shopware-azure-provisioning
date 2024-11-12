@@ -202,6 +202,7 @@ param phpContainerAppCpuCores string = '0.5'
 param phpContainerAppMemory string = '1Gi'
 param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
+param phpContainerAppIpSecurityRestrictions array = []
 // Optional scaling rules
 param phpContainerAppProvisionCronScaleRule bool = false
 param phpContainerAppCronScaleRuleDesiredReplicas int = 1
@@ -261,6 +262,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppUseProbes: phpContainerAppUseProbes
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
+    phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions
 
     // Optional scaling rules
     phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
