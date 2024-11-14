@@ -22,7 +22,7 @@ resource privateDNSzoneForDatabaseNew 'Microsoft.Network/privateDnsZones@2020-06
       virtualNetwork: {
         id: virtualNetwork.id
       }
-      registrationEnabled: true
+      registrationEnabled: false
     }
   }
 }

@@ -3,6 +3,7 @@ param location string = resourceGroup().location
 param backupVaultName string
 param storageAccountName string
 param containers array
+param retentionPeriod string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
@@ -30,7 +31,7 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-09-01
           {
             deleteAfter: {
                 objectType: 'AbsoluteDeleteOption'
-                duration: 'P365D'
+                duration: retentionPeriod
             }
             targetDataStoreCopySettings: []
             sourceDataStore: {

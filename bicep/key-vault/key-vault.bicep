@@ -19,6 +19,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
     enabledForTemplateDeployment: true
     networkAcls: {
       defaultAction: 'Deny'
+      bypass: 'AzureServices'
       ipRules: localIpAddress != '' ? [
         {
           value: localIpAddress
@@ -27,3 +28,5 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
     }
   }
 }
+
+output keyVault object = keyVault

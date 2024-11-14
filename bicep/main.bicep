@@ -2,10 +2,19 @@ param location string = resourceGroup().location
 
 param containerRegistryName string
 
-// Key Vault (assumed to have been created prior to this)
+// Key Vault
 param keyVaultName string
+// If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
 param keyVaultResourceGroupName string = resourceGroup().name
-resource keyVault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
+module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
+  name: 'key-vault'
+  scope: resourceGroup(keyVaultResourceGroupName)
+  params: {
+    name: keyVaultName
+    localIpAddress: localIpAddress
+  }
+}
+resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   name: keyVaultName
   scope: resourceGroup(keyVaultResourceGroupName)
 }
@@ -17,15 +26,17 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 // Virtual Network
 param virtualNetworkName string
 param virtualNetworkAddressSpace string = '10.0.0.0/16'
-// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist
+// If set to a value other than the Resource Group used for the rest of the resources, the VNet will be assumed to already exist in that Resource Group
 param virtualNetworkResourceGroupName string = resourceGroup().name
 param virtualNetworkContainerAppsSubnetName string = 'container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
 param virtualNetworkDatabaseSubnetName string = 'database'
 param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
-// As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
-// subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
+// TODO legacy applications place Private Endpoints in the same subnet as the Container Apps, but this
+// is incorrect as such a subnet should be only occupied by the Container Apps. This setup works fine for
+// Consumption plan CAs but not workload profiles, and in general should be avoided
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
+param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/29'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
@@ -34,8 +45,15 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     virtualNetworkAddressSpace: virtualNetworkAddressSpace
     containerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
+    containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    privateEndpointsSubnetName: virtualNetworkPrivateEndpointsSubnetName
+    privateEndpointsSubnetAddressSpace: virtualNetworkPrivateEndpointsSubnetAddressSpace
+    // Optional services VM provisioning (see configuration below)
+    provisionServicesVM: provisionServicesVM
+    servicesVmSubnetName: servicesVmSubnetName
+    servicesVmSubnetAddressSpace: servicesVmSubnetAddressSpace
   }
 }
 
@@ -76,6 +94,7 @@ param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = true
+param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
@@ -87,7 +106,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     accessTier: storageAccountAccessTier
     kind: storageAccountKind
     sku: storageAccountSku
-    firewallIps: storageAccountFirewallIps
+    firewallIps: concat([localIpAddress], storageAccountFirewallIps)
     virtualNetworkName: virtualNetworkName
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
@@ -97,6 +116,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     privateEndpointNicName: storageAccountPrivateEndpointNicName
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
+    longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
   }
 }
 
@@ -107,10 +127,12 @@ param databaseAdminPasswordSecretName string = 'database-admin-password'
 param databaseSkuName string = 'Standard_B1ms'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
-param databaseName string = 'shopware'
-param databaseBackupRetentionDays int = 7
+param databaseName string = 'pimcore'
+param databaseBackupRetentionDays int = 7 //deprecated in favor of renamed param below
+param databaseShortTermBackupRetentionDays int = databaseBackupRetentionDays
 param databaseGeoRedundantBackup bool = false
 param databaseLongTermBackups bool = true
+param databaseLongTermBackupRetentionPeriod string = 'P365D'
 module database 'database/database.bicep' = {
   name: 'database'
   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
@@ -127,10 +149,11 @@ module database 'database/database.bicep' = {
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
     virtualNetworkStorageAccountPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
-    backupRetentionDays: databaseBackupRetentionDays
+    shortTermBackupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
-    longTermBackups: databaseLongTermBackups
     backupVaultName: backupVaultName
+    longTermBackups: databaseLongTermBackups
+    longTermBackupRetentionPeriod: databaseLongTermBackupRetentionPeriod
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
     privateDnsZoneForStorageAccountsId: privateDnsZones.outputs.zoneIdForStorageAccounts
   }
@@ -146,10 +169,13 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
+param containerAppsEnvironmentUseWorkloadProfiles bool = false
+// Deprecated param names (starting with "shopware")
 param shopwareInitContainerAppJobName string = ''
 param shopwareInitImageName string
 param shopwareInitContainerAppJobCpuCores string = '0.5'
 param shopwareInitContainerAppJobMemory string = '1Gi'
+param shopwareInitContainerAppJobReplicaTimeoutSeconds int = 600
 param shopwareWebContainerAppExternal bool = true
 param shopwareWebContainerAppName string
 param shopwareWebImageName string
@@ -158,37 +184,74 @@ param shopwareWebContainerAppCpuCores string = '1.0'
 param shopwareWebContainerAppMemory string = '2Gi'
 param shopwareWebContainerAppMinReplicas int = 1
 param shopwareWebContainerAppMaxReplicas int = 1
+param shopwareWebContainerAppInternalPort int = 80
+// Preferred param names
+param initContainerAppJobName string = shopwareInitContainerAppJobName
+param initContainerAppJobImageName string = shopwareInitImageName
+param initContainerAppJobCpuCores string = shopwareInitContainerAppJobCpuCores
+param initContainerAppJobMemory string = shopwareInitContainerAppJobMemory
+param initContainerAppJobReplicaTimeoutSeconds int = shopwareInitContainerAppJobReplicaTimeoutSeconds
+param phpContainerAppExternal bool = shopwareWebContainerAppExternal
+param phpContainerAppName string = shopwareWebContainerAppName
+param phpContainerAppImageName string = shopwareWebImageName
+param phpContainerAppCustomDomains array = shopwareWebContainerAppCustomDomains
+param phpContainerAppCpuCores string = shopwareWebContainerAppCpuCores
+param phpContainerAppMemory string = shopwareWebContainerAppMemory
+param phpContainerAppMinReplicas int = shopwareWebContainerAppMinReplicas
+param phpContainerAppMaxReplicas int = shopwareWebContainerAppMaxReplicas
+param phpContainerAppIpSecurityRestrictions array = []
+param phpContainerAppInternalPort int = shopwareWebContainerAppInternalPort
+// Optional scale rules
+param phpContainerAppProvisionCronScaleRule bool = false
+param phpContainerAppCronScaleRuleDesiredReplicas int = 0
+param phpContainerAppCronScaleRuleStartSchedule string = ''
+param phpContainerAppCronScaleRuleEndSchedule string = ''
+param phpContainerAppCronScaleRuleTimezone string = ''
 @allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
+param appSecretSecretName string = 'app-secret'
 param appInstallCategoryId string = ''
 param appInstallCurrency string = 'CAD'
 param appInstallLocale string = 'en-CA'
 param appSalesChannelName string = 'Storefront'
+param enableOpensearch bool = false
+// By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
+param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, storageAccount, database, logAnalyticsWorkspace]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
     containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
-    shopwareInitContainerAppJobName: shopwareInitContainerAppJobName
-    shopwareInitImageName: shopwareInitImageName
-    shopwareInitContainerAppJobCpuCores: shopwareInitContainerAppJobCpuCores
-    shopwareInitContainerAppJobMemory: shopwareInitContainerAppJobMemory
-    shopwareWebContainerAppName: shopwareWebContainerAppName
-    shopwareWebContainerAppCustomDomains: shopwareWebContainerAppCustomDomains
-    shopwareWebImageName: shopwareWebImageName
-    shopwareWebContainerAppCpuCores: shopwareWebContainerAppCpuCores
-    shopwareWebContainerAppMemory: shopwareWebContainerAppMemory
-    shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
-    shopwareWebContainerAppMinReplicas: shopwareWebContainerAppMinReplicas
-    shopwareWebContainerAppMaxReplicas: shopwareWebContainerAppMaxReplicas
+    initContainerAppJobName: initContainerAppJobName
+    initContainerAppJobImageName: initContainerAppJobImageName
+    initContainerAppJobCpuCores: initContainerAppJobCpuCores
+    initContainerAppJobMemory: initContainerAppJobMemory
+    initContainerAppJobReplicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
+    phpContainerAppName: phpContainerAppName
+    phpContainerAppCustomDomains: phpContainerAppCustomDomains
+    phpContainerAppImageName: phpContainerAppImageName
+    phpContainerAppCpuCores: phpContainerAppCpuCores
+    phpContainerAppMemory: phpContainerAppMemory
+    phpContainerAppExternal: phpContainerAppExternal
+    phpContainerAppMinReplicas: phpContainerAppMinReplicas
+    phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
+    phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions
+    phpContainerAppInternalPort: phpContainerAppInternalPort
+    phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
+    phpContainerAppCronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
+    phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
+    phpContainerAppCronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
+    phpContainerAppCronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
     appEnv: appEnv
     appUrl: appUrl
+    appSecret: keyVault.getSecret(appSecretSecretName)
     appInstallCategoryId: appInstallCategoryId
     appInstallCurrency: appInstallCurrency
     appInstallLocale: appInstallLocale
@@ -200,6 +263,36 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseUser: databaseAdminUsername
     databasePassword: keyVault.getSecret(databaseAdminPasswordSecretName)
     databaseName: databaseName
+    storageAccountName: storageAccountName
+    storageAccountPublicContainerName: storageAccountPublicContainerName
+    enableOpensearch: enableOpensearch
+    opensearchUrl: opensearchUrl
+  }
+}
+
+// Optional Virtual Machine for running side services (e.g. Opensearch)
+param provisionServicesVM bool = false
+param servicesVmName string = ''
+param servicesVmSubnetName string = 'services-vm'
+param servicesVmSubnetAddressSpace string = '10.0.3.0/29'
+param servicesVmAdminUsername string = 'azureuser'
+param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
+param servicesVmSize string = 'Standard_B2s'
+param servicesVmUbuntuOSVersion string = 'Ubuntu-2204'
+param servicesVmFirewallIpsForSsh array = []
+module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (provisionServicesVM) {
+  name: 'services-virtual-machine'
+  dependsOn: [virtualNetwork]
+  params: {
+    name: servicesVmName
+    adminPublicSshKey: keyVault.getSecret(servicesVmPublicKeyKeyVaultSecretName)
+    adminUsername: servicesVmAdminUsername
+    size: servicesVmSize
+    ubuntuOSVersion: servicesVmUbuntuOSVersion
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkSubnetName: servicesVmSubnetName
+    firewallIpsForSsh: concat([localIpAddress], servicesVmFirewallIpsForSsh)
   }
 }
 
@@ -209,9 +302,10 @@ module containerApps 'container-apps/container-apps.bicep' = {
 // is ever fixed, these can be removed.
 param subscriptionId string = ''
 param resourceGroupName string = ''
-param tenantName string = ''
+param tenantId string = ''
 param servicePrincipalName string = ''
-param deployImagesToContainerRegistry bool = false
 param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
+param localIpAddress string = ''
+param provisionServicePrincipal bool = true

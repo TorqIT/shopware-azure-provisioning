@@ -5,8 +5,8 @@
     "subscriptionId": {
       "value": "my-subscription-id"
     },
-    "tenantName": {
-      "value": "my-tenant-name"
+    "tenantId": {
+      "value": "azure-tenant-directory-id"
     },
     "resourceGroupName": {
       "value": "my-resource-group"
@@ -69,12 +69,6 @@
     // must be of at least /28 size, and must not be occupied by any other resources.
     "virtualNetworkDatabaseSubnetAddressSpace": {
       "value": "10.0.2.0/28"
-    },
-    // Whether to deploy initial Docker images to the Container Registry during this deployment.
-    // This is necessary when first deploying a Container Apps Environment as its provisioning requires
-    // images to actually be present. After this first deployment, this value can be set to false.
-    "deployImagesToContainerRegistry": {
-      "value": true
     },
     // Name of the Backup Vault. Only valid if storageAccountLongTermBackups or databaseLongTermBackups
     // is true.

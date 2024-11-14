@@ -2,6 +2,7 @@ param location string = resourceGroup().location
 
 param backupVaultName string
 param databaseServerName string
+param retentionPeriod string
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
   name: databaseServerName
@@ -28,7 +29,7 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2024-04-01
           {
             deleteAfter: {
                 objectType: 'AbsoluteDeleteOption'
-                duration: 'P365D'
+                duration: retentionPeriod
             }
             targetDataStoreCopySettings: []
             sourceDataStore: {
@@ -75,15 +76,30 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2024-04-01
 
 // Built-in role definition for MySQL Backup And Export Operator. We get this definition so that we 
 // can assign it to the Backup Vault on the database, allowing it to perform its backups.
-resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
+resource mysqlBackupRoleDef 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
   name: 'd18ad5f3-1baf-4119-b49b-d944edb1f9d0'
 }
-resource backupVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource mysqlBackupRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: database
-  name: guid(resourceGroup().id, roleDefinition.id)
+  name: guid(resourceGroup().id, mysqlBackupRoleDef.id)
   properties: {
-    roleDefinitionId: roleDefinition.id
+    roleDefinitionId: mysqlBackupRoleDef.id
+    principalId: backupVault.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// The Backup Vault also requires the Reader role on the Resource Group in order to function
+resource resourceGroupReaderRoleDef 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
+  scope: resourceGroup()
+  name: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+}
+resource resourceGroupReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: resourceGroup()
+  name: guid(resourceGroup().id, resourceGroupReaderRoleDef.id)
+  properties: {
+    roleDefinitionId: resourceGroupReaderRoleDef.id
     principalId: backupVault.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -92,7 +108,7 @@ resource backupVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 resource instance 'Microsoft.DataProtection/backupVaults/backupInstances@2024-04-01' = {
   parent: backupVault
   name: 'database-backup-instance'
-  dependsOn: [backupVaultRoleAssignment]
+  dependsOn: [mysqlBackupRoleAssignment]
   properties: {
     friendlyName: 'database-backup-instance'
     objectType: 'BackupInstance'

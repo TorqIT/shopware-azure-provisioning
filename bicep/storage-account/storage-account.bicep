@@ -20,6 +20,7 @@ param virtualNetworkPrivateEndpointSubnetName string
 
 param longTermBackups bool
 param backupVaultName string
+param longTermBackupRetentionPeriod string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
@@ -107,5 +108,6 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
     backupVaultName: backupVaultName
     storageAccountName: storageAccountName
     containers: [publicContainerName, privateContainerName]
+    retentionPeriod: longTermBackupRetentionPeriod
   }
 }

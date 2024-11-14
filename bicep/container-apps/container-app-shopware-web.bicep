@@ -8,20 +8,31 @@ param cpuCores string
 param memory string
 param minReplicas int
 param maxReplicas int
+param ipSecurityRestrictions array
 param environmentVariables array
+param internalPort int
 
 param containerRegistryName string
 param containerRegistryConfiguration object
+
 @secure()
 param containerRegistryPasswordSecret object
-
+@secure()
 param databaseUrlSecret object
+@secure()
+param storageAccountKeySecret object
+@secure()
+param appSecretSecret object
 
-var internalPort = 80
+// Optional scaling rules
+param provisionCronScaleRule bool
+param cronScaleRuleDesiredReplicas int
+param cronScaleRuleStartSchedule string
+param cronScaleRuleEndSchedule string
+param cronScaleRuleTimezone string
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-preview' existing = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: containerAppsEnvironmentName
-  scope: resourceGroup()
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
@@ -30,9 +41,20 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [containerRegistryPasswordSecret, databaseUrlSecret]
+var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 
-resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
+module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
+  name: 'container-app-scale-rules'
+  params: {
+    provisionCronScaleRule: provisionCronScaleRule
+    cronScaleRuleTimezone: cronScaleRuleTimezone
+    cronScaleRuleStartSchedule: cronScaleRuleStartSchedule
+    cronScaleRuleEndSchedule: cronScaleRuleEndSchedule
+    cronScaleRuleDesiredReplicas: cronScaleRuleDesiredReplicas
+  }
+}
+
+resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
   properties: {
@@ -62,6 +84,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
             bindingType: 'SniEnabled'
             certificateId: certificates[i].id
         }]
+        ipSecurityRestrictions: ipSecurityRestrictions
       }
     }
     template: {
