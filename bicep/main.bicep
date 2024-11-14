@@ -169,6 +169,8 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 
 // Container Apps
 param containerAppsEnvironmentName string
+param containerAppsEnvironmentUseWorkloadProfiles bool = false
+// Deprecated param names (starting with "shopware")
 param shopwareInitContainerAppJobName string = ''
 param shopwareInitImageName string
 param shopwareInitContainerAppJobCpuCores string = '0.5'
@@ -183,6 +185,28 @@ param shopwareWebContainerAppMemory string = '2Gi'
 param shopwareWebContainerAppMinReplicas int = 1
 param shopwareWebContainerAppMaxReplicas int = 1
 param shopwareWebContainerAppInternalPort int = 80
+// Preferred param names
+param initContainerAppJobName string = shopwareInitContainerAppJobName
+param initContainerAppJobImageName string = shopwareInitImageName
+param initContainerAppJobCpuCores string = shopwareInitContainerAppJobCpuCores
+param initContainerAppJobMemory string = shopwareInitContainerAppJobMemory
+param initContainerAppJobReplicaTimeoutSeconds int = shopwareInitContainerAppJobReplicaTimeoutSeconds
+param phpContainerAppExternal bool = shopwareWebContainerAppExternal
+param phpContainerAppName string = shopwareWebContainerAppName
+param phpContainerAppImageName string = shopwareWebImageName
+param phpContainerAppCustomDomains array = shopwareWebContainerAppCustomDomains
+param phpContainerAppCpuCores string = shopwareWebContainerAppCpuCores
+param phpContainerAppMemory string = shopwareWebContainerAppMemory
+param phpContainerAppMinReplicas int = shopwareWebContainerAppMinReplicas
+param phpContainerAppMaxReplicas int = shopwareWebContainerAppMaxReplicas
+param phpContainerAppIpSecurityRestrictions array = []
+param phpContainerAppInternalPort int = shopwareWebContainerAppInternalPort
+// Optional scale rules
+param phpContainerAppProvisionCronScaleRule bool = false
+param phpContainerAppCronScaleRuleDesiredReplicas int = 0
+param phpContainerAppCronScaleRuleStartSchedule string = ''
+param phpContainerAppCronScaleRuleEndSchedule string = ''
+param phpContainerAppCronScaleRuleTimezone string = ''
 @allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
@@ -197,7 +221,7 @@ param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database, portalEngineStorageAccount]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -205,20 +229,26 @@ module containerApps 'container-apps/container-apps.bicep' = {
     containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
-    shopwareInitContainerAppJobName: shopwareInitContainerAppJobName
-    shopwareInitImageName: shopwareInitImageName
-    shopwareInitContainerAppJobCpuCores: shopwareInitContainerAppJobCpuCores
-    shopwareInitContainerAppJobMemory: shopwareInitContainerAppJobMemory
-    shopwareInitContainerAppJobReplicaTimeoutSeconds: shopwareInitContainerAppJobReplicaTimeoutSeconds
-    shopwareWebContainerAppName: shopwareWebContainerAppName
-    shopwareWebContainerAppCustomDomains: shopwareWebContainerAppCustomDomains
-    shopwareWebImageName: shopwareWebImageName
-    shopwareWebContainerAppCpuCores: shopwareWebContainerAppCpuCores
-    shopwareWebContainerAppMemory: shopwareWebContainerAppMemory
-    shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
-    shopwareWebContainerAppMinReplicas: shopwareWebContainerAppMinReplicas
-    shopwareWebContainerAppMaxReplicas: shopwareWebContainerAppMaxReplicas
-    shopwareWebContainerAppInternalPort: shopwareWebContainerAppInternalPort
+    initContainerAppJobName: initContainerAppJobName
+    initContainerAppJobImageName: initContainerAppJobImageName
+    initContainerAppJobCpuCores: initContainerAppJobCpuCores
+    initContainerAppJobMemory: initContainerAppJobMemory
+    initContainerAppJobReplicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
+    phpContainerAppName: phpContainerAppName
+    phpContainerAppCustomDomains: phpContainerAppCustomDomains
+    phpContainerAppImageName: phpContainerAppImageName
+    phpContainerAppCpuCores: phpContainerAppCpuCores
+    phpContainerAppMemory: phpContainerAppMemory
+    phpContainerAppExternal: phpContainerAppExternal
+    phpContainerAppMinReplicas: phpContainerAppMinReplicas
+    phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
+    phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions
+    phpContainerAppInternalPort: phpContainerAppInternalPort
+    phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
+    phpContainerAppCronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
+    phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
+    phpContainerAppCronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
+    phpContainerAppCronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
     appEnv: appEnv
     appUrl: appUrl
     appSecret: keyVault.getSecret(appSecretSecretName)

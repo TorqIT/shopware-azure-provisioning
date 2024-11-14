@@ -11,48 +11,38 @@ param virtualNetworkSubnetName string
 
 param databaseServerName string
 
-param provisionInit bool
-param initContainerAppJobName string
-param initContainerAppJobImageName string
-param initContainerAppJobCpuCores string
-param initContainerAppJobMemory string
-param initContainerAppJobRunPimcoreInstall bool
-param initContainerAppJobReplicaTimeoutSeconds int
-
 param databaseName string
 param databaseUser string
 @secure()
 param databasePassword string
-@secure()
-param pimcoreEnterpriseToken string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
 
 param containerRegistryName string
 
-param shopwareInitContainerAppJobName string
-param shopwareInitImageName string
-param shopwareInitContainerAppJobCpuCores string
-param shopwareInitContainerAppJobMemory string
-param shopwareInitContainerAppJobReplicaTimeoutSeconds int
+param initContainerAppJobName string
+param initContainerAppJobImageName string
+param initContainerAppJobCpuCores string
+param initContainerAppJobMemory string
+param initContainerAppJobReplicaTimeoutSeconds int
 
-param shopwareWebContainerAppExternal bool
-param shopwareWebContainerAppCustomDomains array
-param shopwareWebContainerAppName string
-param shopwareWebImageName string
-param shopwareWebContainerAppCpuCores string
-param shopwareWebContainerAppMemory string
-param shopwareWebContainerAppMinReplicas int
-param shopwareWebContainerAppMaxReplicas int
-param shopwareWebContainerAppInternalPort int
+param phpContainerAppExternal bool
+param phpContainerAppCustomDomains array
+param phpContainerAppName string
+param phpContainerAppImageName string
+param phpContainerAppCpuCores string
+param phpContainerAppMemory string
+param phpContainerAppMinReplicas int
+param phpContainerAppMaxReplicas int
+param phpContainerAppIpSecurityRestrictions array
+param phpContainerAppInternalPort int
 // Optional scale rules
 param phpContainerAppProvisionCronScaleRule bool
 param phpContainerAppCronScaleRuleDesiredReplicas int
 param phpContainerAppCronScaleRuleStartSchedule string
 param phpContainerAppCronScaleRuleEndSchedule string
 param phpContainerAppCronScaleRuleTimezone string
-param phpContainerAppIpSecurityRestrictions array
 
 param appEnv string
 param appUrl string
@@ -71,7 +61,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
   params: {
     location: location
     name: containerAppsEnvironmentName
-    shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
+    shopwareWebContainerAppExternal: phpContainerAppExternal
     useWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
@@ -148,11 +138,11 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
   dependsOn: [containerAppsEnvironment]
   params: {
     location: location
-    containerAppJobName: shopwareInitContainerAppJobName
-    imageName: shopwareInitImageName
-    cpuCores: shopwareInitContainerAppJobCpuCores
-    memory: shopwareInitContainerAppJobMemory
-    replicaTimeoutSeconds: shopwareInitContainerAppJobReplicaTimeoutSeconds
+    containerAppJobName: initContainerAppJobName
+    imageName: initContainerAppJobImageName
+    cpuCores: initContainerAppJobCpuCores
+    memory: initContainerAppJobMemory
+    replicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
     environmentVariables: environmentVariables.outputs.envVars
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerRegistryConfiguration: containerRegistryConfiguration
@@ -170,22 +160,22 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
   params: {
     location: location
     containerAppsEnvironmentName: containerAppsEnvironmentName
-    containerAppName: shopwareWebContainerAppName
-    imageName: shopwareWebImageName
+    containerAppName: phpContainerAppName
+    imageName: phpContainerAppImageName
     containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
-    cpuCores: shopwareWebContainerAppCpuCores
-    memory: shopwareWebContainerAppMemory
-    minReplicas: shopwareWebContainerAppMinReplicas
-    maxReplicas: shopwareWebContainerAppMaxReplicas
+    cpuCores: phpContainerAppCpuCores
+    memory: phpContainerAppMemory
+    minReplicas: phpContainerAppMinReplicas
+    maxReplicas: phpContainerAppMaxReplicas
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     environmentVariables: environmentVariables.outputs.envVars
-    customDomains: shopwareWebContainerAppCustomDomains
+    customDomains: phpContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
-    internalPort: shopwareWebContainerAppInternalPort
+    internalPort: phpContainerAppInternalPort
 
     // Optional scaling rules
     provisionCronScaleRule: phpContainerAppProvisionCronScaleRule

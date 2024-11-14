@@ -108,5 +108,6 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
     backupVaultName: backupVaultName
     storageAccountName: storageAccountName
     containers: [publicContainerName, privateContainerName]
+    retentionPeriod: longTermBackupRetentionPeriod
   }
 }
