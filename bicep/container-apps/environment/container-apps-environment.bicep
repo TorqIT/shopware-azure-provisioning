@@ -2,6 +2,7 @@ param location string = resourceGroup().location
 
 param name string
 param shopwareWebContainerAppExternal bool
+param useWorkloadProfiles bool
 
 param virtualNetworkName string
 param virtualNetworkResourceGroup string
@@ -27,6 +28,12 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
   name: name
   location: location
   properties: {
+    workloadProfiles: useWorkloadProfiles ? [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]: null
     vnetConfiguration: {
       internal: !shopwareWebContainerAppExternal
       infrastructureSubnetId: subnetId
@@ -54,5 +61,3 @@ module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!sho
     vnetId: virtualNetwork.id
   }
 }
-
-output id string = containerAppsEnvironment.id

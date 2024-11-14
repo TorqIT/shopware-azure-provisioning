@@ -32,9 +32,11 @@ param virtualNetworkContainerAppsSubnetName string = 'container-apps'
 param virtualNetworkContainerAppsSubnetAddressSpace string = '10.0.0.0/23'
 param virtualNetworkDatabaseSubnetName string = 'database'
 param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
-// As both Storage Accounts are primarily accessed by the Container Apps, we simply place their Private Endpoints in the same
-// subnet by default. Some clients prefer to place the Endpoints in their own Resource Group. 
+// TODO legacy applications place Private Endpoints in the same subnet as the Container Apps, but this
+// is incorrect as such a subnet should be only occupied by the Container Apps. This setup works fine for
+// Consumption plan CAs but not workload profiles, and in general should be avoided
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
+param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/29'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
@@ -43,8 +45,11 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     virtualNetworkAddressSpace: virtualNetworkAddressSpace
     containerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
+    containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
+    privateEndpointsSubnetName: virtualNetworkPrivateEndpointsSubnetName
+    privateEndpointsSubnetAddressSpace: virtualNetworkPrivateEndpointsSubnetAddressSpace
     // Optional services VM provisioning (see configuration below)
     provisionServicesVM: provisionServicesVM
     servicesVmSubnetName: servicesVmSubnetName
@@ -89,6 +94,7 @@ param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = true
+param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
@@ -110,6 +116,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     privateEndpointNicName: storageAccountPrivateEndpointNicName
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
+    longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
   }
 }
 
@@ -120,10 +127,12 @@ param databaseAdminPasswordSecretName string = 'database-admin-password'
 param databaseSkuName string = 'Standard_B1ms'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
-param databaseName string = 'shopware'
-param databaseBackupRetentionDays int = 7
+param databaseName string = 'pimcore'
+param databaseBackupRetentionDays int = 7 //deprecated in favor of renamed param below
+param databaseShortTermBackupRetentionDays int = databaseBackupRetentionDays
 param databaseGeoRedundantBackup bool = false
 param databaseLongTermBackups bool = true
+param databaseLongTermBackupRetentionPeriod string = 'P365D'
 module database 'database/database.bicep' = {
   name: 'database'
   dependsOn: [virtualNetwork, privateDnsZones, backupVault]
@@ -140,10 +149,11 @@ module database 'database/database.bicep' = {
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
     virtualNetworkStorageAccountPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
-    backupRetentionDays: databaseBackupRetentionDays
+    shortTermBackupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
-    longTermBackups: databaseLongTermBackups
     backupVaultName: backupVaultName
+    longTermBackups: databaseLongTermBackups
+    longTermBackupRetentionPeriod: databaseLongTermBackupRetentionPeriod
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
     privateDnsZoneForStorageAccountsId: privateDnsZones.outputs.zoneIdForStorageAccounts
   }
@@ -187,11 +197,12 @@ param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database, portalEngineStorageAccount]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
     containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     shopwareInitContainerAppJobName: shopwareInitContainerAppJobName

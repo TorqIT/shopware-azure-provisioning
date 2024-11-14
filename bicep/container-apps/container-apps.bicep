@@ -1,6 +1,8 @@
 param location string = resourceGroup().location
 
 param containerAppsEnvironmentName string
+param containerAppsEnvironmentUseWorkloadProfiles bool
+
 param logAnalyticsWorkspaceName string
 
 param virtualNetworkName string
@@ -8,10 +10,21 @@ param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
 param databaseServerName string
+
+param provisionInit bool
+param initContainerAppJobName string
+param initContainerAppJobImageName string
+param initContainerAppJobCpuCores string
+param initContainerAppJobMemory string
+param initContainerAppJobRunPimcoreInstall bool
+param initContainerAppJobReplicaTimeoutSeconds int
+
 param databaseName string
 param databaseUser string
 @secure()
 param databasePassword string
+@secure()
+param pimcoreEnterpriseToken string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
@@ -33,6 +46,13 @@ param shopwareWebContainerAppMemory string
 param shopwareWebContainerAppMinReplicas int
 param shopwareWebContainerAppMaxReplicas int
 param shopwareWebContainerAppInternalPort int
+// Optional scale rules
+param phpContainerAppProvisionCronScaleRule bool
+param phpContainerAppCronScaleRuleDesiredReplicas int
+param phpContainerAppCronScaleRuleStartSchedule string
+param phpContainerAppCronScaleRuleEndSchedule string
+param phpContainerAppCronScaleRuleTimezone string
+param phpContainerAppIpSecurityRestrictions array
 
 param appEnv string
 param appUrl string
@@ -52,6 +72,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     location: location
     name: containerAppsEnvironmentName
     shopwareWebContainerAppExternal: shopwareWebContainerAppExternal
+    useWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
@@ -59,6 +80,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
   }
 }
 
+// Set up common secrets for the PHP and supervisord Container Apps
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
   name: containerRegistryName
 }
@@ -98,7 +120,7 @@ var appSecretSecret = {
 }
 
 // Environment variables
-module environmentVariables './container-apps-variables.bicep' = {
+module environmentVariables './container-apps-env-variables.bicep' = {
   name: 'container-apps-env-vars'
   params: {
     appEnv: appEnv
@@ -156,6 +178,7 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     memory: shopwareWebContainerAppMemory
     minReplicas: shopwareWebContainerAppMinReplicas
     maxReplicas: shopwareWebContainerAppMaxReplicas
+    ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     environmentVariables: environmentVariables.outputs.envVars
     customDomains: shopwareWebContainerAppCustomDomains
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
@@ -163,5 +186,12 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     internalPort: shopwareWebContainerAppInternalPort
+
+    // Optional scaling rules
+    provisionCronScaleRule: phpContainerAppProvisionCronScaleRule
+    cronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
+    cronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
+    cronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
+    cronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
   }
 }

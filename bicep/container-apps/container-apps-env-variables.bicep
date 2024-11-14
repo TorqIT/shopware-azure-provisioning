@@ -91,6 +91,10 @@ var defaultEnvVars = [
     value: storageAccountPublicContainerName
   }
   {
+    name: 'DATABASE_SERVER_VERSION'
+    value: database.properties.version
+  }
+  {
     name: 'AZURE_STORAGE_ACCOUNT_KEY'
     secretRef: storageAccountKeySecretName
   }
