@@ -52,6 +52,7 @@ param supervisordContainerAppMemory string
 param redisContainerAppName string
 param redisContainerAppCpuCores string
 param redisContainerAppMemory string
+param redisContainerAppMaxMemorySetting string
 
 param appDebug string
 param appEnv string
@@ -283,6 +284,7 @@ module redisContainerApp 'container-app-redis.bicep' = {
     containerAppName: redisContainerAppName
     cpuCores: redisContainerAppCpuCores
     memory: redisContainerAppMemory
+    maxMemorySetting: redisContainerAppMaxMemorySetting
   }
 }
 
