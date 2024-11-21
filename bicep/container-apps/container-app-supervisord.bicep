@@ -14,8 +14,6 @@ param memory string
 param databasePasswordSecret object
 @secure()
 param storageAccountKeySecret object
-@secure()
-param pimcoreEnterpriseTokenSecret object
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -29,8 +27,15 @@ var containerAppsEnvironmentId = containerAppsEnvironment.id
 
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var enterpriseSecrets = !empty(pimcoreEnterpriseTokenSecret) ? [pimcoreEnterpriseTokenSecret] : []
-var secrets = concat(defaultSecrets, portalEngineSecrets, enterpriseSecrets)
+var secrets = concat(defaultSecrets, portalEngineSecrets)
+
+module volumesModule './container-apps-volumes.bicep' = {
+  name: 'container-app-php-volumes'
+  params: {
+    provisionForPortalEngine: false // deliberately don't create a volume mount for Portal Engine build as it is not required for supervisord
+    portalEnginePublicBuildStorageMountName: '' 
+  }
+}
 
 resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
@@ -54,8 +59,10 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
             cpu: json(cpuCores)
             memory: memory
           }
+          volumeMounts: volumesModule.outputs.volumeMounts
         }
       ]
+      volumes: volumesModule.outputs.volumes
       scale: {
         minReplicas: 1
         maxReplicas: 1

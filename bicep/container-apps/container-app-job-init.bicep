@@ -29,8 +29,6 @@ param containerRegistryPasswordSecret object
 param storageAccountKeySecret object
 @secure()
 param pimcoreAdminPassword string
-@secure()
-param pimcoreEnterpriseTokenSecret object
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -52,13 +50,11 @@ var adminPasswordSecret = {
 }
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, adminPasswordSecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var enterpiseSecrets = !empty(pimcoreEnterpriseTokenSecret) ? [pimcoreEnterpriseTokenSecret]: []
-var secrets = concat(defaultSecrets, portalEngineSecrets, enterpiseSecrets)
+var secrets = concat(defaultSecrets, portalEngineSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-job-init-volumes'
   params: {
-    pimcoreEnterpriseTokenSecret: pimcoreEnterpriseTokenSecret
     provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
   }
