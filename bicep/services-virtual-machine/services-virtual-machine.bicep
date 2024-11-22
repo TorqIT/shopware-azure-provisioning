@@ -37,7 +37,41 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-01-01' existing 
   parent: virtualNetwork
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-03-01' = {
+  name: networkSecurityGroupName
+  location: location
+  properties: {
+    securityRules: [for ip in firewallIpsForSsh: {
+        name: 'SSH'
+        properties: {
+          priority: 1000
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: ip
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '22'
+        }
+      }
+    ]
+  }
+}
+
+resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2024-03-01' = {
+  name: publicIPAddressName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+}
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2024-03-01' = {
   name: networkInterfaceName
   location: location
   properties: {
@@ -61,41 +95,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
-  name: networkSecurityGroupName
-  location: location
-  properties: {
-    securityRules: [for ip in firewallIpsForSsh: {
-        name: 'SSH'
-        properties: {
-          priority: 1000
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: ip
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '22'
-        }
-      }
-    ]
-  }
-}
-
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
-  name: publicIPAddressName
-  location: location
-  sku: {
-    name: 'Standard'
-  }
-  properties: {
-    publicIPAllocationMethod: 'Static'
-    publicIPAddressVersion: 'IPv4'
-    idleTimeoutInMinutes: 4
-  }
-}
-
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-09-01' = {
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: name
   location: location
   properties: {
