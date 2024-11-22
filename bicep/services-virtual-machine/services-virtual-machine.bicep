@@ -89,7 +89,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
     name: 'Standard'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
+    publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
     idleTimeoutInMinutes: 4
   }
