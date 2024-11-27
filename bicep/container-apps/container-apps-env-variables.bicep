@@ -1,6 +1,6 @@
 param appEnv string
 param appUrl string
-param appSecretSecretName string
+param appSecretSecretRefName string
 param appInstallCurrency string
 param appInstallLocale string
 param appSalesChannelName string
@@ -35,7 +35,7 @@ var defaultEnvVars = [
   }
   {
     name: 'APP_SECRET'
-    secretRef: appSecretSecretName
+    secretRef: appSecretSecretRefName
   }
   {
     name: 'APP_INSTALL_CURRENCY'

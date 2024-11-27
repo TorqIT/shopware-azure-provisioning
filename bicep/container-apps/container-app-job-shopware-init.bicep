@@ -7,6 +7,8 @@ param cpuCores string
 param memory string
 param replicaTimeoutSeconds int
 
+param keyVaultName string
+
 param containerRegistryName string
 param containerRegistryConfiguration object
 @secure()
@@ -34,10 +36,6 @@ var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
-  params: {
-    provisionForPortalEngine: false // deliberately don't create a volume mount for Portal Engine build as it is not required for supervisord
-    portalEnginePublicBuildStorageMountName: '' 
-  }
 }
 
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
