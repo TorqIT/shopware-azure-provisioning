@@ -13,6 +13,7 @@ param useProbes bool
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
+param managedIdentityForKeyVaultId string
 
 @secure()
 param databasePasswordSecret object
@@ -20,6 +21,7 @@ param databasePasswordSecret object
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
+param additionalSecrets array
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -47,7 +49,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
 // Secrets
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var secrets = concat(defaultSecrets, portalEngineSecrets)
+var secrets = concat(defaultSecrets, portalEngineSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
@@ -71,6 +73,12 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
 resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityForKeyVaultId}': {}
+    }
+  }
   properties: {
     managedEnvironmentId: containerAppsEnvironmentId
     configuration: {

@@ -3,6 +3,9 @@ param location string = resourceGroup().location
 param storageAccountName string
 param storageAccountFileShareName string
 
+param keyVaultName string
+param managedIdentityForKeyVaultId string
+
 param containerAppsEnvironmentName string
 param containerAppsEnvironmentStorageMountName string
 param volumeName string
@@ -17,8 +20,7 @@ param customDomains array
 param databaseServerName string
 param databaseName string
 param databaseUser string
-@secure()
-param databasePassword string
+param databasePasswordSecretName string
 
 param provisionCronScaleRule bool
 param cronScaleRuleDesiredReplicas int
@@ -56,9 +58,17 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+resource pimcoreAdminPasswordInKeyVault 'Microsoft.KeyVault/vaults/secrets@2024-04-01-preview' existing = {
+  parent: keyVault
+  name: databasePasswordSecretName
+}
 var databasePasswordSecret = {
   name: 'database-password'
-  value: databasePassword
+  keyVaultUrl: pimcoreAdminPasswordInKeyVault.properties.secretUri
+  identity: managedIdentityForKeyVaultId
 }
 
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
@@ -76,6 +86,12 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   dependsOn: [storageMount]
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityForKeyVaultId}': {}
+    }
+  }
   properties: {
     managedEnvironmentId: containerAppsEnvironment.id
     configuration: {

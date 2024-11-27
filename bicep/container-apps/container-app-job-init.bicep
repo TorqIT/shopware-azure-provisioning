@@ -10,6 +10,8 @@ param replicaTimeoutSeconds int
 // Environment variables shared with the PHP and supervisord Container Apps
 param defaultEnvVars array
 
+param additionalSecrets array
+
 param containerRegistryName string
 param containerRegistryConfiguration object
 
@@ -17,18 +19,21 @@ param databaseServerName string
 param databaseUser string
 param databaseName string
 
+param keyVaultName string
+
 // Whether to run the pimcore-install command when this job runs. 
 // This should only be set to true on first deployment and set to false on all subsequent deploys.
 param runPimcoreInstall bool
 
 @secure()
-param databasePasswordSecret object
-@secure()
 param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
-@secure()
-param pimcoreAdminPassword string
+
+param databasePasswordSecret object
+param pimcoreAdminPasswordSecretName string
+
+param managedIdentityForKeyVaultId string
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -44,13 +49,21 @@ resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' exis
 }
 
 // Secrets
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+resource pimcoreAdminPasswordInKeyVault 'Microsoft.KeyVault/vaults/secrets@2024-04-01-preview' existing = {
+  parent: keyVault
+  name: pimcoreAdminPasswordSecretName
+}
 var adminPasswordSecret = {
   name: 'admin-psswd'
-  value: pimcoreAdminPassword
+  keyVaultUrl: pimcoreAdminPasswordInKeyVault.properties.secretUri
+  identity: managedIdentityForKeyVaultId
 }
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, adminPasswordSecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var secrets = concat(defaultSecrets, portalEngineSecrets)
+var secrets = concat(defaultSecrets, additionalSecrets, portalEngineSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-job-init-volumes'
@@ -103,6 +116,12 @@ var envVars = concat(defaultEnvVars, initEnvVars)
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
   name: containerAppJobName
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityForKeyVaultId}': {}
+    }
+  }
   properties: {
     environmentId: containerAppsEnvironment.id
     configuration: {

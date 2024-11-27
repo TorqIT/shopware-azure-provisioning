@@ -101,8 +101,6 @@ See https://github.com/TorqIT/pimcore-github-actions-workflows for examples of G
 
 Bicep files are declarative, meaning that they declare the desired state of your resources. This means that you can deploy using the same files multiple times, and only the new changes that you've made will be applied. If you wish to change any resource names or properties, simply update them in your `parameters.json` file and re-run `./provision.sh parameters.json`. Keeping the `parameters.json` files committed in your source control is a good practice as it will allow you to maintain a snapshot of your environment's state.
 
-When adding/updating/removing Container Apps secrets for the PHP container, you will need to deactivate any active revisions that are using the existing secrets (Azure will throw an error if you do not first deactivate). To deactivate the active revisions, enter this container and run `./scripts/deactivate-php-container-app-revisions.sh parameters.json`.
-
 ## Useful scripts
 
 Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/pimcore-azure-provisioning/blob/main/scripts/README.md)).

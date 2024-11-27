@@ -90,6 +90,4 @@ then
       supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME
 fi
 
-./bicep/container-apps/apply-container-apps-secrets.sh $1
-
 echo "Done!"

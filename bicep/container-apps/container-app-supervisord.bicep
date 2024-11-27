@@ -10,10 +10,13 @@ param containerRegistryConfiguration object
 param containerRegistryPasswordSecret object
 param cpuCores string
 param memory string
+param managedIdentityForKeyVaultId string
+
 @secure()
 param databasePasswordSecret object
 @secure()
 param storageAccountKeySecret object
+param additionalSecrets array
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -27,7 +30,7 @@ var containerAppsEnvironmentId = containerAppsEnvironment.id
 
 var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
-var secrets = concat(defaultSecrets, portalEngineSecrets)
+var secrets = concat(defaultSecrets, portalEngineSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
@@ -40,6 +43,12 @@ module volumesModule './container-apps-volumes.bicep' = {
 resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityForKeyVaultId}': {}
+    }
+  }
   properties: {
     managedEnvironmentId: containerAppsEnvironmentId
     configuration: {

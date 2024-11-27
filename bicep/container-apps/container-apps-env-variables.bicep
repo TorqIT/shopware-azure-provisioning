@@ -3,9 +3,11 @@ param appEnv string
 param storageAccountName string
 param storageAccountContainerName string
 param storageAccountAssetsContainerName string
+param storageAccountKeySecretRefName string
 param databaseServerName string
 param databaseName string
 param databaseUser string
+param databasePasswordSecretRefName string
 param pimcoreDev string
 param pimcoreEnvironment string
 param redisDb string
@@ -17,6 +19,7 @@ param additionalEnvVars array
 param provisionPortalEngine bool
 param portalEngineStorageAccountName string
 param portalEngineStorageAccountDownloadsContainerName string
+param portalEngineStorageAccountKeySecretRefName string
 
 resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
   name: databaseServerName
@@ -41,7 +44,7 @@ var defaultEnvVars = [
   }
   {
     name: 'AZURE_STORAGE_ACCOUNT_KEY'
-    secretRef: 'storage-account-key'
+    secretRef: storageAccountKeySecretRefName
   }
   {
     name: 'AZURE_STORAGE_ACCOUNT_NAME'
@@ -61,7 +64,7 @@ var defaultEnvVars = [
   }
   {
     name: 'DATABASE_PASSWORD'
-    secretRef: 'database-password'
+    secretRef: databasePasswordSecretRefName
   }
   {
     name: 'DATABASE_SERVER_VERSION'
@@ -100,7 +103,7 @@ var portalEngineEnvVars = provisionPortalEngine ? [
   }
   {
     name: 'PORTAL_ENGINE_STORAGE_ACCOUNT_KEY'
-    secretRef: 'portal-engine-storage-account-key'
+    secretRef: portalEngineStorageAccountKeySecretRefName
   }
 ]: []
 
