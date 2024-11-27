@@ -158,7 +158,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
   }
 }
 
-module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
+module shopwareInitContainerAppJob 'container-app-job-init.bicep' = {
   name: 'shopware-init-container-app-job'
   dependsOn: [containerAppsEnvironment]
   params: {
@@ -182,8 +182,8 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
   }
 }
 
-module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
-  name: 'shopware-web-container-app'
+module phpContainerApp 'container-app-php.bicep' = {
+  name: 'php-container-app'
   dependsOn: [containerAppsEnvironment]
   params: {
     location: location
