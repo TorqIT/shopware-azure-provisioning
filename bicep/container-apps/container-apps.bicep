@@ -62,7 +62,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
   params: {
     location: location
     name: containerAppsEnvironmentName
-    shopwareWebContainerAppExternal: phpContainerAppExternal
+    phpContainerAppExternal: phpContainerAppExternal
     useWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
@@ -158,8 +158,8 @@ module environmentVariables './container-apps-env-variables.bicep' = {
   }
 }
 
-module shopwareInitContainerAppJob 'container-app-job-init.bicep' = {
-  name: 'shopware-init-container-app-job'
+module initContainerAppJob 'container-app-job-init.bicep' = {
+  name: 'init-container-app-job'
   dependsOn: [containerAppsEnvironment]
   params: {
     location: location
