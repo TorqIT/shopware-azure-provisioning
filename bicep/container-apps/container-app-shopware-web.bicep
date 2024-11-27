@@ -9,6 +9,7 @@ param memory string
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
+param managedIdentityForKeyVaultId string
 param environmentVariables array
 param internalPort int
 
@@ -23,6 +24,7 @@ param databaseUrlSecret object
 param storageAccountKeySecret object
 @secure()
 param appSecretSecret object
+param additionalSecrets array
 
 // Optional scaling rules
 param provisionCronScaleRule bool
@@ -41,7 +43,13 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
-var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+// Secrets
+var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+var secrets = concat(defaultSecrets, additionalSecrets)
+
+module volumesModule './container-apps-volumes.bicep' = {
+  name: 'container-app-php-volumes'
+}
 
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   name: 'container-app-scale-rules'
@@ -57,6 +65,12 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
 resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityForKeyVaultId}': {}
+    }
+  }
   properties: {
     managedEnvironmentId: containerAppsEnvironmentId
     configuration: {
@@ -99,6 +113,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
           }
         }
       ]
+      volumes: volumesModule.outputs.volumes
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas

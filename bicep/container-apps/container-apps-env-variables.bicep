@@ -11,12 +11,12 @@ param opensearchUrl string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
-param storageAccountKeySecretName string
+param storageAccountKeySecretRefName string
 
 param databaseServerName string
 param databaseName string
 param databaseUser string
-param databaseUrlSecretName string
+param databaseUrlSecretRefName string
 
 param additionalVars array
 
@@ -42,6 +42,10 @@ var defaultEnvVars = [
     value: appInstallCurrency
   }
   {
+    name: 'AZURE_STORAGE_ACCOUNT_KEY'
+    secretRef: storageAccountKeySecretRefName
+  }
+  {
     name: 'APP_INSTALL_LOCALE'
     value: appInstallLocale
   }
@@ -55,7 +59,7 @@ var defaultEnvVars = [
   }
   {
     name: 'DATABASE_URL'
-    secretRef: databaseUrlSecretName
+    secretRef: databaseUrlSecretRefName
   }
   {
     name: 'DATABASE_HOST'
@@ -93,10 +97,6 @@ var defaultEnvVars = [
   {
     name: 'DATABASE_SERVER_VERSION'
     value: database.properties.version
-  }
-  {
-    name: 'AZURE_STORAGE_ACCOUNT_KEY'
-    secretRef: storageAccountKeySecretName
   }
   {
     name: 'AZURE_CDN_URL'

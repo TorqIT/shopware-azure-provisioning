@@ -40,6 +40,9 @@ var defaultSubnets = [
         {
           service: 'Microsoft.Storage'
         }
+        {
+          service: 'Microsoft.KeyVault'
+        }
       ]
     }
   }

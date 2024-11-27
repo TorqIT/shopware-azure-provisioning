@@ -1,5 +1,3 @@
-@secure()
-param pimcoreEnterpriseTokenSecret object
 param provisionForPortalEngine bool
 param portalEnginePublicBuildStorageMountName string
 
@@ -12,23 +10,17 @@ module portalEngineVolumeMounts './portal-engine/container-app-portal-engine-vol
 }
 var defaultVolumes = []
 var portalEngineVolume = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolume] : []
-var enterpriseVolume = !empty(pimcoreEnterpriseTokenSecret) ? [{
+var secretsVolume = [{
   storageType: 'Secret'
-  name: 'pimcore-enterprise-token'
-  secrets: [
-    {
-      path: 'pimcore-enterprise-token'
-      secretRef: 'pimcore-enterprise-token'
-    }
-  ]
-}] : []
-output volumes array = concat(defaultVolumes, portalEngineVolume, enterpriseVolume)
+  name: 'secrets'
+}]
+output volumes array = concat(defaultVolumes, secretsVolume, portalEngineVolume)
 
 // Volume mounts
 var defaultVolumeMounts = []
-var portalEngineVolumeMount = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolumeMount] : []
-var enterpriseVolumeMount = !empty(pimcoreEnterpriseTokenSecret) ? [{
+var secretsVolumeMount = [{
+  volumeName: 'secrets'
   mountPath: '/run/secrets'
-  volumeName: 'pimcore-enterprise-token'
-}] : []
-output volumeMounts array = concat(defaultVolumeMounts, portalEngineVolumeMount, enterpriseVolumeMount)
+}]
+var portalEngineVolumeMount = provisionForPortalEngine ? [portalEngineVolumeMounts.outputs.portalEngineVolumeMount] : []
+output volumeMounts array = concat(defaultVolumeMounts, secretsVolumeMount, portalEngineVolumeMount)

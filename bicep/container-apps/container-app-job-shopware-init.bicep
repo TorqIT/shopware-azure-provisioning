@@ -11,12 +11,15 @@ param containerRegistryName string
 param containerRegistryConfiguration object
 @secure()
 param containerRegistryPasswordSecret object
+param managedIdentityForKeyVaultId string
+
 @secure()
 param databaseUrlSecret object
 @secure()
 param storageAccountKeySecret object
 @secure()
 param appSecretSecret object
+param additionalSecrets array
 
 param environmentVariables array
 
@@ -26,11 +29,26 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-var secrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+var secrets = concat(defaultSecrets, additionalSecrets)
+
+module volumesModule './container-apps-volumes.bicep' = {
+  name: 'container-app-php-volumes'
+  params: {
+    provisionForPortalEngine: false // deliberately don't create a volume mount for Portal Engine build as it is not required for supervisord
+    portalEnginePublicBuildStorageMountName: '' 
+  }
+}
 
 resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   location: location
   name: containerAppJobName
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityForKeyVaultId}': {}
+    }
+  }
   properties: {
     environmentId: containerAppsEnvironmentId
     configuration: {
@@ -57,8 +75,10 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
             cpu: json(cpuCores)
             memory: memory
           }
+          volumeMounts: volumesModule.outputs.volumeMounts
         }
       ]
+      volumes: volumesModule.outputs.volumes
     }
   }
 }

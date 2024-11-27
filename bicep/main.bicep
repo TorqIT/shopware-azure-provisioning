@@ -12,6 +12,9 @@ module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupN
   params: {
     name: keyVaultName
     localIpAddress: localIpAddress
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
   }
 }
 resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
@@ -219,12 +222,15 @@ param enableOpensearch bool = false
 // By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
 param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
+// TODO no need for this to be an object anymore, it could be an array
+param additionalSecrets object = {}
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
   dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
+    additionalSecrets: additionalSecrets.array
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
@@ -259,9 +265,10 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
+    keyVaultName: keyVaultName
     databaseServerName: databaseServerName
     databaseUser: databaseAdminUsername
-    databasePassword: keyVault.getSecret(databaseAdminPasswordSecretName)
+    databasePasswordSecretNameInKeyVault: databaseAdminPasswordSecretName
     databaseName: databaseName
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
@@ -304,7 +311,6 @@ param subscriptionId string = ''
 param resourceGroupName string = ''
 param tenantId string = ''
 param servicePrincipalName string = ''
-param additionalSecrets object = {}
 param containerRegistrySku string = ''
 param waitForKeyVaultManualIntervention bool = false
 param localIpAddress string = ''

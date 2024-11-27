@@ -9,12 +9,12 @@ param virtualNetworkName string
 param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
-param databaseServerName string
+param keyVaultName string
 
+param databaseServerName string
 param databaseName string
 param databaseUser string
-@secure()
-param databasePassword string
+param databasePasswordSecretNameInKeyVault string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
@@ -55,6 +55,7 @@ param appSecret string
 param enableOpensearch bool
 param opensearchUrl string
 param additionalEnvVars array
+param additionalSecrets array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
@@ -70,18 +71,23 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
   }
 }
 
-// Set up common secrets for the PHP and supervisord Container Apps
+// SECRETS
+// Managed Identity allowing the Container App resources to pull secrets directly from the Key Vault
+module managedIdentityForKeyVault './secrets/container-apps-key-vault-managed-identitity.bicep' = {
+  name: 'container-apps-key-vault-managed-identity'
+  params: {
+    location: location
+    keyVaultName: keyVaultName
+    resourceGroupName: resourceGroup().name
+  }
+}
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+// Set up common secrets for the init, PHP and supervisord Container Apps 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
   name: containerRegistryName
 }
-resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
-  name: databaseServerName
-}
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
-  name: storageAccountName
-}
-
-// Secrets
 var containerRegistryPasswordSecretName = 'container-registry-password'
 var containerRegistryPasswordSecret = {
   name: containerRegistryPasswordSecretName
@@ -92,21 +98,40 @@ var containerRegistryConfiguration = {
   username: containerRegistry.listCredentials().username
   passwordSecretRef: containerRegistryPasswordSecretName
 }
-var databaseUrlSecretName = 'database-url'
-var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
+resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
+  name: databaseServerName
+}
+resource databasePasswordSecretInKeyVault 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
+  parent: keyVault
+  name: databasePasswordSecretNameInKeyVault
+}
+var databaseUrl = 'mysql://${databaseUser}:${databasePasswordSecretInKeyVault.properties.value}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
+var databaseUrlSecretRefName = 'database-url'
 var databaseUrlSecret = {
-  name: databaseUrlSecretName
+  name: databaseUrlSecretRefName
   value: databaseUrl
 }
-var storageAccountKeySecretName = 'storage-account-key'
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: storageAccountName
+}
+var storageAccountKeySecretRefName = 'storage-account-key'
 var storageAccountKeySecret = {
-  name: storageAccountKeySecretName
+  name: storageAccountKeySecretRefName
   value: storageAccount.listKeys().keys[0].value
 }
-var appSecretSecretname = 'app-secret'
+var appSecretSecretRefName = 'app-secret'
 var appSecretSecret = {
-  name: appSecretSecretname
+  name: appSecretSecretRefName
   value: appSecret
+}
+// Optional additional secrets, assumed to exist in Key Vault
+module additionalSecretsModule './secrets/container-apps-additional-secrets.bicep' = {
+  name: 'container-apps-additional-secrets'
+  params: {
+    keyVaultName: keyVaultName
+    secrets: additionalSecrets
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+  }
 }
 
 // Environment variables
@@ -115,20 +140,20 @@ module environmentVariables './container-apps-env-variables.bicep' = {
   params: {
     appEnv: appEnv
     appUrl: appUrl
-    appSecretSecretName: appSecretSecretname
+    appSecretSecretRefName: appSecretSecretRefName
     appInstallCurrency: appInstallCurrency
     appInstallLocale: appInstallLocale
     appSalesChannelName: appSalesChannelName
     appInstallCategoryId: appInstallCategoryId
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
-    databaseUrlSecretName: databaseUrlSecretName
+    databaseUrlSecretRefName: databaseUrlSecretRefName
     databaseServerName: databaseServerName
     databaseName: databaseName
     databaseUser: databaseUser
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
-    storageAccountKeySecretName: storageAccountKeySecretName
+    storageAccountKeySecretRefName: storageAccountKeySecretRefName
     additionalVars: additionalEnvVars
   }
 }
@@ -151,6 +176,9 @@ module shopwareInitContainerAppJob 'container-app-job-shopware-init.bicep' = {
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+    keyVaultName: keyVaultName
+    additionalSecrets: additionalSecretsModule.outputs.secrets
   }
 }
 
@@ -171,11 +199,13 @@ module shopwareWebContainerApp 'container-app-shopware-web.bicep' = {
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     environmentVariables: environmentVariables.outputs.envVars
     customDomains: phpContainerAppCustomDomains
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     internalPort: phpContainerAppInternalPort
+    additionalSecrets: additionalSecretsModule.outputs.secrets
 
     // Optional scaling rules
     provisionCronScaleRule: phpContainerAppProvisionCronScaleRule
