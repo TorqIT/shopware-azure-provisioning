@@ -2,26 +2,6 @@ param location string = resourceGroup().location
 
 param containerRegistryName string
 
-// Key Vault
-param keyVaultName string
-// If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
-param keyVaultResourceGroupName string = resourceGroup().name
-module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
-  name: 'key-vault'
-  scope: resourceGroup(keyVaultResourceGroupName)
-  params: {
-    name: keyVaultName
-    localIpAddress: localIpAddress
-    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
-    virtualNetworkName: virtualNetworkName
-    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
-  }
-}
-resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
-  name: keyVaultName
-  scope: resourceGroup(keyVaultResourceGroupName)
-}
-
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
   name: containerRegistryName
 }
@@ -58,6 +38,27 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
     servicesVmSubnetName: servicesVmSubnetName
     servicesVmSubnetAddressSpace: servicesVmSubnetAddressSpace
   }
+}
+
+// Key Vault
+param keyVaultName string
+// If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
+param keyVaultResourceGroupName string = resourceGroup().name
+module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
+  name: 'key-vault'
+  dependsOn: [virtualNetwork]
+  scope: resourceGroup(keyVaultResourceGroupName)
+  params: {
+    name: keyVaultName
+    localIpAddress: localIpAddress
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
+  }
+}
+resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
+  name: keyVaultName
+  scope: resourceGroup(keyVaultResourceGroupName)
 }
 
 param privateDnsZonesSubscriptionId string = subscription().id
