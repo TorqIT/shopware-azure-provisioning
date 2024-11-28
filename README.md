@@ -27,9 +27,8 @@ Follow these steps to provision an environment for the first time:
 3. Enter the container shell with `docker exec -it <container-name> bash`.
 4. Run `./login-to-tenant.sh parameters.json` and follow the browser prompts to log in. If you wish to use a Service Principal instead of your Microsoft account to perform the provisioning, instead run `az login --service-principal -u <service principal id> -p <service principal password> --tenant <your tenant>`.
 5. If a Resource Group has not yet been created (e.g. if you are not an Owner in the Azure tenant), ensure it is created before running any scripts. Ensure also that you have Owner permissions on the created Resource Group.
-6. Run `./create-key-vault.sh parameters.json` to create a Key Vault in your Resource Group. Once created, navigate to the created Key Vault in the Azure Portal and use the "Access control (IAM)" blade to add yourself to the "Key Vault Secrets Officer" role (the Owner role at the Resource Group will allow you to do this; but it is not itself sufficient to actually manage secrets). Additionally, make sure the Key Vault is using a "Role-based Access Policy" in the "Access configuration" blade. Make up a secure database password and add it as a secret to this vault using either the Azure Portal or CLI (make sure the `databasePasswordSecretName` value matches the secret name in the vault). Add any other secrets your Container App will need to this vault as well (see `stub.parameters.jsonc` for details on how to reference these).
-   1. NOTE: There is an open issue to improve the Key Vault scripting (see [#50](https://github.com/TorqIT/pimcore-azure-provisioning/issues/50))
-7. Run `./provision.sh parameters.json` to provision the Azure environment.
+6. Ensure that `waitForKeyVaultManualIntervention` is set to `true` on initial provisioning.
+7. Run `./provision.sh parameters.json` to provision the Azure environment. When the script prompts you to add secrets to the Key Vault, do so in the Azure Portal.
 8. On first run of the script, a Service Principal will be created with permissions that will allow it to deploy to your environment via CI/CD workflows. Note down the appId and password returned by this section of the script.
 
 ## Custom domains and HTTPS certificates
