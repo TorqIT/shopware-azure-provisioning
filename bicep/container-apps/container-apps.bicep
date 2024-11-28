@@ -44,6 +44,11 @@ param phpContainerAppCronScaleRuleStartSchedule string
 param phpContainerAppCronScaleRuleEndSchedule string
 param phpContainerAppCronScaleRuleTimezone string
 
+param supervisordContainerAppName string
+param supervisordContainerAppImageName string
+param supervisordContainerAppCpuCores string
+param supervisordContainerAppMemory string
+
 param appEnv string
 param appUrl string
 param appInstallCurrency string
@@ -213,5 +218,26 @@ module phpContainerApp 'container-app-php.bicep' = {
     cronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
     cronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
     cronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
+  }
+}
+
+module supervisordContainerApp 'container-app-supervisord.bicep' = {
+  name: 'supervisord-container-app'
+  dependsOn: [containerAppsEnvironment, environmentVariables]
+  params: {
+    location: location
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppName: supervisordContainerAppName
+    imageName: supervisordContainerAppImageName
+    environmentVariables: environmentVariables.outputs.envVars
+    containerRegistryConfiguration: containerRegistryConfiguration
+    containerRegistryName: containerRegistryName
+    containerRegistryPasswordSecret: containerRegistryPasswordSecret
+    cpuCores: supervisordContainerAppCpuCores
+    memory: supervisordContainerAppMemory
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+    databaseUrlSecret: databaseUrlSecret
+    storageAccountKeySecret: storageAccountKeySecret
+    additionalSecrets: additionalSecretsModule.outputs.secrets
   }
 }
