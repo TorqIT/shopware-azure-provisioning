@@ -211,6 +211,10 @@ param phpContainerAppCronScaleRuleDesiredReplicas int = 0
 param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
+param supervisordContainerAppName string 
+param supervisordContainerAppImageName string
+param supervisordContainerAppCpuCores string = '0.25'
+param supervisordContainerAppMemory string = '0.5Gi'
 @allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
@@ -256,6 +260,10 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
     phpContainerAppCronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
     phpContainerAppCronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
+    supervisordContainerAppName: supervisordContainerAppName
+    supervisordContainerAppImageName: supervisordContainerAppImageName
+    supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
+    supervisordContainerAppMemory: supervisordContainerAppMemory
     appEnv: appEnv
     appUrl: appUrl
     appSecret: keyVault.getSecret(appSecretSecretName)
