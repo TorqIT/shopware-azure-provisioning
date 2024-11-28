@@ -35,8 +35,7 @@ resource redisContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
           command: [
             'redis-server'
             '--maxmemory ${maxMemorySetting}'
-            '--maxmemory-policy'
-            'volatile-lru'
+            '--maxmemory-policy volatile-lru'
             '--save ""'
           ]
           resources: {
