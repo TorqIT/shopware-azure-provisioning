@@ -232,6 +232,7 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
+    appSecretSecret: appSecretSecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
   }
 }
