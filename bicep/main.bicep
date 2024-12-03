@@ -174,43 +174,30 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 // Container Apps
 param containerAppsEnvironmentName string
 param containerAppsEnvironmentUseWorkloadProfiles bool = false
-// Deprecated param names (starting with "shopware")
-param shopwareInitContainerAppJobName string = ''
-param shopwareInitImageName string
-param shopwareInitContainerAppJobCpuCores string = '0.5'
-param shopwareInitContainerAppJobMemory string = '1Gi'
-param shopwareInitContainerAppJobReplicaTimeoutSeconds int = 600
-param shopwareWebContainerAppExternal bool = true
-param shopwareWebContainerAppName string
-param shopwareWebImageName string
-param shopwareWebContainerAppCustomDomains array = []
-param shopwareWebContainerAppCpuCores string = '1.0'
-param shopwareWebContainerAppMemory string = '2Gi'
-param shopwareWebContainerAppMinReplicas int = 1
-param shopwareWebContainerAppMaxReplicas int = 1
-param shopwareWebContainerAppInternalPort int = 80
-// Preferred param names
-param initContainerAppJobName string = shopwareInitContainerAppJobName
-param initContainerAppJobImageName string = shopwareInitImageName
-param initContainerAppJobCpuCores string = shopwareInitContainerAppJobCpuCores
-param initContainerAppJobMemory string = shopwareInitContainerAppJobMemory
-param initContainerAppJobReplicaTimeoutSeconds int = shopwareInitContainerAppJobReplicaTimeoutSeconds
-param phpContainerAppExternal bool = shopwareWebContainerAppExternal
-param phpContainerAppName string = shopwareWebContainerAppName
-param phpContainerAppImageName string = shopwareWebImageName
-param phpContainerAppCustomDomains array = shopwareWebContainerAppCustomDomains
-param phpContainerAppCpuCores string = shopwareWebContainerAppCpuCores
-param phpContainerAppMemory string = shopwareWebContainerAppMemory
-param phpContainerAppMinReplicas int = shopwareWebContainerAppMinReplicas
-param phpContainerAppMaxReplicas int = shopwareWebContainerAppMaxReplicas
+// Init Container App Job 
+param initContainerAppJobName string
+param initContainerAppJobImageName string
+param initContainerAppJobCpuCores string = '0.5'
+param initContainerAppJobMemory string = '1Gi'
+param initContainerAppJobReplicaTimeoutSeconds int = 600
+// PHP (web) Container App
+param phpContainerAppExternal bool = true
+param phpContainerAppName string
+param phpContainerAppImageName string
+param phpContainerAppCustomDomains array = []
+param phpContainerAppCpuCores string = '1.0'
+param phpContainerAppMemory string = '2.0'
+param phpContainerAppMinReplicas int = 1
+param phpContainerAppMaxReplicas int = 1
 param phpContainerAppIpSecurityRestrictions array = []
-param phpContainerAppInternalPort int = shopwareWebContainerAppInternalPort
+param phpContainerAppInternalPort int = 80
 // Optional scale rules
 param phpContainerAppProvisionCronScaleRule bool = false
 param phpContainerAppCronScaleRuleDesiredReplicas int = 0
 param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
+// Supervisord Container App
 param supervisordContainerAppName string 
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string = '0.25'
