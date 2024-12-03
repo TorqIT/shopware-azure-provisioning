@@ -110,7 +110,8 @@ resource databasePasswordSecretInKeyVault 'Microsoft.KeyVault/vaults/secrets@202
   parent: keyVault
   name: databasePasswordSecretNameInKeyVault
 }
-var databaseUrl = 'mysql://${databaseUser}:${databasePasswordSecretInKeyVault.properties.value}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
+var databasePassword = databasePasswordSecretInKeyVault.properties.value
+var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
 var databaseUrlSecretRefName = 'database-url'
 var databaseUrlSecret = {
   name: databaseUrlSecretRefName
