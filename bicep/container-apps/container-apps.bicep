@@ -14,7 +14,8 @@ param keyVaultName string
 param databaseServerName string
 param databaseName string
 param databaseUser string
-param databasePasswordSecretNameInKeyVault string
+@secure()
+param databasePassword string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
@@ -106,11 +107,6 @@ var containerRegistryConfiguration = {
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
   name: databaseServerName
 }
-resource databasePasswordSecretInKeyVault 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = {
-  parent: keyVault
-  name: databasePasswordSecretNameInKeyVault
-}
-var databasePassword = databasePasswordSecretInKeyVault.properties.value
 var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
 var databaseUrlSecretRefName = 'database-url'
 var databaseUrlSecret = {
