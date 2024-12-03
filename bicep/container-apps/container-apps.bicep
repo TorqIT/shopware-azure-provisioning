@@ -87,9 +87,6 @@ module managedIdentityForKeyVault './secrets/container-apps-key-vault-managed-id
     resourceGroupName: resourceGroup().name
   }
 }
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyVaultName
-}
 // Set up common secrets for the init, PHP and supervisord Container Apps 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
   name: containerRegistryName
