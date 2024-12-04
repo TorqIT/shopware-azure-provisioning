@@ -153,7 +153,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountKeySecretRefName: storageAccountKeySecretRefName
-    additionalVars: additionalEnvVars
+    additionalVars: concat(additionalEnvVars, additionalSecretsModule.outputs.envVars)
   }
 }
 
