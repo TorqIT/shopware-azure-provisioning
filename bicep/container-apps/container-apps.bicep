@@ -53,11 +53,15 @@ param supervisordContainerAppMemory string
 param appEnv string
 param appUrl string
 param appInstallCurrency string
-param appInstallLocale string
 param appSalesChannelName string
-param appInstallCategoryId string
+param appSalesChannelId string
+param appSalesChannelCurrencyId string
+param appSalesChannelCountryIso string
+param appSalesChannelSnippetIso string
 @secure()
 param appSecret string
+@secure()
+param appPassword string
 param enableOpensearch bool
 param opensearchUrl string
 param additionalEnvVars array
@@ -141,9 +145,11 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     appUrl: appUrl
     appSecretSecretRefName: appSecretSecretRefName
     appInstallCurrency: appInstallCurrency
-    appInstallLocale: appInstallLocale
     appSalesChannelName: appSalesChannelName
-    appInstallCategoryId: appInstallCategoryId
+    appSalesChannelId: appSalesChannelId
+    appSalesChannelCurrencyId: appSalesChannelCurrencyId
+    appSalesChannelCountryIso: appSalesChannelCountryIso
+    appSalesChannelSnippetIso: appSalesChannelSnippetIso
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
     databaseUrlSecretRefName: databaseUrlSecretRefName
@@ -175,6 +181,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
+    appPassword: appPassword
     managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
     keyVaultName: keyVaultName
     additionalSecrets: additionalSecretsModule.outputs.secrets

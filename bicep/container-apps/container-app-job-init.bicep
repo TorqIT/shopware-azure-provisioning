@@ -21,6 +21,8 @@ param databaseUrlSecret object
 param storageAccountKeySecret object
 @secure()
 param appSecretSecret object
+@secure()
+param appPassword string
 param additionalSecrets array
 
 param environmentVariables array
@@ -31,7 +33,17 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-11-01-
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+// Secrets
+var appPasswordSecretRefName = 'app-password'
+var appPasswordSecret = {
+  name: appPasswordSecretRefName
+  value: appPassword
+}
+var appPasswordEnvVar = {
+  name: 'APP_PASSWORD'
+  secretRef: appPasswordSecretRefName
+}
+var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret, appPasswordSecret]
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
@@ -68,7 +80,7 @@ resource containerAppJob 'Microsoft.App/jobs@2024-03-01' = {
         {
           image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
           name: imageName
-          env: environmentVariables
+          env: concat(environmentVariables, [appPasswordEnvVar])
           resources: {
             cpu: json(cpuCores)
             memory: memory

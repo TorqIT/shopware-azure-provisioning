@@ -2,9 +2,11 @@ param appEnv string
 param appUrl string
 param appSecretSecretRefName string
 param appInstallCurrency string
-param appInstallLocale string
 param appSalesChannelName string
-param appInstallCategoryId string
+param appSalesChannelId string
+param appSalesChannelCurrencyId string
+param appSalesChannelCountryIso string
+param appSalesChannelSnippetIso string
 
 param enableOpensearch bool
 param opensearchUrl string
@@ -42,20 +44,24 @@ var defaultEnvVars = [
     value: appInstallCurrency
   }
   {
-    name: 'AZURE_STORAGE_ACCOUNT_KEY'
-    secretRef: storageAccountKeySecretRefName
-  }
-  {
-    name: 'APP_INSTALL_LOCALE'
-    value: appInstallLocale
-  }
-  {
     name: 'APP_SALESCHANNEL_NAME'
     value: appSalesChannelName
   }
   {
-    name: 'APP_INSTALL_CATEGORY_ID'
-    value: appInstallCategoryId
+    name: 'APP_SALESCHANNEL_ID'
+    value: appSalesChannelId
+  }
+  {
+    name: 'APP_SALESCHANNEL_CURRENCY_ID'
+    value: appSalesChannelCurrencyId
+  }
+  {
+    name: 'APP_SALESCHANNEL_COUNTRY_ISO'
+    value: appSalesChannelCountryIso
+  }
+  {
+    name: 'APP_SALESCHANNEL_SNIPPET_ISO'
+    value: appSalesChannelSnippetIso
   }
   {
     name: 'DATABASE_URL'
@@ -93,6 +99,10 @@ var defaultEnvVars = [
   {
     name: 'AZURE_STORAGE_ACCOUNT_PUBLIC_CONTAINER'
     value: storageAccountPublicContainerName
+  }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_KEY'
+    secretRef: storageAccountKeySecretRefName
   }
   {
     name: 'DATABASE_SERVER_VERSION'
