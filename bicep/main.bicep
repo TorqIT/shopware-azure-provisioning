@@ -198,6 +198,7 @@ param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
 // Supervisord Container App
+param provisionSupervisordContainerApp bool = false
 param supervisordContainerAppName string 
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string = '0.25'
@@ -250,6 +251,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
     phpContainerAppCronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
     phpContainerAppCronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
+    provisionSupervisordContainerApp: provisionSupervisordContainerApp
     supervisordContainerAppName: supervisordContainerAppName
     supervisordContainerAppImageName: supervisordContainerAppImageName
     supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
