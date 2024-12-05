@@ -19,6 +19,7 @@ param databasePassword string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
+param storageAccountPrivateContainerName string
 
 param containerRegistryName string
 
@@ -158,6 +159,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     databaseUser: databaseUser
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
+    storageAccountPrivateContainerName: storageAccountPrivateContainerName
     storageAccountKeySecretRefName: storageAccountKeySecretRefName
     additionalVars: concat(additionalEnvVars, additionalSecretsModule.outputs.envVars)
   }

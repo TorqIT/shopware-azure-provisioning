@@ -13,6 +13,7 @@ param opensearchUrl string
 
 param storageAccountName string
 param storageAccountPublicContainerName string
+param storageAccountPrivateContainerName string
 param storageAccountKeySecretRefName string
 
 param databaseServerName string
@@ -99,6 +100,10 @@ var defaultEnvVars = [
   {
     name: 'AZURE_STORAGE_ACCOUNT_PUBLIC_CONTAINER'
     value: storageAccountPublicContainerName
+  }
+  {
+    name: 'AZURE_STORAGE_ACCOUNT_PRIVATE_CONTAINER'
+    value: storageAccountPrivateContainerName
   }
   {
     name: 'AZURE_STORAGE_ACCOUNT_KEY'

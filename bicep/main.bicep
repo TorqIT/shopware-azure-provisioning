@@ -274,6 +274,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseName: databaseName
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
+    storageAccountPrivateContainerName: storageAccountPrivateContainerName
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
   }
