@@ -52,8 +52,9 @@ jobs:
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "ref=latest" >> $GITHUB_OUTPUT
-            if [ ! -z "${{ needs.release.outputs.tag }}" ]; then
-              echo "major=${{ needs.release.outputs.tag }}"
+            if [ "${{ needs.release.result }}" == "success" ]; then
+              echo "major=${{ needs.release.outputs.major }}"
+              echo "specific=${{ needs.release.outputs.specific }}"
             fi
           else 
             echo "ref=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
@@ -67,6 +68,7 @@ jobs:
           tags: |
             ${{ steps.tags.outputs.ref }}
             ${{ steps.tags.outputs.major }}
+            ${{ steps.tags.outputs.specific }}
       
       - name: Build Docker image
         uses: docker/build-push-action@v6
