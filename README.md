@@ -12,7 +12,7 @@ Follow these steps to provision an environment for the first time:
    ```yaml
    services:
      pimcore-azure-provisioning:
-        # The image uses semantic versioning. Do NOT use the latest tag as it may be unstable.
+        # The image uses semantic versioning
         image: ghcr.io/torqit/pimcore-azure-provisioning:1
         volumes:
            # Necessary for running Docker commands within the container
