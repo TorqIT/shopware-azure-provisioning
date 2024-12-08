@@ -3,6 +3,8 @@ name: Create and publish Docker image
 on:
   push:
   workflow_dispatch:
+  release: 
+    types: [created]
 
 concurrency: 
   group: ${{ github.repository }}__${{ github.ref }}
@@ -13,8 +15,14 @@ env:
   IMAGE_NAME: torqit/pimcore-azure-provisioning
 
 jobs:
+  release:
+    uses: TorqIT/github-actions-workflows/.github/workflows/update-major-release-tag.yml@v1
+    if: github.event_name == 'release' && github.event.action == 'created'
+
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: [release]
+    if: always() && (needs.release.result == 'success' || needs.release.result == 'skipped')
     permissions:
       contents: read
       packages: write
@@ -37,13 +45,17 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Determine image label
-        id: label
+      - name: Determine image tags
+        id: tags
         run: |
+          echo "${{ github.event_name }}"
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "label=latest" >> $GITHUB_OUTPUT
-          else
-            echo "label=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+            echo "ref=latest" >> $GITHUB_OUTPUT
+            if [ -z "${{ needs.release.outputs.tag }}" ]; then
+              echo "major=${{ needs.release.outputs.tag }}"
+            fi
+          else 
+            echo "ref=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
           fi
 
       - name: Extract metadata (tags, labels) for Docker
@@ -51,7 +63,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: ${{ steps.label.outputs.label }}
+          tags: |
+            ${{ steps.tags.outputs.ref }}
+            ${{ steps.tags.outputs.major }}
       
       - name: Build Docker image
         uses: docker/build-push-action@v6
@@ -64,7 +78,7 @@ jobs:
       
       - name: Test Docker image
         run: |
-          docker run ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} /bin/bash -c 'az bicep build -f bicep/main.bicep'
+          docker run ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test /bin/bash -c 'az bicep build -f bicep/main.bicep'
 
       - name: Push Docker image
         uses: docker/build-push-action@v6
