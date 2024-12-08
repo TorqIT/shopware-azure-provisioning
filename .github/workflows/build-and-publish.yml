@@ -50,10 +50,9 @@ jobs:
       - name: Determine image tags
         id: tags
         run: |
-          echo "${{ github.event_name }}"
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "ref=latest" >> $GITHUB_OUTPUT
-            if [ -z "${{ needs.release.outputs.tag }}" ]; then
+            if [ ! -z "${{ needs.release.outputs.tag }}" ]; then
               echo "major=${{ needs.release.outputs.tag }}"
             fi
           else 
