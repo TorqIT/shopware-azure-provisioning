@@ -53,8 +53,8 @@ jobs:
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "ref=latest" >> $GITHUB_OUTPUT
             if [ "${{ needs.release.result }}" == "success" ]; then
-              echo "major=${{ needs.release.outputs.major }}"
-              echo "specific=${{ needs.release.outputs.specific }}"
+              echo "major=${{ needs.release.outputs.major }}" >> $GITHUB_OUTPUT
+              echo "specific=${{ needs.release.outputs.specific }}" >> $GITHUB_OUTPUT
             fi
           else 
             echo "ref=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
