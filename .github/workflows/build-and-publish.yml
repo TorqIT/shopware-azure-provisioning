@@ -19,7 +19,6 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    if: always() && (needs.release.result == 'success' || needs.release.result == 'skipped')
     permissions:
       contents: read
       packages: write
