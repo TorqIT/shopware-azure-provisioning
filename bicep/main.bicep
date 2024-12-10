@@ -209,11 +209,12 @@ param appUrl string
 param appSecretSecretName string = 'app-secret'
 param appPasswordSecretName string = 'app-password'
 param appInstallCurrency string = 'USD'
+param appInstallCreateCAD bool = false
 param appSalesChannelName string = 'Storefront'
 param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string = 'US'
-param appSalesChannelSnippetIso string = 'en-GB'
+param appSalesChannelSnippetsetId string = 'en-GB'
 param enableOpensearch bool = false
 // By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
 param opensearchUrl string = 'services-vm:9200'
@@ -260,12 +261,13 @@ module containerApps 'container-apps/container-apps.bicep' = {
     appUrl: appUrl
     appSecret: keyVault.getSecret(appSecretSecretName)
     appPassword: keyVault.getSecret(appPasswordSecretName)
+    appInstallCreateCAD: appInstallCreateCAD
     appInstallCurrency: appInstallCurrency
     appSalesChannelName: appSalesChannelName
     appSalesChannelId: appSalesChannelId
     appSalesChannelCurrencyId: appSalesChannelCurrencyId
     appSalesChannelCountryIso: appSalesChannelCountryIso
-    appSalesChannelSnippetIso: appSalesChannelSnippetIso
+    appSalesChannelSnippetsetId: appSalesChannelSnippetsetId
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
