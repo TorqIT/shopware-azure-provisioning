@@ -3,9 +3,9 @@ param location string = resourceGroup().location
 param name string
 param localIpAddress string = ''
 
-param virtualNetworkResourceGroupName string
-param virtualNetworkName string
-param virtualNetworkContainerAppsSubnetName string
+param virtualNetworkResourceGroupName string = ''
+param virtualNetworkName string = ''
+param virtualNetworkContainerAppsSubnetName string = ''
 
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-03-01' existing = if (virtualNetworkName != '') {

@@ -15,14 +15,14 @@ param geoRedundantBackup bool
 
 param databaseName string
 
-param longTermBackups bool
-param backupVaultName string
-param longTermBackupRetentionPeriod string
+// param longTermBackups bool
+// param backupVaultName string
+// param longTermBackupRetentionPeriod string
 
+param publicNetworkAccess bool
 param virtualNetworkResourceGroupName string
 param virtualNetworkName string
-param virtualNetworkDatabaseSubnetName string
-param virtualNetworkStorageAccountPrivateEndpointSubnetName string
+param virtualNetworkPrivateEndpointsSubnetName string
 
 param privateDnsZoneForDatabaseId string
 param privateDnsZoneForStorageAccountsId string
@@ -31,12 +31,12 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing 
   scope: resourceGroup(virtualNetworkResourceGroupName)
   name: virtualNetworkName
 }
-resource databaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
   parent: virtualNetwork
-  name: virtualNetworkDatabaseSubnetName
+  name: virtualNetworkPrivateEndpointsSubnetName
 }
 
-resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
+resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
   name: serverName
   location: location
   sku: {
@@ -51,7 +51,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
       storageSizeGB: storageSizeGB
     }
     network: {
-      delegatedSubnetResourceId: databaseSubnet.id
+      publicNetworkAccess: publicNetworkAccess ? 'Enabled' : 'Disabled'
       privateDnsZoneResourceId: privateDnsZoneForDatabaseId
     }
     backup: {
@@ -69,12 +69,49 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2021-05-01' = {
   }
 }
 
-module databaseBackupVault 'database-backup-vault.bicep' = if (longTermBackups) {
-  name: 'database-backup-vault'
-  dependsOn: [databaseServer]
-  params: {
-    backupVaultName: backupVaultName
-    databaseServerName: serverName
-    retentionPeriod: longTermBackupRetentionPeriod
+var privateEndpointName = '${serverName}-private-endpoint'
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-03-01' = {
+  name: privateEndpointName
+  location: location
+  properties: {
+    subnet: {
+      id: privateEndpointsSubnet.id
+    }
+    privateLinkServiceConnections: [
+      {
+        name: privateEndpointName
+        properties: {
+          privateLinkServiceId: databaseServer.id
+          groupIds: [
+            'mysqlserver'
+          ]
+        }
+      }
+    ]
+  }
+
+  resource dnsGroup 'privateDnsZoneGroups' = {
+    name: 'default'
+    properties: {
+      privateDnsZoneConfigs: [
+        {
+          name: 'default'
+          properties: {
+            privateDnsZoneId: privateDnsZoneForDatabaseId
+          }
+        }
+      ]
+    }
   }
 }
+
+// Per https://learn.microsoft.com/en-us/azure/backup/backup-azure-mysql-flexible-server, support long-term backups of MySQL servers are currently paused.
+// module databaseBackupVault 'database-backup-vault.bicep' = if (longTermBackups) {
+//   name: 'database-backup-vault'
+//   dependsOn: [databaseServer]
+//   params: {
+//     backupVaultName: backupVaultName
+//     databaseServerName: serverName
+//     retentionPeriod: longTermBackupRetentionPeriod
+//   }
+// }
