@@ -55,11 +55,12 @@ param supervisordContainerAppMemory string
 param appEnv string
 param appUrl string
 param appInstallCurrency string
+param appInstallCreateCAD bool
 param appSalesChannelName string
 param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string
-param appSalesChannelSnippetIso string
+param appSalesChannelSnippetsetId string
 @secure()
 param appSecret string
 @secure()
@@ -147,11 +148,12 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     appUrl: appUrl
     appSecretSecretRefName: appSecretSecretRefName
     appInstallCurrency: appInstallCurrency
+    appInstallCreateCAD: appInstallCreateCAD
     appSalesChannelName: appSalesChannelName
     appSalesChannelId: appSalesChannelId
     appSalesChannelCurrencyId: appSalesChannelCurrencyId
     appSalesChannelCountryIso: appSalesChannelCountryIso
-    appSalesChannelSnippetIso: appSalesChannelSnippetIso
+    appSalesChannelSnippetsetId: appSalesChannelSnippetsetId
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
     databaseUrlSecretRefName: databaseUrlSecretRefName
