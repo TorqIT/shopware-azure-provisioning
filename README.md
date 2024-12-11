@@ -8,7 +8,8 @@ Follow these steps to provision an environment for the first time:
    ```yaml
    services:
      shopware-azure-provisioning:
-        image: ghcr.io/torqit/shopware-azure-provisioning:latest
+        # The image uses semantic versioning
+        image: ghcr.io/torqit/shopware-azure-provisioning:1
         volumes:
            # Necessary for running Docker commands within the container
            - /var/run/docker.sock:/var/run/docker.sock
