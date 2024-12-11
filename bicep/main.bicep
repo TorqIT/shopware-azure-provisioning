@@ -97,7 +97,7 @@ param storageAccountFirewallIps array = []
 param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
 param storageAccountPrivateEndpointNicName string = ''
-param storageAccountLongTermBackups bool = true
+param storageAccountLongTermBackups bool = false
 param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
