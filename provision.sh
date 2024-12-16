@@ -60,9 +60,6 @@ az deployment group create \
   --template-file ./bicep/main.bicep \
   --parameters @$1
 
-# TODO reconfigure for Shopware
-#./bicep/container-apps/apply-container-apps-secrets.sh $1
-
 PROVISION_SERVICE_PRINCIPAL=$(jq -r '.parameters.provisionServicePrincipal.value' $1) #alternative operator (//) does not work here because "false" makes it always execute
 if [ "${PROVISION_SERVICE_PRINCIPAL}" = "null" ] || [ "${PROVISION_SERVICE_PRINCIPAL}" = true ]
 then
@@ -78,7 +75,7 @@ then
 
   INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.initContainerAppJobName.value' $1)
   PHP_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value' $1)
-  SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value // empty' $1)
+  SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.supervisordContainerAppName.value // empty' $1)
   echo "Assigning roles for service principal..."
   az deployment group create \
     --resource-group $RESOURCE_GROUP \
