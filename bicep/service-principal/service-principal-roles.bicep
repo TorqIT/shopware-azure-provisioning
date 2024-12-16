@@ -2,17 +2,21 @@ param location string = resourceGroup().location
 
 param servicePrincipalId string
 param containerRegistryName string
-param shopwareInitContainerAppJobName string
-param shopwareWebContainerAppName string
+param initContainerAppJobName string
+param phpContainerAppName string
+param supervisordContainerAppName string = ''
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' existing = {
   name: containerRegistryName
 }
 resource initContainerAppJob 'Microsoft.App/jobs@2024-03-01' existing = {
-  name: shopwareInitContainerAppJobName
+  name: initContainerAppJobName
 }
 resource webContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
-  name: shopwareWebContainerAppName
+  name: phpContainerAppName
+}
+resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = if (supervisordContainerAppName != '') {
+  name: supervisordContainerAppName
 }
 resource acrPushRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
@@ -52,3 +56,14 @@ resource webContainerAppRoleAssignment 'Microsoft.Authorization/roleAssignments@
     principalType: 'ServicePrincipal'
   }
 }
+
+resource supervisordContainerAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (supervisordContainerAppName != '') {
+  scope: supervisordContainerApp
+  name: guid(supervisordContainerApp.id, servicePrincipalId, contributorRoleDefinition.id)
+  properties: {
+    roleDefinitionId: contributorRoleDefinition.id
+    principalId: servicePrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+

@@ -76,8 +76,9 @@ then
     SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
   fi
 
-  SHOPWARE_INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.shopwareInitContainerAppJobName.value' $1)
-  SHOPWARE_WEB_CONTAINER_APP_NAME=$(jq -r '.parameters.shopwareWebContainerAppName.value' $1)
+  INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.initContainerAppJobName.value' $1)
+  PHP_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value' $1)
+  SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value // empty' $1)
   echo "Assigning roles for service principal..."
   az deployment group create \
     --resource-group $RESOURCE_GROUP \
@@ -85,8 +86,9 @@ then
     --parameters \
       servicePrincipalId=$SERVICE_PRINCIPAL_ID \
       containerRegistryName=$CONTAINER_REGISTRY_NAME \
-      shopwareInitContainerAppJobName=$SHOPWARE_INIT_CONTAINER_APP_JOB_NAME \
-      shopwareWebContainerAppName=$SHOPWARE_WEB_CONTAINER_APP_NAME
+      initContainerAppJobName=$INIT_CONTAINER_APP_JOB_NAME \
+      phpContainerAppName=$PHP_CONTAINER_APP_NAME \
+      supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME
 fi
 
 echo "Done!"
