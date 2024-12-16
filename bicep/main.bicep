@@ -201,8 +201,8 @@ param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
 // Supervisord Container App
 param provisionSupervisordContainerApp bool = false
-param supervisordContainerAppName string 
-param supervisordContainerAppImageName string
+param supervisordContainerAppName string = ''
+param supervisordContainerAppImageName string = ''
 param supervisordContainerAppCpuCores string = '0.25'
 param supervisordContainerAppMemory string = '0.5Gi'
 @allowed(['dev', 'prod'])
