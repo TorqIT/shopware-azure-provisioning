@@ -7,7 +7,7 @@ param appSalesChannelName string
 param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string
-param appSalesChannelSnippetsetIso string
+param appSalesChannelSnippetsetId string
 
 param enableOpensearch bool
 param opensearchUrl string
@@ -66,8 +66,8 @@ var defaultEnvVars = [
     value: appSalesChannelCountryIso
   }
   {
-    name: 'APP_SALESCHANNEL_SNIPPETSET_ISO'
-    value: appSalesChannelSnippetsetIso
+    name: 'APP_SALESCHANNEL_SNIPPETSET_ID'
+    value: appSalesChannelSnippetsetId
   }
   {
     name: 'DATABASE_URL'
