@@ -7,7 +7,7 @@ param appSalesChannelName string
 param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string
-param appSalesChannelSnippetsetId string
+param appSalesChannelSnippetsetIso string
 
 param enableOpensearch bool
 param opensearchUrl string
@@ -47,7 +47,7 @@ var defaultEnvVars = [
   }
   {
     name: 'APP_INSTALL_CREATE_CAD'
-    value: '${appInstallCreateCAD}'
+    value: string(appInstallCreateCAD)
   }
   {
     name: 'APP_SALESCHANNEL_NAME'
@@ -66,8 +66,8 @@ var defaultEnvVars = [
     value: appSalesChannelCountryIso
   }
   {
-    name: 'APP_SALESCHANNEL_SNIPPET_ISO'
-    value: appSalesChannelSnippetsetId
+    name: 'APP_SALESCHANNEL_SNIPPETSET_ISO'
+    value: appSalesChannelSnippetsetIso
   }
   {
     name: 'DATABASE_URL'

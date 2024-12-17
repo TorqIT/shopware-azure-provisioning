@@ -60,7 +60,7 @@ param appSalesChannelName string
 param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string
-param appSalesChannelSnippetsetId string
+param appSalesChannelSnippetsetIso string
 @secure()
 param appSecret string
 @secure()
@@ -153,7 +153,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     appSalesChannelId: appSalesChannelId
     appSalesChannelCurrencyId: appSalesChannelCurrencyId
     appSalesChannelCountryIso: appSalesChannelCountryIso
-    appSalesChannelSnippetsetId: appSalesChannelSnippetsetId
+    appSalesChannelSnippetsetIso: appSalesChannelSnippetsetIso
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
     databaseUrlSecretRefName: databaseUrlSecretRefName

@@ -216,7 +216,7 @@ param appSalesChannelName string = 'Storefront'
 param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string = 'US'
-param appSalesChannelSnippetsetId string = ''
+param appSalesChannelSnippetsetIso string = ''
 param enableOpensearch bool = false
 // By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
 param opensearchUrl string = 'services-vm:9200'
@@ -269,7 +269,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     appSalesChannelId: appSalesChannelId
     appSalesChannelCurrencyId: appSalesChannelCurrencyId
     appSalesChannelCountryIso: appSalesChannelCountryIso
-    appSalesChannelSnippetsetId: appSalesChannelSnippetsetId
+    appSalesChannelSnippetsetIso: appSalesChannelSnippetsetIso
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
