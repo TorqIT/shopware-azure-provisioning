@@ -87,7 +87,9 @@ then
       provisionInit=${PROVISION_INIT:-false} \
       initContainerAppJobName=$INIT_CONTAINER_APP_JOB_NAME \
       phpContainerAppName=$PHP_CONTAINER_APP_NAME \
-      supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME
+      supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME \
+      keyVaultName=$KEY_VAULT_NAME \
+      keyVaultResourceGroupName=$KEY_VAULT_RESOURCE_GROUP_NAME
 fi
 
 echo "Done!"

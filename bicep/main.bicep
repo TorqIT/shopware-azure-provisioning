@@ -51,7 +51,6 @@ param keyVaultResourceGroupName string = resourceGroup().name
 module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
   name: 'key-vault'
   dependsOn: [virtualNetwork]
-  scope: resourceGroup(keyVaultResourceGroupName)
   params: {
     name: keyVaultName
     localIpAddress: localIpAddress

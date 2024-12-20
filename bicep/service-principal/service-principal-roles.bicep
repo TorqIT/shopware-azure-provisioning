@@ -6,6 +6,8 @@ param provisionInit bool
 param initContainerAppJobName string
 param phpContainerAppName string
 param supervisordContainerAppName string
+param keyVaultName string
+param keyVaultResourceGroupName string = resourceGroup().name
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' existing = {
   name: containerRegistryName
@@ -19,6 +21,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
 resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
   name: supervisordContainerAppName
 }
+
 resource acrPushRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
   name: '8311e382-0749-4cb8-b61a-304f252e45ec'
@@ -65,5 +68,14 @@ resource supervisordContainerAppRoleAssignment 'Microsoft.Authorization/roleAssi
     roleDefinitionId: contributorRoleDefinition.id
     principalId: servicePrincipalId
     principalType: 'ServicePrincipal'
+  }
+}
+
+module keyVaultRoleAssignment './service-principal-key-vault-role-assignment.bicep' = {
+  name: 'service-principal-key-vault-role-assignment'
+  scope: resourceGroup(keyVaultResourceGroupName)
+  params: {
+    keyVaultName: keyVaultName
+    servicePrincipalId: servicePrincipalId
   }
 }
