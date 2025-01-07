@@ -111,6 +111,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
             cpu: json(cpuCores)
             memory: memory
           }
+          volumeMounts: volumesModule.outputs.volumeMounts
         }
       ]
       volumes: volumesModule.outputs.volumes
