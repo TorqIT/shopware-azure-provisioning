@@ -104,4 +104,4 @@ Bicep files are declarative, meaning that they declare the desired state of your
 
 ## Useful scripts
 
-Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/pimcore-azure-provisioning/blob/main/scripts/README.md)).
+Once an environment has been provisioned, the `helper-scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/pimcore-azure-provisioning/blob/main/scripts/README.md)).

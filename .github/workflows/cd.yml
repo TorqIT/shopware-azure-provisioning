@@ -2,14 +2,12 @@ name: Create and publish Docker image
 
 on:
   push:
-    branches: 
-      - "*"
     tags:
       - "v*.*.*"
-  workflow_dispatch:
+  workflow_call: 
 
 concurrency: 
-  group: ${{ github.repository }}__${{ github.ref }}
+  group: ${{ github.repository }}__${{ github.ref }}-cd
   cancel-in-progress: true
 
 env:

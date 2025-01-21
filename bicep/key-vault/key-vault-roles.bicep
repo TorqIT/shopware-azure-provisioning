@@ -1,5 +1,5 @@
 param keyVaultName string
-param principalId string
+param principalType string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
   name: keyVaultName
@@ -15,7 +15,7 @@ resource keyVaultSecretsOfficerRoleAssignment 'Microsoft.Authorization/roleAssig
   name: guid(resourceGroup().id, keyVaultSecretsOfficerRoleDef.id)
   properties: {
     roleDefinitionId: keyVaultSecretsOfficerRoleDef.id
-    principalId: principalId
-    principalType: 'User'
+    principalId: deployer().objectId
+    principalType: principalType == 'user' ? 'User' : 'ServicePrincipal'
   }
 }

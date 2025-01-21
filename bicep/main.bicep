@@ -48,6 +48,7 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetwo
 param keyVaultName string
 // If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
 param keyVaultResourceGroupName string = resourceGroup().name
+param keyVaultEnablePurgeProtection bool = true
 module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
   name: 'key-vault'
   dependsOn: [virtualNetwork]
@@ -57,6 +58,7 @@ module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupN
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
     virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
+    enablePurgeProtection: keyVaultEnablePurgeProtection
   }
 }
 resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
@@ -109,7 +111,7 @@ param storageAccountLongTermBackups bool = true
 param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
 module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
-  dependsOn: [virtualNetwork, privateDnsZones, backupVault]
+  dependsOn: [virtualNetwork, backupVault]
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -151,7 +153,7 @@ param databaseGeoRedundantBackup bool = false
 // param databaseLongTermBackupRetentionPeriod string = 'P365D'
 module database 'database/database.bicep' = {
   name: 'database'
-  dependsOn: [virtualNetwork, privateDnsZones, backupVault]
+  dependsOn: [virtualNetwork, backupVault]
   params: {
     location: location
     administratorLogin: databaseAdminUsername
@@ -446,6 +448,8 @@ param resourceGroupName string = ''
 param tenantId string = ''
 param servicePrincipalName string = ''
 param containerRegistrySku string = ''
+// DEPRECATED
 param waitForKeyVaultManualIntervention bool = false
+param keyVaultGenerateRandomSecrets bool = false
 param localIpAddress string = ''
 param provisionServicePrincipal bool = true
