@@ -6,6 +6,9 @@ param provisionInit bool
 param initContainerAppJobName string
 param phpContainerAppName string
 param supervisordContainerAppName string
+param databaseLongTermBackups bool = false
+param databaseServerName string = ''
+param databaseBackupsStorageAccountName string = ''
 param keyVaultName string
 param keyVaultResourceGroupName string = resourceGroup().name
 
@@ -21,6 +24,12 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
 resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
   name: supervisordContainerAppName
 }
+resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' existing = if (databaseLongTermBackups) {
+  name: databaseServerName
+}
+resource databaseBackupsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = if (databaseLongTermBackups) {
+  name: databaseBackupsStorageAccountName
+}
 
 resource acrPushRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
@@ -29,6 +38,10 @@ resource acrPushRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-
 resource contributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
   scope: subscription()
   name: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+}
+resource storageBlobContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = if (databaseLongTermBackups) {
+  scope: subscription()
+  name: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 }
 
 resource containerRegistryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -79,3 +92,32 @@ module keyVaultRoleAssignment './service-principal-key-vault-role-assignment.bic
     servicePrincipalId: servicePrincipalId
   }
 }
+
+resource databaseServerContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (databaseLongTermBackups) {
+  scope: databaseServer
+  name: guid(databaseServer.id, servicePrincipalId, contributorRoleDefinition.id)
+  properties: {
+    roleDefinitionId: contributorRoleDefinition.id
+    principalId: servicePrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+resource databaseBackupsStorageAccountContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (databaseLongTermBackups) {
+  scope: databaseBackupsStorageAccount
+  name: guid(databaseBackupsStorageAccount.id, servicePrincipalId, contributorRoleDefinition.id)
+  properties: {
+    roleDefinitionId: contributorRoleDefinition.id
+    principalId: servicePrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+resource databaseBackupsStorageAccountBlobContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (databaseLongTermBackups) {
+  scope: databaseBackupsStorageAccount
+  name: guid(databaseBackupsStorageAccount.id, servicePrincipalId, storageBlobContributorRoleDefinition.id)
+  properties: {
+    roleDefinitionId: storageBlobContributorRoleDefinition.id
+    principalId: servicePrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+

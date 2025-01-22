@@ -89,7 +89,7 @@ The provisioning script will automatically configure the following backups:
 
 1. Point-in-time snapshots of the database. Retention of these snapshots is controlled by the `databaseBackupRetentionDays` parameter.
 2. Point-in-time snapshots of the Storage Account (which contains persistent Pimcore files such as assets). Retention of these snapshots is controlled by the `storageAccountBackupRetentionDays` parameter.
-3. Long-term backups of the database. As Azure Database for MySQL does not have built-in support for long-term backups, this image uses a custom solution using https://github.com/TorqIT/pimcore-database-backup-bundle to store backups in a Storage Account configured by the `databaseBackupsStorageAccount*` parameters.
+3. As Azure Database for MySQL does not have built-in support for long-term backups, the scripts will create a Storage Account configured by the `databaseBackupsStorageAccount*` parameters. A custom solution is then required to write backups of the database to this Storage Account.
 4. Long-term backups of the Storage Account. The provisioning script will automatically create a Backup Vault that stores monthly backups of the containers. These backups are retained for up to one year.
 
 Note that all backups are stored using Local Redundancy (see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy#locally-redundant-storage for more information).
