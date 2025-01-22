@@ -63,7 +63,7 @@ then
       phpContainerAppName=$PHP_CONTAINER_APP_NAME \
       supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME \
       databaseLongTermBackups=$DATABASE_LONG_TERM_BACKUPS \
-      databaseServerName=$DATABASE_LONG_TERM_BACKUPS \
+      databaseServerName=$DATABASE_SERVER_NAME \
       databaseBackupsStorageAccountName=$DATABASE_BACKUPS_STORAGE_ACCOUNT_NAME \
       keyVaultName=$KEY_VAULT_NAME \
       keyVaultResourceGroupName=$KEY_VAULT_RESOURCE_GROUP_NAME
