@@ -70,7 +70,7 @@ module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!php
 module portalEngineStorageMount './container-apps-environment-portal-engine-mount.bicep' = if (provisionForPortalEngine) {
   name: 'portal-engine-storage-mount'
   params: {
-    containerAppsEnvironmentName: name
+    containerAppsEnvironmentName: containerAppsEnvironment.name
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
     portalEngineStorageAccountName: portalEngineStorageAccountName
     portalEngineStorageAccountPublicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
