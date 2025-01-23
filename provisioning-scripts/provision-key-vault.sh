@@ -19,16 +19,16 @@ if [ $returnCode -ne 0 ]; then
     --parameters \
       name=$KEY_VAULT_NAME \
       enablePurgeProtection=$KEY_VAULT_ENABLE_PURGE_PROTECTION
-
-  echo "Assigning Key Vault Secrets Officer role to current user..."
-  PRINCIPAL_TYPE=$(az account show --query "user.type" -o tsv)
-  az deployment group create \
-    --resource-group $KEY_VAULT_RESOURCE_GROUP_NAME \
-    --template-file ./bicep/key-vault/key-vault-roles.bicep \
-    --parameters \
-      keyVaultName=$KEY_VAULT_NAME \
-      principalType=$PRINCIPAL_TYPE
 fi
+
+echo "Assigning Key Vault Secrets Officer role to current user..."
+PRINCIPAL_TYPE=$(az account show --query "user.type" -o tsv)
+az deployment group create \
+  --resource-group $KEY_VAULT_RESOURCE_GROUP_NAME \
+  --template-file ./bicep/key-vault/key-vault-roles.bicep \
+  --parameters \
+    keyVaultName=$KEY_VAULT_NAME \
+    principalType=$PRINCIPAL_TYPE
 
 KEY_VAULT_GENERATE_RANDOM_SECRETS=$(jq -r '.parameters.keyVaultGenerateRandomSecrets.value' $1) 
 if [ "${KEY_VAULT_GENERATE_RANDOM_SECRETS}" != "null" ] || [ "${KEY_VAULT_GENERATE_RANDOM_SECRETS}" = true ]; then
