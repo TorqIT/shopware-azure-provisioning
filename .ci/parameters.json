@@ -111,17 +111,23 @@
     "redisContainerAppMemory": {
       "value": "1Gi"
     },
-    "appDebug": {
-      "value": "1"
-    },
     "appEnv": {
       "value": "test_env"
     },
-    "shopwareDev": {
-      "value": "1"
+    "appUrl": {
+      "value": "my-app.domain.com"
     },
-    "shopwareEnvironment": {
-      "value": "dev"
+    "appInstallCategoryId": {
+      "value": "018f62358a357230852fd8838c604b60"
+    },
+    "appInstallCurrency": {
+      "value": "CAD"
+    },
+    "appInstallLocale": {
+      "value": "en-CA"
+    },
+    "appSalesChannelName": {
+      "value": "My Sales Channel"
     },
     "redisDb": {
       "value": "12"
