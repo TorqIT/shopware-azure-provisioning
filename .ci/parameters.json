@@ -129,6 +129,12 @@
     "appSalesChannelName": {
       "value": "My Sales Channel"
     },
+    "appSalesChannelCurrencyId": {
+      "value": "018f62358a357230852fd8838c604b60"
+    },
+    "appSalesChannelId": {
+      "value": "018f62358a357230852fd8838c604b60"
+    },
     "redisDb": {
       "value": "12"
     },
