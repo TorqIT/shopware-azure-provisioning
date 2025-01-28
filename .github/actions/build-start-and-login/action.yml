@@ -1,0 +1,49 @@
+name: ''
+description: ''
+inputs:
+  TAG:
+    required: true
+    description: ""
+  DOCKER_COMPOSE_FILE:
+    required: false
+    description: ""
+    default: ./.ci/docker-compose.yml
+  PARAMETERS_FILE:
+    required: false
+    description: ""
+    default: ./.ci/parameters.json
+  SERVICE_PRINCIPAL_ID:
+    required: true
+    description: ""
+  SERVICE_PRINCIPAL_PASSWORD:
+    required: true
+    description: ""
+  
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build and start container
+      shell: bash
+      run: |
+        touch .env
+        TAG=${{ inputs.TAG }} >> .env
+        docker compose \
+          --file ${{ inputs.DOCKER_COMPOSE_FILE }} \
+          up -d --force-recreate
+
+    - name: Log in to Azure via service principal
+      shell: bash
+      run: |
+        touch .env
+        TENANT=$(jq -r '.parameters.tenantId.value' ${{ inputs.PARAMETERS_FILE }}) >> .env
+        SERVICE_PRINCIPAL_ID=${{ inputs.SERVICE_PRINCIPAL_ID }} >> .env
+        SERVICE_PRINCIPAL_PASSWORD=${{ inputs.SERVICE_PRINCIPAL_PASSWORD }} >> .env
+        docker compose \
+          --file ${{ inputs.DOCKER_COMPOSE_FILE }} \
+          --env-file .env \
+          exec azure \
+            az login --tenant $TENANT \
+              --service-principal \
+                --username $SERVICE_PRINCIPAL_ID \
+                --password $SERVICE_PRINCIPAL_PASSWORD

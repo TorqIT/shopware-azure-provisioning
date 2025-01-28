@@ -120,7 +120,7 @@ var defaultEnvVars = [
   }
   {
     name: 'AZURE_CDN_URL'
-    value: 'https://${storageAccountName}.blob.core.windows.net/${storageAccountPublicContainerName}'
+    value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}/${storageAccountPublicContainerName}'
   }
   // TODO unsure how necessary the following values are
   {

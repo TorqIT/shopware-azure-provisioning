@@ -1,0 +1,128 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptionId": {
+      "value": "27cab9a2-4a98-4eab-86ca-296494dbbcf2"
+    },
+    "tenantId": {
+      "value": "6f8ae12a-9b31-4877-b46f-c0590040b1fb"
+    },
+    "resourceGroupName": {
+      "value": "Shopware-Azure-Test"
+    },
+    "provisionServicePrincipal": {
+      "value": false
+    },
+    "location": {
+      "value": "canadacentral"
+    },
+    "keyVaultName": {
+      "value": "shopware-azure-kv-test"
+    },
+    "keyVaultEnablePurgeProtection": {
+      "value": false
+    },
+    "keyVaultGenerateRandomSecrets": {
+      "value": true
+    },
+    "containerRegistryName": {
+      "value": "shopwareazurecrtest"
+    },
+    "virtualNetworkName": {
+      "value": "shopware-azure-vnet-test"
+    },
+    "virtualNetworkPrivateEndpointsSubnetName": {
+      "value": "private-endpoints"
+    },
+    "storageAccountName": {
+      "value": "shopwareazuresatest"
+    },
+    "storageAccountLongTermBackups": {
+      "value": false
+    },
+    "databaseServerName": {
+      "value": "shopware-azure-db-test"
+    },
+    "containerAppsEnvironmentName": {
+      "value": "shopware-azure-cae-test"
+    },
+    "containerAppsEnvironmentUseWorkloadProfiles": {
+      "value": true
+    },
+    "initContainerAppJobName": {
+      "value": "shopware-azure-init-test"
+    },
+    "initContainerAppJobImageName": {
+      "value": "init"
+    },
+    "initContainerAppJobCpuCores": {
+      "value": "1.5"
+    },
+    "initContainerAppJobMemory": {
+      "value": "3Gi"
+    },
+    "phpContainerAppExternal": {
+      "value": true
+    },
+    "phpContainerAppName": {
+      "value": "shopware-azure-php-test"
+    },
+    "phpContainerAppCustomDomains": {
+      "value": [
+      ]
+    },
+    "phpContainerAppImageName": {
+      "value": "php"
+    },
+    "phpContainerAppCpuCores": {
+      "value": "1.5"
+    },
+    "phpContainerAppMemory": {
+      "value": "3Gi"
+    },
+    "phpContainerAppMinReplicas": {
+      "value": 0
+    },
+    "supervisordContainerAppName": {
+      "value": "shopware-azure-supervisord-test"
+    },
+    "supervisordContainerAppImageName": {
+      "value": "supervisord"
+    },
+    "supervisordContainerAppCpuCores": {
+      "value": "0.5"
+    },
+    "supervisordContainerAppMemory": {
+      "value": "1Gi"
+    },
+    "appEnv": {
+      "value": "test_env"
+    },
+    "appUrl": {
+      "value": "my-app.domain.com"
+    },
+    "appInstallCurrency": {
+      "value": "CAD"
+    },
+    "appSalesChannelName": {
+      "value": "My Sales Channel"
+    },
+    "appSalesChannelCurrencyId": {
+      "value": "018f62358a357230852fd8838c604b60"
+    },
+    "appSalesChannelId": {
+      "value": "018f62358a357230852fd8838c604b60"
+    },
+    "additionalEnvVars": {
+      "value": [
+      ]
+    },
+    "additionalSecrets": {
+      "value": {
+        "array": [
+        ]
+      }
+    }
+  }
+}

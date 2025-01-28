@@ -1,0 +1,55 @@
+name: Deploy and test changes in an Azure environment
+
+on:
+  pull_request:
+
+concurrency: 
+  group: ${{ github.repository }}__${{ github.ref }}-ci
+  cancel-in-progress: true
+
+jobs:
+  deploy-azure-changes: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start container, and log in to Azure
+        uses: ./.github/actions/build-start-and-login
+        with:
+          TAG: ${{ github.head_ref || github.ref_name }}
+          SERVICE_PRINCIPAL_ID: ${{ vars.SERVICE_PRINCIPAL_ID }}
+          SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+
+      - name: Deploy changes to the Azure environment
+        id: deploy
+        run: |
+          docker compose \
+            --file .ci/docker-compose.yml \
+            exec azure \
+              ./provision.sh parameters.json
+
+      - name: Cancel Azure deployment if the deploy step failed or was cancelled
+        if: always()
+        run: |
+          if [ ${{ steps.deploy.outcome }} == 'failure' ] || [ ${{ steps.deploy.outcome }} == 'cancelled' ]; then
+            touch .env
+            RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .ci/parameters.json) >> .env
+            docker compose \
+              --file .ci/docker-compose.yml \
+              exec azure \
+                az deployment group cancel \
+                  --resource-group $RESOURCE_GROUP \
+                  --name main
+          fi
+
+      # TODO pull latest skeleton
+      # - name: Pull latest skeleton
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: TorqIT/shopware-skeleton
+      #     ref: 2024.x
+      #     path: skeleton
+
+      # TODO build and push skeleton images to CR (only on first deploy though)
+
+      # TODO run test against environment

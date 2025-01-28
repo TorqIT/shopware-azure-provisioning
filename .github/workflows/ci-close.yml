@@ -1,0 +1,41 @@
+name: Tear down Azure resources when PR is closed
+
+on:
+  pull_request:
+    types: closed
+
+concurrency: 
+  group: ${{ github.repository }}__${{ github.ref }}-ci-close
+  cancel-in-progress: true
+
+jobs:
+  deploy-and-test-in-azure: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start container, and log in to Azure
+        uses: ./.github/actions/build-start-and-login
+        with:
+          TAG: ${{ github.head_ref || github.ref_name }}
+          SERVICE_PRINCIPAL_ID: ${{ vars.SERVICE_PRINCIPAL_ID }}
+          SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+
+      - name: Tear down Azure resources when PR is closed
+        run: |
+          touch .env
+          echo "Deleting Resource Group..."
+          RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .ci/parameters.json) >> .env
+          docker compose \
+            --file .ci/docker-compose.yml \
+            exec azure \
+              az group delete \
+                --name $RESOURCE_GROUP \
+                --yes
+          echo "Purging Key Vault..."
+          KEY_VAULT=$(jq -r '.parameters.keyVaultName.value' .ci/parameters.json) >> .env
+          docker compose \
+            --file .ci/docker-compose.yml \
+            exec azure \
+              az keyvault purge \
+                --name $KEY_VAULT
