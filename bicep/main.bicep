@@ -208,7 +208,6 @@ param supervisordContainerAppName string = ''
 param supervisordContainerAppImageName string = ''
 param supervisordContainerAppCpuCores string = '0.25'
 param supervisordContainerAppMemory string = '0.5Gi'
-@allowed(['dev', 'prod'])
 param appEnv string
 param appUrl string
 param appSecretSecretName string = 'app-secret'
