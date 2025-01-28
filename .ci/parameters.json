@@ -50,9 +50,6 @@
     "containerAppsEnvironmentUseWorkloadProfiles": {
       "value": true
     },
-    "provisionInit": {
-      "value": true
-    },
     "initContainerAppJobName": {
       "value": "shopware-azure-init-test"
     },
@@ -64,9 +61,6 @@
     },
     "initContainerAppJobMemory": {
       "value": "3Gi"
-    },
-    "initContainerAppJobRunShopwareInstall": {
-      "value": true
     },
     "phpContainerAppExternal": {
       "value": true
@@ -102,29 +96,14 @@
     "supervisordContainerAppMemory": {
       "value": "1Gi"
     },
-    "redisContainerAppName": {
-      "value": "shopware-azure-redis-test"
-    },
-    "redisContainerAppCpuCores": {
-      "value": "0.5"
-    },
-    "redisContainerAppMemory": {
-      "value": "1Gi"
-    },
     "appEnv": {
       "value": "test_env"
     },
     "appUrl": {
       "value": "my-app.domain.com"
     },
-    "appInstallCategoryId": {
-      "value": "018f62358a357230852fd8838c604b60"
-    },
     "appInstallCurrency": {
       "value": "CAD"
-    },
-    "appInstallLocale": {
-      "value": "en-CA"
     },
     "appSalesChannelName": {
       "value": "My Sales Channel"
@@ -134,12 +113,6 @@
     },
     "appSalesChannelId": {
       "value": "018f62358a357230852fd8838c604b60"
-    },
-    "redisDb": {
-      "value": "12"
-    },
-    "redisSessionDb": {
-      "value": "14"
     },
     "additionalEnvVars": {
       "value": [
