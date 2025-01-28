@@ -121,7 +121,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     kind: storageAccountKind
     sku: storageAccountSku
     assetsContainerAccessLevel: storageAccountAssetsContainerAccessLevel
-    firewallIps: concat([localIpAddress], storageAccountFirewallIps)
+    firewallIps: storageAccountFirewallIps
     cdnAssetAccess: storageAccountCdnAccess
     virtualNetworkName: virtualNetworkName
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
@@ -380,7 +380,7 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: servicesVmSubnetName
-    firewallIpsForSsh: concat([localIpAddress], servicesVmFirewallIpsForSsh)
+    firewallIpsForSsh: !empty(localIpAddress) ? concat([localIpAddress], servicesVmFirewallIpsForSsh) : servicesVmFirewallIpsForSsh
   }
 }
 
