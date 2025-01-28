@@ -229,7 +229,7 @@ module phpContainerApp 'container-app-php.bicep' = {
 
 module supervisordContainerApp 'container-app-supervisord.bicep' = if (provisionSupervisordContainerApp) {
   name: 'supervisord-container-app'
-  dependsOn: [containerAppsEnvironment, environmentVariables]
+  dependsOn: [containerAppsEnvironment]
   params: {
     location: location
     containerAppsEnvironmentName: containerAppsEnvironmentName

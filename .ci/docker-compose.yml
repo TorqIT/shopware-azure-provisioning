@@ -1,0 +1,8 @@
+services:
+  azure:
+    build:
+      dockerfile: Dockerfile
+      context: ../
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./parameters.json:/azure/parameters.json

@@ -63,10 +63,10 @@ Container Apps support custom domains and Azure-managed HTTPS certificates, but 
 
 The provisioning script will automatically configure the following backups:
 
-1. Point-in-time snapshots of the database. Retention of these snapshots is controlled by the `databaseBackupRetentionDays` parameter.
+1. Point-in-time snapshots of the database. Retention of these snapshots is controlled by the `databaseShortTermBackupRetentionDays` parameter.
 2. Point-in-time snapshots of the Storage Account (which contains persistent Shopware files such as assets). Retention of these snapshots is controlled by the `storageAccountBackupRetentionDays` parameter.
-3. Long-term backups of the database. The provisioning script will automatically create a Backup Vault that stores weekly backups of the database. These backups are retained for up to one year.
-4. Long-term backups of the Storage Account. The script will use the Backup Vault created above to store monthly backups of the Storage Account containers. These backups are retained for up to one year.
+3. As Azure Database for MySQL does not have built-in support for long-term backups, the scripts will create a Storage Account configured by the `databaseBackupsStorageAccount*` parameters. A custom solution is then required to write backups of the database to this Storage Account.
+4. Long-term backups of the Storage Account. The provisioning script will automatically create a Backup Vault that stores monthly backups of the containers. These backups are retained for up to one year.
 
 Note that all backups are stored using Local Redundancy (see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy#locally-redundant-storage for more information).
 
@@ -80,4 +80,4 @@ Bicep files are declarative, meaning that they declare the desired state of your
 
 ## Useful scripts
 
-Once an environment has been provisioned, the `scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/shopware-azure-provisioning/blob/main/scripts/README.md)).
+Once an environment has been provisioned, the `helper-scripts/` directory contains some useful scripts that can be run against the running environment (see its [README](https://github.com/TorqIT/shopware-azure-provisioning/blob/main/scripts/README.md)).
