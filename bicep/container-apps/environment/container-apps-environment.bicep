@@ -15,6 +15,8 @@ param portalEngineStorageAccountName string
 param portalEngineStorageAccountPublicBuildFileShareName string
 param portalEnginePublicBuildStorageMountName string
 
+param additionalVolumesAndMounts array
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroup)
   name: virtualNetworkName
@@ -66,6 +68,17 @@ module privateDns 'container-apps-environment-private-dns-zone.bicep' = if (!php
     vnetId: virtualNetwork.id
   }
 }
+
+module storageMount './container-apps-environment-mount.bicep' = [for volumeAndMount in additionalVolumesAndMounts : {
+  name: 'storageMount-${volumeAndMount.mountName}'
+  params: {
+    containerAppsEnvironmentName: containerAppsEnvironment.name
+    mountName: volumeAndMount.mountName
+    mountAccessMode: volumeAndMount.mountAccessMode
+    storageAccountName: volumeAndMount.storageAccountName
+    fileShareName: volumeAndMount.fileShareName
+  }
+}]
 
 module portalEngineStorageMount './container-apps-environment-portal-engine-mount.bicep' = if (provisionForPortalEngine) {
   name: 'portal-engine-storage-mount'

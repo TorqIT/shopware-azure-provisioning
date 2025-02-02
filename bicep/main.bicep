@@ -136,6 +136,26 @@ module storageAccount 'storage-account/storage-account.bicep' = {
   }
 }
 
+// Optional Azure Files-based Storage Account for use as volume mounts in Container Apps (leveraging NFS)
+param fileStorageAccountName string = ''
+param fileStorageAccountSku string = 'Premium_LRS'
+param fileStorageAccountFileShares array = []
+module fileStorage './file-storage/file-storage.bicep' = {
+  name: 'file-storage-account'
+  dependsOn: [virtualNetwork]
+  params: {
+    storageAccountName: fileStorageAccountName
+    storageAccountSku: fileStorageAccountSku
+    fileShares: map(fileStorageAccountFileShares, (fileShare => {
+      name: fileShare.name
+      maxSizeGB: fileShare.maxSizeGB
+    }))
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
+  }
+}
+
 // Database
 param databaseServerName string
 param databaseAdminUsername string = 'adminuser'
@@ -239,13 +259,15 @@ param redisSessionDb string
 param additionalEnvVars array = []
 // TODO no need for this to be an object anymore, it could be an array
 param additionalSecrets object = {}
+param additionalVolumesAndMounts array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database, portalEngineStorageAccount]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, database, portalEngineStorageAccount]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
     additionalSecrets: additionalSecrets.array
+    additionalVolumesAndMounts: additionalVolumesAndMounts
     appDebug: appDebug
     appEnv: appEnv
     containerAppsEnvironmentName: containerAppsEnvironmentName

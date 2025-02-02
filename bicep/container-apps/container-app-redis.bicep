@@ -13,7 +13,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-resource redisContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource redisContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: containerAppName
   location: location
   properties: {

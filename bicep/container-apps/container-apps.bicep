@@ -66,6 +66,7 @@ param redisDb string
 param redisSessionDb string
 param additionalEnvVars array
 param additionalSecrets array
+param additionalVolumesAndMounts array
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -113,6 +114,8 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     portalEngineStorageAccountName: portalEngineStorageAccountName
     portalEngineStorageAccountPublicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+
+    additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
 
@@ -235,6 +238,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = if (provisionInit) {
     keyVaultName: keyVaultName
     pimcoreAdminPasswordSecretName: pimcoreAdminPasswordSecretName
     additionalSecrets: additionalSecretsModule.outputs.secrets
+    additionalVolumesAndMounts: additionalVolumesAndMounts
     
     // Optional Portal Engine provisioning
     provisionForPortalEngine: provisionForPortalEngine
@@ -266,6 +270,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
+    additionalVolumesAndMounts: additionalVolumesAndMounts
 
     // Optional Portal Engine provisioning
     provisionForPortalEngine: provisionForPortalEngine
@@ -299,6 +304,7 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
+    additionalVolumesAndMounts: additionalVolumesAndMounts
 
     // Optional Portal Engine provisioning
     provisionForPortalEngine: provisionForPortalEngine

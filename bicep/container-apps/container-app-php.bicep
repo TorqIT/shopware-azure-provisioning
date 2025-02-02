@@ -22,6 +22,7 @@ param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
 param additionalSecrets array
+param additionalVolumesAndMounts array
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -56,6 +57,7 @@ module volumesModule './container-apps-volumes.bicep' = {
   params: {
     provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+    additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
 
@@ -70,7 +72,7 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   }
 }
 
-resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: containerAppName
   location: location
   identity: {

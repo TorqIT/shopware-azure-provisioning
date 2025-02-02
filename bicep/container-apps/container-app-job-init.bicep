@@ -12,6 +12,8 @@ param defaultEnvVars array
 
 param additionalSecrets array
 
+param additionalVolumesAndMounts array
+
 param containerRegistryName string
 param containerRegistryConfiguration object
 
@@ -70,6 +72,7 @@ module volumesModule './container-apps-volumes.bicep' = {
   params: {
     provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+    additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
 

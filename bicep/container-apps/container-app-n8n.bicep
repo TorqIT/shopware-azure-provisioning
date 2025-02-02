@@ -82,7 +82,7 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   }
 }
 
-resource n8nContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource n8nContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: containerAppName
   dependsOn: [storageMount]
   location: location
