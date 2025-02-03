@@ -140,7 +140,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
 param fileStorageAccountName string = ''
 param fileStorageAccountSku string = 'Premium_LRS'
 param fileStorageAccountFileShares array = []
-module fileStorage './file-storage/file-storage.bicep' = {
+module fileStorage './file-storage/file-storage.bicep' = if (!empty(fileStorageAccountName)) {
   name: 'file-storage-account'
   dependsOn: [virtualNetwork]
   params: {
