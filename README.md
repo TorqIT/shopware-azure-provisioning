@@ -2,7 +2,7 @@ This Docker image can be used to easily provision an Azure environment to host a
 
 The topography of the resulting environment will look like (assuming all resources are declared within the same Resource Group):
 
-![Infrastructure diagram](./topography.drawio.svg)
+![Infrastructure diagram](./topography.drawio.png)
 
 ## Initial provisioning
 
