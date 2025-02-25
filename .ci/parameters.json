@@ -119,7 +119,7 @@
       }
     },
     "fileStorageAccountName": {
-      "value": "pimcoreazurefilestest"
+      "value": "shopwareazurefilestest"
     },
     "fileStorageAccountFileShares": {
       "value": [
@@ -132,7 +132,7 @@
     "additionalVolumesAndMounts": {
       "value": [
         {
-          "storageAccountName": "pimcoreazurefilestest",
+          "storageAccountName": "shopwareazurefilestest",
           "fileShareName": "assets",
           "mountName": "assets",
           "mountAccessMode": "ReadWrite",
