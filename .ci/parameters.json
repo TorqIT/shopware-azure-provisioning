@@ -75,12 +75,6 @@
     "phpContainerAppImageName": {
       "value": "php"
     },
-    "phpContainerAppCpuCores": {
-      "value": "1.5"
-    },
-    "phpContainerAppMemory": {
-      "value": "3Gi"
-    },
     "phpContainerAppMinReplicas": {
       "value": 0
     },
@@ -123,6 +117,29 @@
         "array": [
         ]
       }
+    },
+    "fileStorageAccountName": {
+      "value": "pimcoreazurefilestest"
+    },
+    "fileStorageAccountFileShares": {
+      "value": [
+        {
+          "name": "assets",
+          "maxSizeGB": 120
+        }
+      ]
+    },
+    "additionalVolumesAndMounts": {
+      "value": [
+        {
+          "storageAccountName": "pimcoreazurefilestest",
+          "fileShareName": "assets",
+          "mountName": "assets",
+          "mountAccessMode": "ReadWrite",
+          "volumeName": "assets",
+          "mountPath": "/var/www/html/public/var/assets"
+        }
+      ]
     }
   }
 }

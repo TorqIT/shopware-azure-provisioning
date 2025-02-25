@@ -12,6 +12,7 @@ param ipSecurityRestrictions array
 param managedIdentityForKeyVaultId string
 param environmentVariables array
 param internalPort int
+param additionalVolumesAndMounts array
 
 param containerRegistryName string
 param containerRegistryConfiguration object
@@ -49,6 +50,9 @@ var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
+  params: {
+    additionalVolumesAndMounts: additionalVolumesAndMounts
+  }
 }
 
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
@@ -62,7 +66,7 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   }
 }
 
-resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: containerAppName
   location: location
   identity: {

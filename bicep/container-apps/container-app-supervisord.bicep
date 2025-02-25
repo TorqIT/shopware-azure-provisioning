@@ -11,6 +11,7 @@ param containerRegistryPasswordSecret object
 param cpuCores string
 param memory string
 param managedIdentityForKeyVaultId string
+param additionalVolumesAndMounts array
 
 @secure()
 param databaseUrlSecret object
@@ -30,9 +31,12 @@ var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
+  params: {
+    additionalVolumesAndMounts: additionalVolumesAndMounts
+  }
 }
 
-resource supervisordContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource supervisordContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: containerAppName
   location: location
   identity: {

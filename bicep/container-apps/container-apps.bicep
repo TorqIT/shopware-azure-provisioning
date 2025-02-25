@@ -69,6 +69,7 @@ param enableOpensearch bool
 param opensearchUrl string
 param additionalEnvVars array
 param additionalSecrets array
+param additionalVolumesAndMounts array
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
@@ -81,6 +82,7 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
 
@@ -190,6 +192,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
     keyVaultName: keyVaultName
     additionalSecrets: additionalSecretsModule.outputs.secrets
+    additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
 
@@ -217,6 +220,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     appSecretSecret: appSecretSecret
     internalPort: phpContainerAppInternalPort
     additionalSecrets: additionalSecretsModule.outputs.secrets
+    additionalVolumesAndMounts: additionalVolumesAndMounts
 
     // Optional scaling rules
     provisionCronScaleRule: phpContainerAppProvisionCronScaleRule
@@ -246,5 +250,6 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = if (provision
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
+    additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
