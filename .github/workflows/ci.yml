@@ -1,4 +1,4 @@
-name: Deploy and test changes in an Azure environment
+name: CI
 
 on:
   pull_request:
@@ -30,6 +30,7 @@ jobs:
 
       - name: Cancel Azure deployment if the deploy step failed or was cancelled
         if: always()
+        continue-on-error: true
         run: |
           if [ ${{ steps.deploy.outcome }} == 'failure' ] || [ ${{ steps.deploy.outcome }} == 'cancelled' ]; then
             touch .env

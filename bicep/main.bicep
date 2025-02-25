@@ -125,11 +125,31 @@ module storageAccount 'storage-account/storage-account.bicep' = {
   }
 }
 
+// Optional Azure Files-based Storage Account for use as volume mounts in Container Apps (leveraging NFS)
+param fileStorageAccountName string = ''
+param fileStorageAccountSku string = 'Premium_LRS'
+param fileStorageAccountFileShares array = []
+module fileStorage './file-storage/file-storage.bicep' = if (!empty(fileStorageAccountName)) {
+  name: 'file-storage-account'
+  dependsOn: [virtualNetwork]
+  params: {
+    storageAccountName: fileStorageAccountName
+    storageAccountSku: fileStorageAccountSku
+    fileShares: map(fileStorageAccountFileShares, (fileShare => {
+      name: fileShare.name
+      maxSizeGB: fileShare.maxSizeGB
+    }))
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
+  }
+}
+
 // Database
 param databaseServerName string
 param databaseAdminUsername string = 'adminuser'
 param databaseAdminPasswordSecretName string = 'database-admin-password'
-param databaseSkuName string = 'Standard_B1ms'
+param databaseSkuName string = 'Standard_B2s'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
 param databaseName string = 'shopware'
@@ -182,23 +202,23 @@ param containerAppsEnvironmentUseWorkloadProfiles bool = false
 // Init Container App Job 
 param initContainerAppJobName string
 param initContainerAppJobImageName string
-param initContainerAppJobCpuCores string = '0.5'
-param initContainerAppJobMemory string = '1Gi'
+param initContainerAppJobCpuCores string = '1.5'
+param initContainerAppJobMemory string = '3Gi'
 param initContainerAppJobReplicaTimeoutSeconds int = 600
 // PHP (web) Container App
 param phpContainerAppExternal bool = true
 param phpContainerAppName string
 param phpContainerAppImageName string
 param phpContainerAppCustomDomains array = []
-param phpContainerAppCpuCores string = '1.0'
-param phpContainerAppMemory string = '2.0'
+param phpContainerAppCpuCores string = '1.5'
+param phpContainerAppMemory string = '3Gi'
 param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
 param phpContainerAppIpSecurityRestrictions array = []
 param phpContainerAppInternalPort int = 80
 // Optional scale rules
 param phpContainerAppProvisionCronScaleRule bool = false
-param phpContainerAppCronScaleRuleDesiredReplicas int = 0
+param phpContainerAppCronScaleRuleDesiredReplicas int = 1
 param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
@@ -206,8 +226,8 @@ param phpContainerAppCronScaleRuleTimezone string = ''
 param provisionSupervisordContainerApp bool = false
 param supervisordContainerAppName string = ''
 param supervisordContainerAppImageName string = ''
-param supervisordContainerAppCpuCores string = '0.25'
-param supervisordContainerAppMemory string = '0.5Gi'
+param supervisordContainerAppCpuCores string = '1'
+param supervisordContainerAppMemory string = '2Gi'
 param appEnv string
 param appUrl string
 param appSecretSecretName string = 'app-secret'
@@ -225,13 +245,15 @@ param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
 // TODO no need for this to be an object anymore, it could be an array
 param additionalSecrets object = {}
+param additionalVolumesAndMounts array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, database]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, database]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
     additionalSecrets: additionalSecrets.array
+    additionalVolumesAndMounts: additionalVolumesAndMounts
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName

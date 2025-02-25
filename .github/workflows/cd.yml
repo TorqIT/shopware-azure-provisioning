@@ -2,6 +2,8 @@ name: Create and publish Docker image
 
 on:
   push:
+    branches: 
+      - '*'
     tags:
       - "v*.*.*"
   workflow_call: 
@@ -49,7 +51,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=sha
       
       - name: Build Docker image
         uses: docker/build-push-action@v6

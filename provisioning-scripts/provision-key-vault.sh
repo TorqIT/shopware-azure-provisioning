@@ -21,17 +21,17 @@ if [ $returnCode -ne 0 ]; then
       enablePurgeProtection=$KEY_VAULT_ENABLE_PURGE_PROTECTION
 fi
 
-echo "Assigning Key Vault Secrets Officer role to current user..."
-PRINCIPAL_TYPE=$(az account show --query "user.type" -o tsv)
-az deployment group create \
-  --resource-group $KEY_VAULT_RESOURCE_GROUP_NAME \
-  --template-file ./bicep/key-vault/key-vault-roles.bicep \
-  --parameters \
-    keyVaultName=$KEY_VAULT_NAME \
-    principalType=$PRINCIPAL_TYPE
-
 KEY_VAULT_GENERATE_RANDOM_SECRETS=$(jq -r '.parameters.keyVaultGenerateRandomSecrets.value' $1) 
 if [ "${KEY_VAULT_GENERATE_RANDOM_SECRETS}" != "null" ] || [ "${KEY_VAULT_GENERATE_RANDOM_SECRETS}" = true ]; then
+  echo "Assigning Key Vault Secrets Officer role to current user..."
+  PRINCIPAL_TYPE=$(az account show --query "user.type" -o tsv)
+  az deployment group create \
+    --resource-group $KEY_VAULT_RESOURCE_GROUP_NAME \
+    --template-file ./bicep/key-vault/key-vault-roles.bicep \
+    --parameters \
+      keyVaultName=$KEY_VAULT_NAME \
+      principalType=$PRINCIPAL_TYPE
+
   echo Adding temporary network rule to the Key Vault firewall...
   az keyvault network-rule add \
     --name $KEY_VAULT_NAME \
@@ -59,10 +59,14 @@ if [ "${KEY_VAULT_GENERATE_RANDOM_SECRETS}" != "null" ] || [ "${KEY_VAULT_GENERA
       echo Secret $secret already exists in Key Vault!
     fi
   done
+
+  # TODO interactively prompt for other secrets
   
   echo Removing network rule for this runner from the Key Vault firewall...
   az keyvault network-rule remove \
     --name $KEY_VAULT_NAME \
     --resource-group $KEY_VAULT_RESOURCE_GROUP_NAME \
     --ip-address $(curl ipinfo.io/ip)
+
+  # TODO remove role assignment
 fi

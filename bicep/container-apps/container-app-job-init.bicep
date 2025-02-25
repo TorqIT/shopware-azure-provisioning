@@ -9,6 +9,8 @@ param replicaTimeoutSeconds int
 
 param keyVaultName string
 
+param additionalVolumesAndMounts array
+
 param containerRegistryName string
 param containerRegistryConfiguration object
 @secure()
@@ -47,7 +49,10 @@ var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storag
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
-  name: 'container-app-php-volumes'
+  name: 'container-app-job-init-volumes'
+  params: {
+    additionalVolumesAndMounts: additionalVolumesAndMounts
+  }
 }
 
 resource containerAppJob 'Microsoft.App/jobs@2024-03-01' = {
