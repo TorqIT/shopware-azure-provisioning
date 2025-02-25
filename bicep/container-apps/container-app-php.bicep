@@ -118,6 +118,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
+        rules: scaleRules.outputs.scaleRules
       }
     }
   }
