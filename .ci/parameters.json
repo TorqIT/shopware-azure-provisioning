@@ -59,12 +59,6 @@
     "initContainerAppJobImageName": {
       "value": "init"
     },
-    "initContainerAppJobCpuCores": {
-      "value": "1.5"
-    },
-    "initContainerAppJobMemory": {
-      "value": "3Gi"
-    },
     "initContainerAppJobRunPimcoreInstall": {
       "value": true
     },
@@ -81,12 +75,6 @@
     "phpContainerAppImageName": {
       "value": "php"
     },
-    "phpContainerAppCpuCores": {
-      "value": "1.5"
-    },
-    "phpContainerAppMemory": {
-      "value": "3Gi"
-    },
     "phpContainerAppMinReplicas": {
       "value": 0
     },
@@ -96,20 +84,8 @@
     "supervisordContainerAppImageName": {
       "value": "supervisord"
     },
-    "supervisordContainerAppCpuCores": {
-      "value": "0.5"
-    },
-    "supervisordContainerAppMemory": {
-      "value": "1Gi"
-    },
     "redisContainerAppName": {
       "value": "pimcore-azure-redis-test"
-    },
-    "redisContainerAppCpuCores": {
-      "value": "0.5"
-    },
-    "redisContainerAppMemory": {
-      "value": "1Gi"
     },
     "appDebug": {
       "value": "1"

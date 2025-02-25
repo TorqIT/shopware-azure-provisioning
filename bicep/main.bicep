@@ -160,7 +160,7 @@ module fileStorage './file-storage/file-storage.bicep' = if (!empty(fileStorageA
 param databaseServerName string
 param databaseAdminUsername string = 'adminuser'
 param databasePasswordSecretName string = 'databasePassword'
-param databaseSkuName string = 'Standard_B1ms'
+param databaseSkuName string = 'Standard_B2s'
 param databaseSkuTier string = 'Burstable'
 param databaseStorageSizeGB int = 20
 param databaseName string = 'pimcore'
@@ -215,8 +215,8 @@ param containerAppsEnvironmentUseWorkloadProfiles bool = false
 param provisionInit bool = false
 param initContainerAppJobName string = ''
 param initContainerAppJobImageName string = ''
-param initContainerAppJobCpuCores string = '0.5'
-param initContainerAppJobMemory string = '1Gi'
+param initContainerAppJobCpuCores string = '1.5'
+param initContainerAppJobMemory string = '3Gi'
 param initContainerAppJobReplicaTimeoutSeconds int = 600
 param initContainerAppJobRunPimcoreInstall bool = false
 param pimcoreAdminPasswordSecretName string = 'pimcore-admin-password'
@@ -226,22 +226,22 @@ param phpContainerAppName string
 param phpContainerAppImageName string
 param phpContainerAppUseProbes bool = false
 param phpContainerAppCustomDomains array = []
-param phpContainerAppCpuCores string = '0.5'
-param phpContainerAppMemory string = '1Gi'
+param phpContainerAppCpuCores string = '1.5'
+param phpContainerAppMemory string = '3Gi'
 param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
 param phpContainerAppIpSecurityRestrictions array = []
 // Optional scaling rules
 param phpContainerAppProvisionCronScaleRule bool = false
 param phpContainerAppCronScaleRuleDesiredReplicas int = 1
-param phpContainerAppCronScaleRuleStartSchedule string = '0 7 * * *'
-param phpContainerAppCronScaleRuleEndSchedule string = '0 18 * * *'
-param phpContainerAppCronScaleRuleTimezone string = 'Etc/UTC'
+param phpContainerAppCronScaleRuleStartSchedule string = ''
+param phpContainerAppCronScaleRuleEndSchedule string = ''
+param phpContainerAppCronScaleRuleTimezone string = ''
 // Supervisord Container App
 param supervisordContainerAppName string
 param supervisordContainerAppImageName string
-param supervisordContainerAppCpuCores string = '0.25'
-param supervisordContainerAppMemory string = '0.5Gi'
+param supervisordContainerAppCpuCores string = '1'
+param supervisordContainerAppMemory string = '2Gi'
 // Redis Container App
 param redisContainerAppName string
 param redisContainerAppCpuCores string = '0.25'
