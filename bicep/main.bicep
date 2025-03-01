@@ -214,7 +214,7 @@ param containerAppsEnvironmentUseWorkloadProfiles bool = false
 // TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
 param provisionInit bool = false
 param initContainerAppJobName string = ''
-param initContainerAppJobImageName string = ''
+param initContainerAppJobImageName string = 'init'
 param initContainerAppJobCpuCores string = '1.5'
 param initContainerAppJobMemory string = '3Gi'
 param initContainerAppJobReplicaTimeoutSeconds int = 600
@@ -223,7 +223,7 @@ param pimcoreAdminPasswordSecretName string = 'pimcore-admin-password'
 // PHP ("web") Container App 
 param phpContainerAppExternal bool = true
 param phpContainerAppName string
-param phpContainerAppImageName string
+param phpContainerAppImageName string = 'php'
 param phpContainerAppUseProbes bool = false
 param phpContainerAppCustomDomains array = []
 param phpContainerAppCpuCores string = '1.5'
@@ -239,7 +239,7 @@ param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
 // Supervisord Container App
 param supervisordContainerAppName string
-param supervisordContainerAppImageName string
+param supervisordContainerAppImageName string = 'supervisord'
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
 // Redis Container App
