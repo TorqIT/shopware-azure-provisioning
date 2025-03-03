@@ -118,7 +118,7 @@ resource cdn 'Microsoft.Cdn/profiles@2024-09-01' = if (cdnAssetAccess) {
   location: location
   name: storageAccountName
   sku: {
-    name: 'Premium_AzureFrontDoor'
+    name: 'Standard_AzureFrontDoor'
   }
 
   resource endpoint 'endpoints' = {
