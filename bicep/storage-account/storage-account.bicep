@@ -114,11 +114,11 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
 }
 
 var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
-resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = if (cdnAssetAccess) {
+resource cdn 'Microsoft.Cdn/profiles@2024-09-01' = if (cdnAssetAccess) {
   location: location
   name: storageAccountName
   sku: {
-    name: 'Standard_Microsoft'
+    name: 'Premium_AzureFrontDoor'
   }
 
   resource endpoint 'endpoints' = {
