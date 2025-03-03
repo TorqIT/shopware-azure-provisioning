@@ -62,6 +62,7 @@ resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-
 resource databaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
   parent: virtualNetwork
   name: databaseSubnetName
+  dependsOn: [containerAppsSubnet] // hacky workaround as Azure does not support subnets being deployed in parallel
   properties: {
     addressPrefix: databaseSubnetAddressSpace
     delegations: [
@@ -75,11 +76,12 @@ resource databaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' =
   }
 }
 
-// TODO this is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
+// TODO the condition here is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
 // that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
 resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = if (privateEndpointsSubnetName != containerAppsSubnetName) {
   parent: virtualNetwork
   name: privateEndpointsSubnetName
+  dependsOn: [containerAppsSubnet, databaseSubnet] // hacky workaround as Azure does not support subnets being deployed in parallel
   properties: {
     addressPrefix: privateEndpointsSubnetAddressSpace
   }
@@ -88,6 +90,7 @@ resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-
 resource servicesVmSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = if (provisionServicesVM) {
   parent: virtualNetwork
   name: servicesVmSubnetName
+  dependsOn: [containerAppsSubnet, databaseSubnet, privateEndpointsSubnet] // hacky workaround as Azure does not support subnets being deployed in parallel
   properties: {
     addressPrefix: servicesVmSubnetAddressSpace
   }
