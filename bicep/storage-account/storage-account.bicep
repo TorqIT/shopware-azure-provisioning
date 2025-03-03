@@ -7,6 +7,7 @@ param accessTier string
 param publicContainerName string
 param privateContainerName string
 param firewallIps array
+param cdnAssetAccess bool
 
 param shortTermBackupRetentionDays int
 
@@ -109,5 +110,31 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
     storageAccountName: storageAccountName
     containers: [publicContainerName, privateContainerName]
     retentionPeriod: longTermBackupRetentionPeriod
+  }
+}
+
+var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
+resource cdn 'Microsoft.Cdn/profiles@2024-09-01' = if (cdnAssetAccess) {
+  name: storageAccountName
+  location: 'Global'
+  sku: {
+    name: 'Standard_AzureFrontDoor'
+  }
+
+  resource endpoint 'endpoints' = {
+    name: storageAccountName
+    location: 'Global'
+    properties: {
+      originHostHeader: storageAccountDomainName
+      isHttpAllowed: false
+      origins: [
+        {
+          name: storageAccount.name
+          properties: {
+            hostName: storageAccountDomainName
+          } 
+        }
+      ]
+    }
   }
 }

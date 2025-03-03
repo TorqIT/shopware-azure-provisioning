@@ -95,6 +95,7 @@ param storageAccountAccessTier string = 'Hot'
 param storageAccountPublicContainerName string = 'public'
 param storageAccountPrivateContainerName string = 'private'
 param storageAccountFirewallIps array = []
+param storageAccountCdnAccess bool = false
 param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
 param storageAccountPrivateEndpointNicName string = ''
@@ -112,6 +113,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     kind: storageAccountKind
     sku: storageAccountSku
     firewallIps: storageAccountFirewallIps
+    cdnAssetAccess: storageAccountCdnAccess
     virtualNetworkName: virtualNetworkName
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName

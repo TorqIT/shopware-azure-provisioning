@@ -41,6 +41,9 @@
     "storageAccountLongTermBackups": {
       "value": false
     },
+    "storageAccountCdnAccess": {
+      "value": true
+    },
     "databaseServerName": {
       "value": "shopware-azure-db-test"
     },
