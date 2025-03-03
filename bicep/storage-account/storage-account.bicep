@@ -115,15 +115,15 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (lo
 
 var storageAccountDomainName = split(storageAccount.properties.primaryEndpoints.blob, '/')[2]
 resource cdn 'Microsoft.Cdn/profiles@2024-09-01' = if (cdnAssetAccess) {
-  location: location
   name: storageAccountName
+  location: 'Global'
   sku: {
     name: 'Standard_AzureFrontDoor'
   }
 
   resource endpoint 'endpoints' = {
-    location: location
     name: storageAccountName
+    location: 'Global'
     properties: {
       originHostHeader: storageAccountDomainName
       isHttpAllowed: false
