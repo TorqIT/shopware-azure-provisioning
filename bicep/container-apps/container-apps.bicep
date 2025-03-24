@@ -46,7 +46,6 @@ param phpContainerAppCronScaleRuleStartSchedule string
 param phpContainerAppCronScaleRuleEndSchedule string
 param phpContainerAppCronScaleRuleTimezone string
 
-param provisionSupervisordContainerApp bool
 param supervisordContainerAppName string
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string
@@ -236,7 +235,7 @@ module phpContainerApp 'container-app-php.bicep' = {
   }
 }
 
-module supervisordContainerApp 'container-app-supervisord.bicep' = if (provisionSupervisordContainerApp) {
+module supervisordContainerApp 'container-app-supervisord.bicep' = {
   name: 'supervisord-container-app'
   dependsOn: [containerAppsEnvironment]
   params: {
