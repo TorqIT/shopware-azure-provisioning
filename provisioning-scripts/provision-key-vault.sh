@@ -5,7 +5,8 @@ KEY_VAULT_RESOURCE_GROUP_NAME=$(jq -r --arg RESOURCE_GROUP "$RESOURCE_GROUP" '.p
 set +e
 az keyvault show \
   --resource-group $KEY_VAULT_RESOURCE_GROUP_NAME \
-  --name $KEY_VAULT_NAME
+  --name $KEY_VAULT_NAME \
+  --output none
 returnCode=$?
 set -e
 

@@ -68,6 +68,11 @@ param additionalEnvVars array
 param additionalSecrets array
 param additionalVolumesAndMounts array
 
+// Optional metric alerts provisioning
+param provisionMetricAlerts bool
+param generalMetricAlertsActionGroupName string
+param criticalMetricAlertsActionGroupName string
+
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
 param portalEngineStorageAccountName string
@@ -356,3 +361,13 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
     cronScaleRuleTimezone: n8nContainerAppCronScaleRuleTimezone
   }
 }
+
+// Optional metric alerts
+module alerts './alerts/container-app-alerts.bicep' = [for containerAppName in [phpContainerAppName, supervisordContainerAppName]: if (provisionMetricAlerts) {
+  name: '${containerAppName}-alerts'
+  dependsOn: [phpContainerApp, supervisordContainerApp]
+  params: {
+    containerAppName: containerAppName
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+  }
+}] 

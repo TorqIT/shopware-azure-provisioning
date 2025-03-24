@@ -1,4 +1,4 @@
-name: CI
+name: Deploy changes to Azure and test
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
         id: deploy
         run: |
           docker compose \
-            --file .ci/docker-compose.yml \
+            --file .github/test-files/docker-compose.yml \
             exec azure \
               ./provision.sh parameters.json
 
@@ -34,9 +34,9 @@ jobs:
         run: |
           if [ ${{ steps.deploy.outcome }} == 'failure' ] || [ ${{ steps.deploy.outcome }} == 'cancelled' ]; then
             touch .env
-            RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .ci/parameters.json) >> .env
+            RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .github/test-files/parameters.json) >> .env
             docker compose \
-              --file .ci/docker-compose.yml \
+              --file .github/test-files/docker-compose.yml \
               exec azure \
                 az deployment group cancel \
                   --resource-group $RESOURCE_GROUP \
