@@ -38,6 +38,9 @@
     "storageAccountName": {
       "value": "shopwareazuresatest"
     },
+    "storageAccountCdnAccess": {
+      "value": true
+    },
     "storageAccountLongTermBackups": {
       "value": false
     },
