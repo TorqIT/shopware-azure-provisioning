@@ -145,6 +145,33 @@ module fileStorage './file-storage/file-storage.bicep' = if (!empty(fileStorageA
   }
 }
 
+// Metric alerts
+param provisionMetricAlerts bool = false
+param generalMetricAlertsActionGroupName string = '${resourceGroupName}-general-metric-alerts-group'
+@maxLength(12)
+param generalMetricAlertsActionGroupShortName string = 'gen-metrics'
+param generalMetricAlertsEmailReceivers array = []
+module generalMetricAlertsActionGroup 'insights/metric-alerts/metrics-action-group.bicep' = if (provisionMetricAlerts) {
+  name: 'general-metric-alerts-action-group'
+  params: {
+    name: generalMetricAlertsActionGroupName
+    shortName: generalMetricAlertsActionGroupShortName
+    emailReceivers: generalMetricAlertsEmailReceivers
+  }
+}
+param criticalMetricAlertsActionGroupName string = '${resourceGroupName}-critical-metric-alerts-group'
+@maxLength(12)
+param criticalMetricAlertsActionGroupShortName string = 'crit-metrics'
+param criticalMetricAlertsEmailReceivers array = []
+module criticalMetricAlertsActionGroup 'insights/metric-alerts/metrics-action-group.bicep' = if (provisionMetricAlerts) {
+  name: 'critical-metric-alerts-action-group'
+  params: {
+    name: criticalMetricAlertsActionGroupName
+    shortName: criticalMetricAlertsActionGroupShortName
+    emailReceivers: criticalMetricAlertsEmailReceivers
+  }
+}
+
 // Database
 param databaseServerName string
 param databaseAdminUsername string = 'adminuser'
@@ -164,7 +191,7 @@ param databaseBackupsStorageAccountKind string = 'StorageV2'
 param databaseBackupsStorageAccountContainerName string = 'database'
 module database 'database/database.bicep' = {
   name: 'database'
-  dependsOn: [virtualNetwork, backupVault]
+  dependsOn: [virtualNetwork, backupVault, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
     location: location
     administratorLogin: databaseAdminUsername
@@ -180,11 +207,17 @@ module database 'database/database.bicep' = {
     shortTermBackupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
+
+    // Optional long-term backups
     longTermBackups: databaseLongTermBackups
     databaseBackupsStorageAccountName: databaseBackupsStorageAccountName
     databaseBackupsStorageAccountContainerName: databaseBackupsStorageAccountContainerName
     databaseBackupsStorageAccountKind: databaseBackupsStorageAccountKind
     databaseBackupsStorageAccountSku: databaseBackupsStorageAccountSku
+
+    // Optional metrics alerts
+    provisionMetricAlerts: provisionMetricAlerts
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
   }
 }
 
@@ -223,8 +256,7 @@ param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
 // Supervisord Container App
-param provisionSupervisordContainerApp bool = false
-param supervisordContainerAppName string = ''
+param supervisordContainerAppName string
 param supervisordContainerAppImageName string = ''
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
@@ -245,10 +277,11 @@ param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
 // TODO no need for this to be an object anymore, it could be an array
 param additionalSecrets object = {}
+// Volume mounts
 param additionalVolumesAndMounts array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, database]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, database, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
     location: location
     additionalEnvVars: additionalEnvVars
@@ -278,7 +311,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
     phpContainerAppCronScaleRuleEndSchedule: phpContainerAppCronScaleRuleEndSchedule
     phpContainerAppCronScaleRuleTimezone: phpContainerAppCronScaleRuleTimezone
-    provisionSupervisordContainerApp: provisionSupervisordContainerApp
     supervisordContainerAppName: supervisordContainerAppName
     supervisordContainerAppImageName: supervisordContainerAppImageName
     supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
@@ -307,6 +339,11 @@ module containerApps 'container-apps/container-apps.bicep' = {
     storageAccountPrivateContainerName: storageAccountPrivateContainerName
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
+
+    // Optional alerts provisioning
+    provisionMetricAlerts: provisionMetricAlerts
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
   }
 }
 

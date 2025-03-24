@@ -25,17 +25,17 @@ jobs:
         run: |
           touch .env
           echo "Deleting Resource Group..."
-          RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .ci/parameters.json) >> .env
+          RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .github/test-files/parameters.json) >> .env
           docker compose \
-            --file .ci/docker-compose.yml \
+            --file .github/test-files/docker-compose.yml \
             exec azure \
               az group delete \
                 --name $RESOURCE_GROUP \
                 --yes
           echo "Purging Key Vault..."
-          KEY_VAULT=$(jq -r '.parameters.keyVaultName.value' .ci/parameters.json) >> .env
+          KEY_VAULT=$(jq -r '.parameters.keyVaultName.value' .github/test-files/parameters.json) >> .env
           docker compose \
-            --file .ci/docker-compose.yml \
+            --file .github/test-files/docker-compose.yml \
             exec azure \
               az keyvault purge \
                 --name $KEY_VAULT

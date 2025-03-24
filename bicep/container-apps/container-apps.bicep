@@ -46,7 +46,6 @@ param phpContainerAppCronScaleRuleStartSchedule string
 param phpContainerAppCronScaleRuleEndSchedule string
 param phpContainerAppCronScaleRuleTimezone string
 
-param provisionSupervisordContainerApp bool
 param supervisordContainerAppName string
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string
@@ -70,6 +69,11 @@ param opensearchUrl string
 param additionalEnvVars array
 param additionalSecrets array
 param additionalVolumesAndMounts array
+
+// Optional metric alerts provisioning
+param provisionMetricAlerts bool
+param generalMetricAlertsActionGroupName string
+param criticalMetricAlertsActionGroupName string
 
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
@@ -231,7 +235,7 @@ module phpContainerApp 'container-app-php.bicep' = {
   }
 }
 
-module supervisordContainerApp 'container-app-supervisord.bicep' = if (provisionSupervisordContainerApp) {
+module supervisordContainerApp 'container-app-supervisord.bicep' = {
   name: 'supervisord-container-app'
   dependsOn: [containerAppsEnvironment]
   params: {
@@ -253,3 +257,13 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = if (provision
     additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
+
+// Optional metric alerts
+module alerts './alerts/container-app-alerts.bicep' = [for containerAppName in [phpContainerAppName, supervisordContainerAppName]: if (provisionMetricAlerts) {
+  name: '${containerAppName}-alerts'
+  dependsOn: [phpContainerApp, supervisordContainerApp]
+  params: {
+    containerAppName: containerAppName
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+  }
+}] 
