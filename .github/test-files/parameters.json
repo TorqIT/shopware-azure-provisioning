@@ -140,6 +140,9 @@
           "mountPath": "/var/www/html/public/var/assets"
         }
       ]
+    },
+    "provisionMetricAlerts": {
+      "value": true
     }
   }
 }

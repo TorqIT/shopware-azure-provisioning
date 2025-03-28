@@ -229,6 +229,7 @@ module database 'database/database.bicep' = {
     // Optional metrics alerts
     provisionMetricAlerts: provisionMetricAlerts
     generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
   }
 }
 
