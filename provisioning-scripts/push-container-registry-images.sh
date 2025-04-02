@@ -3,15 +3,11 @@
 set -e
 
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
-INIT_IMAGE_NAME=$(jq -r '.parameters.initContainerAppJobImageName.value // empty' $1)
-PHP_IMAGE_NAME=$(jq -r '.parameters.phpContainerAppImageName.value' $1)
-SUPERVISORD_IMAGE_NAME=$(jq -r '.parameters.supervisordContainerAppImageName.value' $1)
+INIT_IMAGE_NAME=$(jq -r '.parameters.initContainerAppJobImageName.value // "init"' $1)
+PHP_IMAGE_NAME=$(jq -r '.parameters.phpContainerAppImageName.value // "php"' $1)
+SUPERVISORD_IMAGE_NAME=$(jq -r '.parameters.supervisordContainerAppImageName.value // "supervisord"' $1)
 
-IMAGES=($PHP_IMAGE_NAME $SUPERVISORD_IMAGE_NAME)
-if [ ! -z $INIT_IMAGE_NAME ];
-then
-  IMAGES+=($INIT_IMAGE_NAME)
-fi
+IMAGES=($PHP_IMAGE_NAME $SUPERVISORD_IMAGE_NAME $INIT_IMAGE_NAME)
 
 EXISTING_REPOSITORIES=$(az acr repository list --name $CONTAINER_REGISTRY_NAME --output tsv)
 if [ -z "$EXISTING_REPOSITORIES" ];
