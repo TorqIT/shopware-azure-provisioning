@@ -1,4 +1,5 @@
 param appEnv string
+param appDebug string
 param appUrl string
 param appSecretSecretRefName string
 param appInstallCurrency string
@@ -32,6 +33,10 @@ var defaultEnvVars = [
   {
     name: 'APP_ENV'
     value: appEnv
+  }
+  {
+    name: 'APP_DEBUG'
+    value: appDebug
   }
   {
     name: 'APP_URL'

@@ -52,6 +52,7 @@ param supervisordContainerAppCpuCores string
 param supervisordContainerAppMemory string
 
 param appEnv string
+param appDebug string
 param appUrl string
 param appInstallCurrency string
 param appInstallCreateCAD bool
@@ -151,6 +152,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
   name: 'container-apps-env-vars'
   params: {
     appEnv: appEnv
+    appDebug: appDebug
     appUrl: appUrl
     appSecretSecretRefName: appSecretSecretRefName
     appInstallCurrency: appInstallCurrency

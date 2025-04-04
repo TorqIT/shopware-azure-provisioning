@@ -262,6 +262,7 @@ param supervisordContainerAppImageName string = ''
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
 param appEnv string
+param appDebug string = '1'
 param appUrl string
 param appSecretSecretName string = 'app-secret'
 param appPasswordSecretName string = 'app-password'
@@ -317,6 +318,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
     supervisordContainerAppMemory: supervisordContainerAppMemory
     appEnv: appEnv
+    appDebug: appDebug
     appUrl: appUrl
     appSecret: keyVault.getSecret(appSecretSecretName)
     appPassword: keyVault.getSecret(appPasswordSecretName)
