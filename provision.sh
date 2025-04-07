@@ -51,6 +51,7 @@ then
   DATABASE_LONG_TERM_BACKUPS=$(jq -r '.parameters.databaseLongTermBackups.value // empty' $1)
   DATABASE_SERVER_NAME=$(jq -r '.parameters.databaseServerName.value // empty' $1)
   DATABASE_BACKUPS_STORAGE_ACCOUNT_NAME=$(jq -r '.parameters.databaseBackupsStorageAccountName.value // empty' $1)
+  FILE_STORAGE_ACCOUNT_NAME=$(jq -r '.parameters.fileStorageAccountName.value // empty' $1)
   echo "Assigning roles for service principal..."
   az deployment group create \
     --resource-group $RESOURCE_GROUP \
@@ -65,6 +66,7 @@ then
       databaseLongTermBackups=$DATABASE_LONG_TERM_BACKUPS \
       databaseServerName=$DATABASE_SERVER_NAME \
       databaseBackupsStorageAccountName=$DATABASE_BACKUPS_STORAGE_ACCOUNT_NAME \
+      fileStorageAccountName=$FILE_STORAGE_ACCOUNT_NAME \
       keyVaultName=$KEY_VAULT_NAME \
       keyVaultResourceGroupName=$KEY_VAULT_RESOURCE_GROUP_NAME
 fi

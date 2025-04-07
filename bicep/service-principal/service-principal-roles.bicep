@@ -9,6 +9,7 @@ param supervisordContainerAppName string
 param databaseLongTermBackups bool = false
 param databaseServerName string = ''
 param databaseBackupsStorageAccountName string = ''
+param fileStorageAccountName string = ''
 param keyVaultName string
 param keyVaultResourceGroupName string = resourceGroup().name
 
@@ -29,6 +30,9 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' existi
 }
 resource databaseBackupsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = if (databaseLongTermBackups) {
   name: databaseBackupsStorageAccountName
+}
+resource fileStorageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' existing = if (!empty(fileStorageAccountName)) {
+  name: fileStorageAccountName
 }
 
 resource acrPushRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-05-01-preview' existing = {
@@ -121,3 +125,12 @@ resource databaseBackupsStorageAccountBlobContributorRoleAssignment 'Microsoft.A
   }
 }
 
+resource fileStorageAccountContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(fileStorageAccountName)) {
+  scope: fileStorageAccount
+  name: guid(fileStorageAccount.id, servicePrincipalId, contributorRoleDefinition.id)
+  properties: {
+    roleDefinitionId: contributorRoleDefinition.id
+    principalId: servicePrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
