@@ -5,6 +5,7 @@ param storageAccountContainerName string
 param storageAccountAssetsContainerName string
 param storageAccountKeySecretRefName string
 param databaseServerName string
+param databaseServerVersion string
 param databaseName string
 param databaseUser string
 param databasePasswordSecretRefName string
@@ -20,10 +21,6 @@ param provisionPortalEngine bool
 param portalEngineStorageAccountName string
 param portalEngineStorageAccountDownloadsContainerName string
 param portalEngineStorageAccountKeySecretRefName string
-
-resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
-  name: databaseServerName
-}
 
 var defaultEnvVars = [
   {
@@ -52,7 +49,7 @@ var defaultEnvVars = [
   }
   {
     name: 'DATABASE_HOST'
-    value: database.properties.fullyQualifiedDomainName 
+    value: '${databaseServerName}.mysql.database.azure.com'
   }
   {
     name: 'DATABASE_NAME'
@@ -68,7 +65,7 @@ var defaultEnvVars = [
   }
   {
     name: 'DATABASE_SERVER_VERSION'
-    value: database.properties.version
+    value: databaseServerVersion
   }
   {
     name: 'PIMCORE_DEV'

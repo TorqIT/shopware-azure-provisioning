@@ -3,6 +3,7 @@ param location string = resourceGroup().location
 param fullProvision bool
 
 param serverName string
+param serverVersion string
 
 param administratorLogin string
 @secure()
@@ -53,7 +54,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
     tier: skuTier
   }
   properties: {
-    version: '8.0.21'
+    version: serverVersion
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorPassword
     storage: {

@@ -14,6 +14,7 @@ param virtualNetworkSubnetName string
 param keyVaultName string
 
 param databaseServerName string
+param databaseServerVersion string
 param databasePasswordSecretNameInKeyVault string
 
 param containerRegistryName string
@@ -202,6 +203,7 @@ module environmentVariables 'container-apps-env-variables.bicep' = {
     appDebug: appDebug
     appEnv: appEnv
     databaseServerName: databaseServerName
+    databaseServerVersion: databaseServerVersion
     databaseName: databaseName
     databaseUser: databaseUser
     databasePasswordSecretRefName: databasePasswordSecretRefName

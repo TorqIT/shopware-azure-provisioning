@@ -1,6 +1,5 @@
 #!/bin/bash
 
-echo "Provisioning the Azure environment..."
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 az deployment group create \
   --resource-group $RESOURCE_GROUP \

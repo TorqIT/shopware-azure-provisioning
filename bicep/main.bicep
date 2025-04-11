@@ -187,6 +187,7 @@ module criticalMetricAlertsActionGroup 'insights/metric-alerts/metrics-action-gr
 
 // Database
 param databaseServerName string
+param databaseServerVersion string = '8.0.21'
 param databaseAdminUsername string = 'adminuser'
 param databasePasswordSecretName string = 'databasePassword'
 param databaseSkuName string = 'Standard_B2s'
@@ -212,6 +213,7 @@ module database 'database/database.bicep' = {
     administratorPassword: keyVault.getSecret(databasePasswordSecretName)
     databaseName: databaseName
     serverName: databaseServerName
+    serverVersion: databaseServerVersion
     skuName: databaseSkuName
     skuTier: databaseSkuTier
     storageSizeGB: databaseStorageSizeGB
@@ -301,7 +303,7 @@ param additionalSecrets object = {}
 param additionalVolumesAndMounts array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, database, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup, portalEngineStorageAccount]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup, portalEngineStorageAccount]
   params: {
     location: location
     fullProvision: fullProvision
@@ -318,6 +320,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseName: databaseName
     databasePasswordSecretNameInKeyVault: databasePasswordSecretName
     databaseServerName: databaseServerName
+    databaseServerVersion: databaseServerVersion
     databaseUser: databaseAdminUsername
     provisionInit: provisionInit
     initContainerAppJobName: initContainerAppJobName
