@@ -2,14 +2,8 @@ param location string = resourceGroup().location
 
 param servicePrincipalId string
 param containerRegistryName string
-param provisionInit bool
-param initContainerAppJobName string
-param phpContainerAppName string
-param supervisordContainerAppName string
 param databaseLongTermBackups bool = false
-param databaseServerName string = ''
 param databaseBackupsStorageAccountName string = ''
-param fileStorageAccountName string = ''
 param keyVaultName string
 param keyVaultResourceGroupName string = resourceGroup().name
 
