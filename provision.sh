@@ -29,7 +29,8 @@ echo "Provisioning the Azure environment..."
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file ./bicep/main.bicep \
-  --parameters @$1
+  --parameters @$1 \
+  --parameters fullProvision=true
 
 PROVISION_SERVICE_PRINCIPAL=$(jq -r '.parameters.provisionServicePrincipal.value' $1) #alternative operator (//) does not work here because "false" makes it always execute
 if [ "${PROVISION_SERVICE_PRINCIPAL}" = "null" ] || [ "${PROVISION_SERVICE_PRINCIPAL}" = true ]

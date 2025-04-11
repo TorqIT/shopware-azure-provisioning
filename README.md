@@ -96,11 +96,15 @@ Note that all backups are stored using Local Redundancy (see https://learn.micro
 
 ## Configuring CI/CD
 
-See https://github.com/TorqIT/pimcore-github-actions-workflows for examples of GitHub Actions workflows that can be used to deploy to Container Apps, in particular the `container-apps-*.yml` files.
+See https://github.com/TorqIT/pimcore-github-actions-workflows for examples of GitHub Actions workflows that can be used to deploy to Container Apps.
 
 ## Updating an existing environment
 
 Bicep files are declarative, meaning that they declare the desired state of your resources. This means that you can deploy using the same files multiple times, and only the new changes that you've made will be applied. If you wish to change any resource names or properties, simply update them in your `parameters.json` file and re-run `./provision.sh parameters.json`. Keeping the `parameters.json` files committed in your source control is a good practice as it will allow you to maintain a snapshot of your environment's state.
+
+## "Full" vs "quick" provisioning
+
+The `provision.sh` script provides the `main.bicep` file with the parameter `fullProvision` set to `true`. This means that everything declared in `main.bicep` will be deployed. `provision-quick.sh`, on the other hand, sets the value to `false` and skips several steps for modules and resources in order to achieve a faster deployment. It also skips steps that require higher permissions, such as role assignments. A common use case for this script is within a CI/CD workflow, where a full deployment is not usually necessary when a developer may simply want to change an environment variable, SKU tier or Container App resource.
 
 ## Useful scripts
 
