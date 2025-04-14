@@ -1,6 +1,9 @@
 param location string = resourceGroup().location
 
+param fullProvision bool
+
 param serverName string
+param serverVersion string
 
 param administratorLogin string
 @secure()
@@ -51,7 +54,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
     tier: skuTier
   }
   properties: {
-    version: '8.0.21'
+    version: serverVersion
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorPassword
     storage: {
@@ -123,7 +126,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-03-01' = {
 //   }
 // }
 
-module databaseBackupsStorageAccount './database-backups-storage-account.bicep' = if (longTermBackups) {
+module databaseBackupsStorageAccount './database-backups-storage-account.bicep' = if (fullProvision && longTermBackups) {
   name: 'database-backups-storage-account'
   params: {
     storageAccountName: databaseBackupsStorageAccountName

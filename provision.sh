@@ -29,7 +29,8 @@ echo "Provisioning the Azure environment..."
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file ./bicep/main.bicep \
-  --parameters @$1
+  --parameters @$1 \
+  --parameters fullProvision=true
 
 PROVISION_SERVICE_PRINCIPAL=$(jq -r '.parameters.provisionServicePrincipal.value' $1) #alternative operator (//) does not work here because "false" makes it always execute
 if [ "${PROVISION_SERVICE_PRINCIPAL}" = "null" ] || [ "${PROVISION_SERVICE_PRINCIPAL}" = true ]
@@ -44,11 +45,7 @@ then
     SERVICE_PRINCIPAL_ID=$(az ad sp list --display-name $SERVICE_PRINCIPAL_NAME --query "[].{spID:id}" --output tsv)
   fi
 
-  INIT_CONTAINER_APP_JOB_NAME=$(jq -r '.parameters.initContainerAppJobName.value' $1)
-  PHP_CONTAINER_APP_NAME=$(jq -r '.parameters.phpContainerAppName.value' $1)
-  SUPERVISORD_CONTAINER_APP_NAME=$(jq -r '.parameters.supervisordContainerAppName.value // empty' $1)
   DATABASE_LONG_TERM_BACKUPS=$(jq -r '.parameters.databaseLongTermBackups.value // empty' $1)
-  DATABASE_SERVER_NAME=$(jq -r '.parameters.databaseServerName.value // empty' $1)
   DATABASE_BACKUPS_STORAGE_ACCOUNT_NAME=$(jq -r '.parameters.databaseBackupsStorageAccountName.value // empty' $1)
   echo "Assigning roles for service principal..."
   az deployment group create \
@@ -57,11 +54,7 @@ then
     --parameters \
       servicePrincipalId=$SERVICE_PRINCIPAL_ID \
       containerRegistryName=$CONTAINER_REGISTRY_NAME \
-      initContainerAppJobName=$INIT_CONTAINER_APP_JOB_NAME \
-      phpContainerAppName=$PHP_CONTAINER_APP_NAME \
-      supervisordContainerAppName=$SUPERVISORD_CONTAINER_APP_NAME \
       databaseLongTermBackups=$DATABASE_LONG_TERM_BACKUPS \
-      databaseServerName=$DATABASE_SERVER_NAME \
       databaseBackupsStorageAccountName=$DATABASE_BACKUPS_STORAGE_ACCOUNT_NAME \
       keyVaultName=$KEY_VAULT_NAME \
       keyVaultResourceGroupName=$KEY_VAULT_RESOURCE_GROUP_NAME

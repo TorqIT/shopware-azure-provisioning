@@ -1,5 +1,7 @@
 param location string = resourceGroup().location
 
+param fullProvision bool
+
 param containerAppsEnvironmentName string
 param containerAppsEnvironmentUseWorkloadProfiles bool
 
@@ -14,6 +16,7 @@ param keyVaultName string
 param databaseServerName string
 param databaseName string
 param databaseUser string
+param databaseServerVersion string
 @secure()
 param databasePassword string
 
@@ -93,13 +96,18 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
 
 // SECRETS
 // Managed Identity allowing the Container App resources to pull secrets directly from the Key Vault
-module managedIdentityForKeyVault './secrets/container-apps-key-vault-managed-identitity.bicep' = {
+var managedIdentityName = '${resourceGroup().name}-container-app-managed-id'
+module managedIdentityForKeyVaultModule './secrets/container-apps-key-vault-managed-identitity.bicep' = if (fullProvision) {
   name: 'container-apps-key-vault-managed-identity'
   params: {
     location: location
+    name: managedIdentityName
+    fullProvision: fullProvision
     keyVaultName: keyVaultName
-    resourceGroupName: resourceGroup().name
   }
+}
+resource managedIdentityForKeyVault 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
+  name: managedIdentityName
 }
 // Set up common secrets for the init, PHP and supervisord Container Apps 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
@@ -143,7 +151,7 @@ module additionalSecretsModule './secrets/container-apps-additional-secrets.bice
   params: {
     keyVaultName: keyVaultName
     secrets: additionalSecrets
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
   }
 }
 
@@ -166,6 +174,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     opensearchUrl: opensearchUrl
     databaseUrlSecretRefName: databaseUrlSecretRefName
     databaseServerName: databaseServerName
+    databaseServerVersion: databaseServerVersion
     databaseName: databaseName
     databaseUser: databaseUser
     storageAccountName: storageAccountName
@@ -195,7 +204,7 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     appPassword: appPassword
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
     keyVaultName: keyVaultName
     additionalSecrets: additionalSecretsModule.outputs.secrets
     additionalVolumesAndMounts: additionalVolumesAndMounts
@@ -219,7 +228,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     environmentVariables: environmentVariables.outputs.envVars
     customDomains: phpContainerAppCustomDomains
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
@@ -251,7 +260,7 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     containerRegistryPasswordSecret: containerRegistryPasswordSecret
     cpuCores: supervisordContainerAppCpuCores
     memory: supervisordContainerAppMemory
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.outputs.id
+    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
