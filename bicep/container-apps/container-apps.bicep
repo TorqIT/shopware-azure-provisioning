@@ -123,10 +123,7 @@ var containerRegistryConfiguration = {
   username: containerRegistry.listCredentials().username
   passwordSecretRef: containerRegistryPasswordSecretName
 }
-resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2024-02-01-preview' existing = {
-  name: databaseServerName
-}
-var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServer.properties.fullyQualifiedDomainName}/${databaseName}'
+var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServerName}.mysql.database.azure.com/${databaseName}'
 var databaseUrlSecretRefName = 'database-url'
 var databaseUrlSecret = {
   name: databaseUrlSecretRefName
