@@ -1,5 +1,7 @@
 param location string = resourceGroup().location
 
+param fullProvision bool
+
 param storageAccountName string
 param sku string
 param kind string
@@ -100,7 +102,7 @@ module storageAccountPrivateEndpoint './storage-account-private-endpoint.bicep' 
   }
 }
 
-module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (longTermBackups) {
+module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (fullProvision && longTermBackups) {
   name: 'storage-account-backup-vault'
   dependsOn: [storageAccount]
   params: {

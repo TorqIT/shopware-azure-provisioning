@@ -19,15 +19,12 @@ param storageAccountPrivateContainerName string
 param storageAccountKeySecretRefName string
 
 param databaseServerName string
+param databaseServerVersion string
 param databaseName string
 param databaseUser string
 param databaseUrlSecretRefName string
 
 param additionalVars array
-
-resource database 'Microsoft.DBforMySQL/flexibleServers@2021-12-01-preview' existing = {
-  name: databaseServerName
-}
 
 var defaultEnvVars = [
   {
@@ -80,7 +77,7 @@ var defaultEnvVars = [
   }
   {
     name: 'DATABASE_HOST'
-    value: database.properties.fullyQualifiedDomainName
+    value: '${databaseServerName}.mysql.database.azure.com'
   }
   {
     name: 'DATABASE_PORT'
@@ -121,7 +118,7 @@ var defaultEnvVars = [
   }
   {
     name: 'DATABASE_SERVER_VERSION'
-    value: database.properties.version
+    value: databaseServerVersion
   }
   {
     name: 'AZURE_CDN_URL'

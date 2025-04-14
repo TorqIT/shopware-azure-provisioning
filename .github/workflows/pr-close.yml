@@ -21,10 +21,10 @@ jobs:
           SERVICE_PRINCIPAL_ID: ${{ vars.SERVICE_PRINCIPAL_ID }}
           SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
 
-      - name: Tear down Azure resources when PR is closed
+      - name: Delete Resource Group
+        continue-on-error: true
         run: |
           touch .env
-          echo "Deleting Resource Group..."
           RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' .github/test-files/parameters.json) >> .env
           docker compose \
             --file .github/test-files/docker-compose.yml \
@@ -32,7 +32,9 @@ jobs:
               az group delete \
                 --name $RESOURCE_GROUP \
                 --yes
-          echo "Purging Key Vault..."
+                
+      - name: Purge Key Vault
+        run: |
           KEY_VAULT=$(jq -r '.parameters.keyVaultName.value' .github/test-files/parameters.json) >> .env
           docker compose \
             --file .github/test-files/docker-compose.yml \

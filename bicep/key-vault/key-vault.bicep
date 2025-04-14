@@ -1,7 +1,6 @@
 param location string = resourceGroup().location
 
 param name string
-param localIpAddress string = ''
 
 param virtualNetworkResourceGroupName string = ''
 param virtualNetworkName string = ''
@@ -36,11 +35,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
     networkAcls: {
       defaultAction: 'Deny'
       bypass: 'AzureServices'
-      ipRules: localIpAddress != '' ? [
-        {
-          value: localIpAddress
-        }
-      ] : []
       virtualNetworkRules: virtualNetworkName != '' ? [
         {
           id: subnet.id

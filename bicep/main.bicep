@@ -1,7 +1,9 @@
 param location string = resourceGroup().location
 
-param containerRegistryName string
+@description('Whether to fully provision the environment. If set to false, some longer steps will be assumed to already be provisioned and will be skipped to speed up the process.')
+param fullProvision bool = true
 
+param containerRegistryName string
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
   name: containerRegistryName
 }
@@ -20,7 +22,7 @@ param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 // Consumption plan CAs but not workload profiles, and in general should be avoided
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
 param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/29'
-module virtualNetwork 'virtual-network/virtual-network.bicep' = if (virtualNetworkResourceGroupName == resourceGroup().name) {
+module virtualNetwork 'virtual-network/virtual-network.bicep' = if (fullProvision && virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
     location: location
@@ -45,12 +47,11 @@ param keyVaultName string
 // If set to a value other than the Resource Group used for the rest of the resources, the Key Vault will be assumed to already exist in that Resource Group
 param keyVaultResourceGroupName string = resourceGroup().name
 param keyVaultEnablePurgeProtection bool = true
-module keyVaultModule './key-vault/key-vault.bicep' = if (keyVaultResourceGroupName == resourceGroup().name) {
+module keyVaultModule './key-vault/key-vault.bicep' = if (fullProvision && keyVaultResourceGroupName == resourceGroup().name) {
   name: 'key-vault'
   dependsOn: [virtualNetwork]
   params: {
     name: keyVaultName
-    localIpAddress: localIpAddress
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
     virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
@@ -66,7 +67,7 @@ param privateDnsZonesSubscriptionId string = subscription().id
 param privateDnsZonesResourceGroupName string = resourceGroup().name
 param privateDnsZoneForDatabaseName string = 'privatelink.mysql.database.azure.com'
 param privateDnsZoneForStorageAccountsName string = 'privatelink.blob.${environment().suffixes.storage}'
-module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = {
+module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = if (fullProvision) {
   name: 'private-dns-zones'
   params:{
     privateDnsZonesSubscriptionId: privateDnsZonesSubscriptionId
@@ -80,7 +81,7 @@ module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = {
 
 // Backup Vault
 param backupVaultName string = ''
-module backupVault 'backup-vault/backup-vault.bicep' = if (/*databaseLongTermBackups || */storageAccountLongTermBackups) {
+module backupVault 'backup-vault/backup-vault.bicep' = if (fullProvision && storageAccountLongTermBackups) {
   name: 'backup-vault'
   params: {
     name: backupVaultName
@@ -100,11 +101,12 @@ param storageAccountPrivateEndpointName string = '${storageAccountName}-private-
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = false
 param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
-module storageAccount 'storage-account/storage-account.bicep' = {
+module storageAccount 'storage-account/storage-account.bicep' = if (fullProvision) {
   name: 'storage-account'
   dependsOn: [virtualNetwork, backupVault]
   params: {
     location: location
+    fullProvision: fullProvision
     storageAccountName: storageAccountName
     publicContainerName: storageAccountPublicContainerName
     privateContainerName: storageAccountPrivateContainerName
@@ -129,7 +131,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
 param fileStorageAccountName string = ''
 param fileStorageAccountSku string = 'Premium_LRS'
 param fileStorageAccountFileShares array = []
-module fileStorage './file-storage/file-storage.bicep' = if (!empty(fileStorageAccountName)) {
+module fileStorage './file-storage/file-storage.bicep' = if (fullProvision && !empty(fileStorageAccountName)) {
   name: 'file-storage-account'
   dependsOn: [virtualNetwork]
   params: {
@@ -174,6 +176,7 @@ module criticalMetricAlertsActionGroup 'insights/metric-alerts/metrics-action-gr
 
 // Database
 param databaseServerName string
+param databaseServerVersion string = '8.0.21'
 param databaseAdminUsername string = 'adminuser'
 param databaseAdminPasswordSecretName string = 'database-admin-password'
 param databaseSkuName string = 'Standard_B2s'
@@ -194,10 +197,12 @@ module database 'database/database.bicep' = {
   dependsOn: [virtualNetwork, backupVault, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
     location: location
+    fullProvision: fullProvision
     administratorLogin: databaseAdminUsername
     administratorPassword: keyVault.getSecret(databaseAdminPasswordSecretName)
     databaseName: databaseName
     serverName: databaseServerName
+    serverVersion: databaseServerVersion
     skuName: databaseSkuName
     skuTier: databaseSkuTier
     storageSizeGB: databaseStorageSizeGB
@@ -283,9 +288,10 @@ param additionalSecrets object = {}
 param additionalVolumesAndMounts array = []
 module containerApps 'container-apps/container-apps.bicep' = {
   name: 'container-apps'
-  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, database, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
+  dependsOn: [virtualNetwork, containerRegistry, logAnalyticsWorkspace, storageAccount, fileStorage, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
     location: location
+    fullProvision: fullProvision
     additionalEnvVars: additionalEnvVars
     additionalSecrets: additionalSecrets.array
     additionalVolumesAndMounts: additionalVolumesAndMounts
@@ -337,6 +343,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     databaseUser: databaseAdminUsername
     databasePassword: keyVault.getSecret(databaseAdminPasswordSecretName)
     databaseName: databaseName
+    databaseServerVersion: databaseServerVersion
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountPrivateContainerName: storageAccountPrivateContainerName
@@ -360,7 +367,7 @@ param servicesVmPublicKeyKeyVaultSecretName string = 'services-vm-public-key'
 param servicesVmSize string = 'Standard_B2s'
 param servicesVmUbuntuOSVersion string = 'Ubuntu-2204'
 param servicesVmFirewallIpsForSsh array = []
-module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (provisionServicesVM) {
+module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = if (fullProvision && provisionServicesVM) {
   name: 'services-virtual-machine'
   dependsOn: [virtualNetwork]
   params: {
@@ -372,7 +379,7 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: servicesVmSubnetName
-    firewallIpsForSsh: !empty(localIpAddress) ? concat([localIpAddress], servicesVmFirewallIpsForSsh) : servicesVmFirewallIpsForSsh
+    firewallIpsForSsh: servicesVmFirewallIpsForSsh
   }
 }
 
@@ -386,8 +393,8 @@ param tenantId string = ''
 param servicePrincipalName string = ''
 param containerRegistrySku string = ''
 param keyVaultGenerateRandomSecrets bool = false
-param localIpAddress string = ''
 param provisionServicePrincipal bool = true
 // DEPRECATED parameters
 param databasePublicNetworkAccess bool = false
 param waitForKeyVaultManualIntervention bool = false
+param localIpAddress string = ''
