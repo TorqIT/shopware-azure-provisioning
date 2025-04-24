@@ -16,11 +16,15 @@ if [ $(az group exists --name $RESOURCE_GROUP) = false ]; then
       location=$LOCATION
 fi
 
+# Provisioning the Key Vault as a first step allows us to deploy some necessary secrets to it before 
+# provisioning the other resources
+# TODO this may be possible with deployment scripts?
 . ./provisioning-scripts/provision-key-vault.sh $1
 
 # Because we need to run some non-Bicep scripts after deploying the Container Registry (but before
 # deploying the other resources), we create the Container Registry separately here before running the
 # main Bicep file.
+# TODO this may be possible with deployment scripts?
 . ./provisioning-scripts/provision-container-registry.sh $1
 . ./provisioning-scripts/push-container-registry-images.sh $1
 . ./provisioning-scripts/purge-container-registry-task.sh $1

@@ -3,11 +3,6 @@ param location string = resourceGroup().location
 @description('Whether to fully provision the environment. If set to false, some longer steps will be assumed to already be provisioned and will be skipped to speed up the process.')
 param fullProvision bool = true
 
-param containerRegistryName string
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
-  name: containerRegistryName
-}
-
 // Virtual Network
 param virtualNetworkName string
 param virtualNetworkAddressSpace string = '10.0.0.0/16'
@@ -21,7 +16,7 @@ param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 // is incorrect as such a subnet should be only occupied by the Container Apps. This setup works fine for
 // Consumption plan CAs but not workload profiles, and in general should be avoided
 param virtualNetworkPrivateEndpointsSubnetName string = virtualNetworkContainerAppsSubnetName
-param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/29'
+param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/28'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (fullProvision && virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
@@ -67,19 +62,39 @@ resource keyVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
   scope: resourceGroup(keyVaultResourceGroupName)
 }
 
-param privateDnsZonesSubscriptionId string = subscription().id
 param privateDnsZonesResourceGroupName string = resourceGroup().name
 param privateDnsZoneForDatabaseName string = 'privatelink.mysql.database.azure.com'
 param privateDnsZoneForStorageAccountsName string = 'privatelink.blob.${environment().suffixes.storage}'
 module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = if (fullProvision) {
   name: 'private-dns-zones'
   params:{
-    privateDnsZonesSubscriptionId: privateDnsZonesSubscriptionId
     privateDnsZonesResourceGroupName: privateDnsZonesResourceGroupName
-    privateDnsZoneForDatabaseName: privateDnsZoneForDatabaseName
-    privateDnsZoneForStorageAccountsName: privateDnsZoneForStorageAccountsName
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    provisionZoneForContainerRegistry: containerRegistrySku == 'Premium' // Private VNet integration is currently only possible on Premium tier Container Registries
+  }
+}
+
+// Container Registry
+param containerRegistryName string
+param containerRegistrySku string = ''
+param containerRegistryFirewallIps array = []
+param containerRegistryPrivateEndpointName string = '${containerRegistryName}-private-endpoint'
+param containerRegistryPrivateEndpointNicName string = ''
+module containerRegistry './container-registry/container-registry.bicep' = if (fullProvision) {
+  name: 'container-registry'
+  dependsOn: [virtualNetwork]
+  params: {
+    location: location
+    containerRegistryName: containerRegistryName
+    sku: containerRegistrySku
+    firewallIps: containerRegistryFirewallIps
+    privateDnsZoneId:privateDnsZones.outputs.zoneIdForContainerRegistry
+    privateEndpointName: containerRegistryPrivateEndpointName
+    privateEndpointNicName: containerRegistryPrivateEndpointNicName
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
+    virtualNetworkSubnetName: virtualNetworkPrivateEndpointsSubnetName
   }
 }
 
@@ -519,7 +534,6 @@ param subscriptionId string = ''
 param resourceGroupName string = ''
 param tenantId string = ''
 param servicePrincipalName string = ''
-param containerRegistrySku string = ''
 param keyVaultGenerateRandomSecrets bool = false
 param provisionServicePrincipal bool = true
 // DEPRECATED parameters

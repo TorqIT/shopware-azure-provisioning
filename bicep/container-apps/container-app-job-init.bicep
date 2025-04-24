@@ -15,7 +15,6 @@ param additionalSecrets array
 param additionalVolumesAndMounts array
 
 param containerRegistryName string
-param containerRegistryConfiguration object
 
 param databaseServerName string
 param databaseUser string
@@ -28,14 +27,12 @@ param keyVaultName string
 param runPimcoreInstall bool
 
 @secure()
-param containerRegistryPasswordSecret object
-@secure()
 param storageAccountKeySecret object
 
 param databasePasswordSecret object
 param pimcoreAdminPasswordSecretName string
 
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -61,9 +58,9 @@ resource pimcoreAdminPasswordInKeyVault 'Microsoft.KeyVault/vaults/secrets@2024-
 var adminPasswordSecret = {
   name: 'admin-psswd'
   keyVaultUrl: pimcoreAdminPasswordInKeyVault.properties.secretUri
-  identity: managedIdentityForKeyVaultId
+  identity: managedIdentityId
 }
-var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret, adminPasswordSecret]
+var defaultSecrets = [databasePasswordSecret, storageAccountKeySecret, adminPasswordSecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
 var secrets = concat(defaultSecrets, additionalSecrets, portalEngineSecrets)
 
@@ -122,7 +119,7 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -138,7 +135,10 @@ resource containerAppJob 'Microsoft.App/jobs@2023-05-02-preview' = {
         }
       }
       registries: [
-        containerRegistryConfiguration
+        {
+          identity: managedIdentityId
+          server: '${containerRegistryName}.azurecr.io'
+        }
       ]
     }
     template: {

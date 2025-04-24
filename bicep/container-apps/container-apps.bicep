@@ -128,18 +128,18 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
 }
 
 // SECRETS
-// Managed Identity allowing the Container App resources to pull secrets directly from the Key Vault
+// Managed Identity allowing the Container App resources access other resources directly (e.g. Key Vault, Container Registry)
 var managedIdentityName = '${resourceGroup().name}-container-app-managed-id'
-module managedIdentityForKeyVaultModule './secrets/container-apps-key-vault-managed-identitity.bicep' = if (fullProvision) {
-  name: 'container-apps-key-vault-managed-identity'
+module managedIdentityModule './identity/container-apps-managed-identitity.bicep' = if (fullProvision) {
+  name: 'container-apps-managed-identity'
   params: {
     location: location
     name: managedIdentityName
-    fullProvision: fullProvision
     keyVaultName: keyVaultName
+    containerRegistryName: containerRegistryName
   }
 }
-resource managedIdentityForKeyVault 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
   name: managedIdentityName
 }
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
@@ -149,18 +149,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 var databasePasswordSecretRefName = 'database-password'
 var portalEngineStorageAccountSecretRefName = 'portal-engine-storage-account-key'
 var storageAccountKeySecretRefName = 'storage-account-key'
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
-  name: containerRegistryName
-}
-var containerRegistryPasswordSecret = {
-  name: 'container-registry-password'
-  value: containerRegistry.listCredentials().passwords[0].value
-}
-var containerRegistryConfiguration = {
-  server: '${containerRegistryName}.azurecr.io'
-  username: containerRegistry.listCredentials().username
-  passwordSecretRef: 'container-registry-password'
-}
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
@@ -175,7 +163,7 @@ resource databasePasswordSecretInKeyVault 'Microsoft.KeyVault/vaults/secrets@202
 var databasePasswordSecret = {
   name: databasePasswordSecretRefName
   keyVaultUrl: databasePasswordSecretInKeyVault.properties.secretUri
-  identity: managedIdentityForKeyVault.id
+  identity: managedIdentity.id
 }
 // Optional additional secrets, assumed to exist in Key Vault
 module additionalSecretsModule './secrets/container-apps-additional-secrets.bicep' = {
@@ -183,7 +171,7 @@ module additionalSecretsModule './secrets/container-apps-additional-secrets.bice
   params: {
     secrets: additionalSecrets
     keyVaultName: keyVaultName
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityForKeyVaultId: managedIdentity.id
   }
 }
 // Optional Portal Engine secrets
@@ -238,17 +226,15 @@ module initContainerAppJob 'container-app-job-init.bicep' = if (provisionInit) {
     memory: initContainerAppJobMemory
     replicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
     containerAppsEnvironmentName: containerAppsEnvironmentName
-    containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
     storageAccountKeySecret: storageAccountKeySecret
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databasePasswordSecret: databasePasswordSecret
     defaultEnvVars: environmentVariables.outputs.envVars
     databaseServerName: databaseServerName
     databaseName: databaseName
     databaseUser: databaseUser
     runPimcoreInstall: initContainerAppJobRunPimcoreInstall
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityId: managedIdentity.id
     keyVaultName: keyVaultName
     pimcoreAdminPasswordSecretName: pimcoreAdminPasswordSecretName
     additionalSecrets: additionalSecretsModule.outputs.secrets
@@ -270,7 +256,6 @@ module phpContainerApp 'container-app-php.bicep' = {
     containerAppName: phpContainerAppName
     imageName: phpContainerAppImageName
     environmentVariables: environmentVariables.outputs.envVars
-    containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
     cpuCores: phpContainerAppCpuCores
     memory: phpContainerAppMemory
@@ -279,8 +264,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     maxReplicas: phpContainerAppMaxReplicas
     customDomains: phpContainerAppCustomDomains
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
+    managedIdentityId: managedIdentity.id
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
@@ -309,12 +293,10 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     containerAppName: supervisordContainerAppName
     imageName: supervisordContainerAppImageName
     environmentVariables: environmentVariables.outputs.envVars
-    containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
     cpuCores: supervisordContainerAppCpuCores
     memory: supervisordContainerAppMemory
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityId: managedIdentity.id
     databasePasswordSecret: databasePasswordSecret
     storageAccountKeySecret: storageAccountKeySecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
@@ -354,7 +336,7 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
     customDomains: n8nContainerAppCustomDomains
     volumeName: n8nContainerAppVolumeName
     keyVaultName: keyVaultName
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityForKeyVaultId: managedIdentity.id
     storageAccountName: n8nStorageAccountName
     storageAccountFileShareName: n8nStorageAccountFileShareName
     databaseServerName: n8nDatabaseServerName

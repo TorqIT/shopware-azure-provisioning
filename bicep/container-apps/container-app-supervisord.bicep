@@ -5,12 +5,9 @@ param containerAppName string
 param imageName string
 param environmentVariables array
 param containerRegistryName string
-param containerRegistryConfiguration object
-@secure()
-param containerRegistryPasswordSecret object
 param cpuCores string
 param memory string
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
 
 @secure()
 param databasePasswordSecret object
@@ -29,7 +26,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
+var defaultSecrets = [databasePasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
 var secrets = concat(defaultSecrets, portalEngineSecrets, additionalSecrets)
 
@@ -48,7 +45,7 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2024-10-02-preview
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -57,7 +54,10 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2024-10-02-preview
       activeRevisionsMode: 'Single'
       secrets: secrets
       registries: [
-        containerRegistryConfiguration
+        {
+          identity: managedIdentityId
+          server: '${containerRegistryName}.azurecr.io'
+        }
       ]
     }
     template: {

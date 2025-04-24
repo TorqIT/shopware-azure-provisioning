@@ -5,7 +5,6 @@ param containerAppName string
 param imageName string
 param environmentVariables array
 param containerRegistryName string
-param containerRegistryConfiguration object
 param customDomains array
 param cpuCores string
 param memory string
@@ -13,12 +12,10 @@ param useProbes bool
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
 
 @secure()
 param databasePasswordSecret object
-@secure()
-param containerRegistryPasswordSecret object
 @secure()
 param storageAccountKeySecret object
 param additionalSecrets array
@@ -48,7 +45,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
 }]
 
 // Secrets
-var defaultSecrets = [databasePasswordSecret, containerRegistryPasswordSecret, storageAccountKeySecret]
+var defaultSecrets = [databasePasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
 var secrets = concat(defaultSecrets, portalEngineSecrets, additionalSecrets)
 
@@ -78,7 +75,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -87,7 +84,10 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
       activeRevisionsMode: 'Multiple'
       secrets: secrets
       registries: [
-        containerRegistryConfiguration
+        {
+          server: '${containerRegistryName}.azurecr.io'
+          identity: managedIdentityId
+        }
       ]
       ingress: {
         // Slightly confusing - when we want to restrict access to this container to within the VNet, 
