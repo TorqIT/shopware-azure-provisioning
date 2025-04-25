@@ -15,7 +15,6 @@ param internalPort int
 param additionalVolumesAndMounts array
 
 param containerRegistryName string
-param containerRegistryConfiguration object
 
 @secure()
 param databaseUrlSecret object
