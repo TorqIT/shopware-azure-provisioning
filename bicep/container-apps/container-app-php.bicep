@@ -9,16 +9,13 @@ param memory string
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
 param environmentVariables array
 param internalPort int
 param additionalVolumesAndMounts array
 
 param containerRegistryName string
-param containerRegistryConfiguration object
 
-@secure()
-param containerRegistryPasswordSecret object
 @secure()
 param databaseUrlSecret object
 @secure()
@@ -45,7 +42,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
 }]
 
 // Secrets
-var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+var defaultSecrets = [databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
@@ -72,7 +69,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -81,7 +78,10 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
       activeRevisionsMode: 'Multiple'
       secrets: secrets
       registries: [
-        containerRegistryConfiguration
+        {
+          server: '${containerRegistryName}.azurecr.io'
+          identity: managedIdentityId
+        }
       ]
       ingress: {
         // Slightly confusing - when we want to restrict access to this container to within the VNet, 

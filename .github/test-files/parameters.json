@@ -29,6 +29,12 @@
     "containerRegistryName": {
       "value": "shopwareazurecrtest"
     },
+    "containerRegistrySku": {
+      "value": "Basic"
+    },
+    "containerRegistrySku": {
+      "value": "Premium"
+    },
     "virtualNetworkName": {
       "value": "shopware-azure-vnet-test"
     },
