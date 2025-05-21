@@ -105,6 +105,10 @@ param n8nContainerAppCronScaleRuleStartSchedule string
 param n8nContainerAppCronScaleRuleEndSchedule string
 param n8nContainerAppCronScaleRuleTimezone string
 
+// ENVIRONMENT
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
   params: {
@@ -115,7 +119,8 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsCustomerId: logAnalyticsWorkspace.properties.customerId
+    logAnalyticsSharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
 
     // Optional Portal Engine storage mount
     provisionForPortalEngine: provisionForPortalEngine
@@ -322,6 +327,9 @@ module redisContainerApp 'container-app-redis.bicep' = {
 }
 
 // Optional n8n Container App
+resource n8nStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = if (provisionN8N) {
+  name: storageAccountName
+}
 module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
   name: 'n8n-container-app'
   dependsOn: [containerAppsEnvironment]
@@ -338,6 +346,7 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
     keyVaultName: keyVaultName
     managedIdentityForKeyVaultId: managedIdentity.id
     storageAccountName: n8nStorageAccountName
+    storageAccountKey: n8nStorageAccount.listKeys().keys[0].value
     storageAccountFileShareName: n8nStorageAccountFileShareName
     databaseServerName: n8nDatabaseServerName
     databaseName: n8nDatabaseName

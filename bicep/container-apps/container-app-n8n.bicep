@@ -1,6 +1,8 @@
 param location string = resourceGroup().location
 
 param storageAccountName string
+@secure()
+param storageAccountKey string
 param storageAccountFileShareName string
 
 param keyVaultName string
@@ -32,10 +34,6 @@ resource database 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview'
   name: databaseServerName
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
-  name: storageAccountName
-}
-
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-11-02-preview' existing = {
   name: containerAppsEnvironmentName
 }
@@ -46,7 +44,7 @@ resource storageMount 'Microsoft.App/managedEnvironments/storages@2023-11-02-pre
   properties: {
     azureFile: {
       accountName: storageAccountName
-      accountKey: storageAccount.listKeys().keys[0].value
+      accountKey: storageAccountKey
       shareName: storageAccountFileShareName
       accessMode: 'ReadWrite'
     }

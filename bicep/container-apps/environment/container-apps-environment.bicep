@@ -8,7 +8,9 @@ param virtualNetworkName string
 param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
-param logAnalyticsWorkspaceName string
+param logAnalyticsCustomerId string
+@secure()
+param logAnalyticsSharedKey string
 
 param provisionForPortalEngine bool
 param portalEngineStorageAccountName string
@@ -27,10 +29,6 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
 }
 var subnetId = subnet.id
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: logAnalyticsWorkspaceName
-}
-
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name
   location: location
@@ -48,8 +46,8 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logAnalyticsWorkspace.properties.customerId
-        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
+        customerId: logAnalyticsCustomerId
+        sharedKey: logAnalyticsSharedKey
       }
     }
   }
@@ -80,11 +78,15 @@ module storageMount './container-apps-environment-mount.bicep' = [for volumeAndM
   }
 }]
 
+resource portalEngineStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = if (provisionForPortalEngine) {
+  name: portalEngineStorageAccountName
+}
 module portalEngineStorageMount './container-apps-environment-portal-engine-mount.bicep' = if (provisionForPortalEngine) {
   name: 'portal-engine-storage-mount'
   params: {
     containerAppsEnvironmentName: containerAppsEnvironment.name
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
+    portalEngineStorageAccountKey: portalEngineStorageAccount.listKeys().keys[0].value
     portalEngineStorageAccountName: portalEngineStorageAccountName
     portalEngineStorageAccountPublicBuildFileShareName: portalEngineStorageAccountPublicBuildFileShareName
   }
