@@ -79,6 +79,10 @@ param provisionMetricAlerts bool
 param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
 
+// ENVIRONMENT
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
   params: {
@@ -89,39 +93,26 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsCustomerId: logAnalyticsWorkspace.properties.customerId
+    logAnalyticsSharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
     additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
 
 // SECRETS
-// Managed Identity allowing the Container App resources to pull secrets directly from the Key Vault
+// Managed Identity allowing the Container App resources access other resources directly (e.g. Key Vault, Container Registry)
 var managedIdentityName = '${resourceGroup().name}-container-app-managed-id'
-module managedIdentityForKeyVaultModule './secrets/container-apps-key-vault-managed-identitity.bicep' = if (fullProvision) {
-  name: 'container-apps-key-vault-managed-identity'
+module managedIdentityModule './identity/container-apps-managed-identitity.bicep' = if (fullProvision) {
+  name: 'container-apps-managed-identity'
   params: {
     location: location
     name: managedIdentityName
-    fullProvision: fullProvision
     keyVaultName: keyVaultName
+    containerRegistryName: containerRegistryName
   }
 }
-resource managedIdentityForKeyVault 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
   name: managedIdentityName
-}
-// Set up common secrets for the init, PHP and supervisord Container Apps 
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-09-01' existing = {
-  name: containerRegistryName
-}
-var containerRegistryPasswordSecretName = 'container-registry-password'
-var containerRegistryPasswordSecret = {
-  name: containerRegistryPasswordSecretName
-  value: containerRegistry.listCredentials().passwords[0].value
-}
-var containerRegistryConfiguration = {
-  server: '${containerRegistryName}.azurecr.io'
-  username: containerRegistry.listCredentials().username
-  passwordSecretRef: containerRegistryPasswordSecretName
 }
 var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServerName}.mysql.database.azure.com/${databaseName}'
 var databaseUrlSecretRefName = 'database-url'
@@ -148,7 +139,7 @@ module additionalSecretsModule './secrets/container-apps-additional-secrets.bice
   params: {
     keyVaultName: keyVaultName
     secrets: additionalSecrets
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityForKeyVaultId: managedIdentity.id
   }
 }
 
@@ -194,14 +185,12 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     replicaTimeoutSeconds: initContainerAppJobReplicaTimeoutSeconds
     environmentVariables: environmentVariables.outputs.envVars
     containerAppsEnvironmentName: containerAppsEnvironmentName
-    containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     appPassword: appPassword
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityId: managedIdentity.id
     keyVaultName: keyVaultName
     additionalSecrets: additionalSecretsModule.outputs.secrets
     additionalVolumesAndMounts: additionalVolumesAndMounts
@@ -216,7 +205,6 @@ module phpContainerApp 'container-app-php.bicep' = {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppName: phpContainerAppName
     imageName: phpContainerAppImageName
-    containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
     cpuCores: phpContainerAppCpuCores
     memory: phpContainerAppMemory
@@ -225,8 +213,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     environmentVariables: environmentVariables.outputs.envVars
     customDomains: phpContainerAppCustomDomains
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
+    managedIdentityId: managedIdentity.id
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
@@ -252,12 +239,10 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     containerAppName: supervisordContainerAppName
     imageName: supervisordContainerAppImageName
     environmentVariables: environmentVariables.outputs.envVars
-    containerRegistryConfiguration: containerRegistryConfiguration
     containerRegistryName: containerRegistryName
-    containerRegistryPasswordSecret: containerRegistryPasswordSecret
     cpuCores: supervisordContainerAppCpuCores
     memory: supervisordContainerAppMemory
-    managedIdentityForKeyVaultId: managedIdentityForKeyVault.id
+    managedIdentityId: managedIdentity.id
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret

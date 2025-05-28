@@ -8,7 +8,9 @@ param virtualNetworkName string
 param virtualNetworkResourceGroup string
 param virtualNetworkSubnetName string
 
-param logAnalyticsWorkspaceName string
+param logAnalyticsCustomerId string
+@secure()
+param logAnalyticsSharedKey string
 
 param additionalVolumesAndMounts array
 
@@ -21,10 +23,6 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing 
   name: virtualNetworkSubnetName
 }
 var subnetId = subnet.id
-
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: logAnalyticsWorkspaceName
-}
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name
@@ -43,8 +41,8 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logAnalyticsWorkspace.properties.customerId
-        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
+        customerId: logAnalyticsCustomerId
+        sharedKey: logAnalyticsSharedKey
       }
     }
   }

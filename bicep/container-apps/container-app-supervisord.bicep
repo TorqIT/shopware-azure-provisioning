@@ -5,12 +5,10 @@ param containerAppName string
 param imageName string
 param environmentVariables array
 param containerRegistryName string
-param containerRegistryConfiguration object
-@secure()
-param containerRegistryPasswordSecret object
 param cpuCores string
 param memory string
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
+
 param additionalVolumesAndMounts array
 
 @secure()
@@ -26,7 +24,7 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
 }
 var containerAppsEnvironmentId = containerAppsEnvironment.id
 
-var defaultSecrets = [databaseUrlSecret, containerRegistryPasswordSecret, storageAccountKeySecret, appSecretSecret]
+var defaultSecrets = [databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
@@ -42,7 +40,7 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2024-10-02-preview
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -51,7 +49,10 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2024-10-02-preview
       activeRevisionsMode: 'Single'
       secrets: secrets
       registries: [
-        containerRegistryConfiguration
+        {
+          identity: managedIdentityId
+          server: '${containerRegistryName}.azurecr.io'
+        }
       ]
     }
     template: {

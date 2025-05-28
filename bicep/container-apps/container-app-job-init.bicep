@@ -13,9 +13,7 @@ param additionalVolumesAndMounts array
 
 param containerRegistryName string
 param containerRegistryConfiguration object
-@secure()
-param containerRegistryPasswordSecret object
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
 
 @secure()
 param databaseUrlSecret object
@@ -45,7 +43,7 @@ var appPasswordEnvVar = {
   name: 'APP_PASSWORD'
   secretRef: appPasswordSecretRefName
 }
-var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret, appPasswordSecret]
+var defaultSecrets = [databaseUrlSecret, storageAccountKeySecret, appSecretSecret, appPasswordSecret]
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
@@ -61,7 +59,7 @@ resource containerAppJob 'Microsoft.App/jobs@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -77,7 +75,10 @@ resource containerAppJob 'Microsoft.App/jobs@2024-03-01' = {
         }
       }
       registries: [
-        containerRegistryConfiguration
+        {
+          identity: managedIdentityId
+          server: '${containerRegistryName}.azurecr.io'
+        }
       ]
     }
     template: {

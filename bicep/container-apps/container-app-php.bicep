@@ -72,7 +72,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${managedIdentityForKeyVaultId}': {}
+      '${managedIdentityId}': {}
     }
   }
   properties: {
@@ -81,7 +81,10 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
       activeRevisionsMode: 'Multiple'
       secrets: secrets
       registries: [
-        containerRegistryConfiguration
+        {
+          server: '${containerRegistryName}.azurecr.io'
+          identity: managedIdentityId
+        }
       ]
       ingress: {
         // Slightly confusing - when we want to restrict access to this container to within the VNet, 

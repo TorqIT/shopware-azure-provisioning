@@ -4,7 +4,16 @@ param cronScaleRuleStartSchedule string
 param cronScaleRuleEndSchedule string
 param cronScaleRuleTimezone string
 
-var defaultScaleRules = []
+var defaultScaleRules = [
+  {
+    name: 'default-http-scale-rule'
+    http: {
+      metadata: {
+        concurrentRequests: string(50)
+      }
+    }
+  }
+]
 
 module cronScaleRule './container-app-cron-scale-rule.bicep' = if (provisionCronScaleRule) {
   name: 'cron-scale-rule'
