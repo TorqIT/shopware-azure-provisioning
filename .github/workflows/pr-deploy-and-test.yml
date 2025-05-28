@@ -2,7 +2,7 @@ name: Deploy changes to Azure and test
 
 on:
   pull_request:
-    types: synchronize
+    types: [opened, reopened, synchronize]
 
 concurrency: 
   group: ${{ github.repository }}__${{ github.ref }}-ci
