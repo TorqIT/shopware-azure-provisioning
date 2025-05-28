@@ -9,16 +9,13 @@ param memory string
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
-param managedIdentityForKeyVaultId string
+param managedIdentityId string
 param environmentVariables array
 param internalPort int
 param additionalVolumesAndMounts array
 
 param containerRegistryName string
-param containerRegistryConfiguration object
 
-@secure()
-param containerRegistryPasswordSecret object
 @secure()
 param databaseUrlSecret object
 @secure()
@@ -45,7 +42,7 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
 }]
 
 // Secrets
-var defaultSecrets = [containerRegistryPasswordSecret, databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
+var defaultSecrets = [databaseUrlSecret, storageAccountKeySecret, appSecretSecret]
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {

@@ -7,12 +7,9 @@ param cpuCores string
 param memory string
 param replicaTimeoutSeconds int
 
-param keyVaultName string
-
 param additionalVolumesAndMounts array
 
 param containerRegistryName string
-param containerRegistryConfiguration object
 param managedIdentityId string
 
 @secure()
