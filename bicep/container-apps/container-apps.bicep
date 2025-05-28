@@ -79,6 +79,10 @@ param provisionMetricAlerts bool
 param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
 
+// ENVIRONMENT
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
 module containerAppsEnvironment 'environment/container-apps-environment.bicep' = {
   name: 'container-apps-environment'
   params: {
@@ -89,7 +93,8 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroup: virtualNetworkResourceGroup
     virtualNetworkSubnetName: virtualNetworkSubnetName
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsCustomerId: logAnalyticsWorkspace.properties.customerId
+    logAnalyticsSharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
     additionalVolumesAndMounts: additionalVolumesAndMounts
   }
 }
@@ -109,7 +114,6 @@ module managedIdentityModule './identity/container-apps-managed-identitity.bicep
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = {
   name: managedIdentityName
 }
-// Set up common secrets for the init, PHP and supervisord Container Apps 
 var databaseUrl = 'mysql://${databaseUser}:${databasePassword}@${databaseServerName}.mysql.database.azure.com/${databaseName}'
 var databaseUrlSecretRefName = 'database-url'
 var databaseUrlSecret = {
@@ -187,7 +191,6 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     appSecretSecret: appSecretSecret
     appPassword: appPassword
     managedIdentityId: managedIdentity.id
-    keyVaultName: keyVaultName
     additionalSecrets: additionalSecretsModule.outputs.secrets
     additionalVolumesAndMounts: additionalVolumesAndMounts
   }
