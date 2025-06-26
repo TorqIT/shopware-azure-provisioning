@@ -328,7 +328,7 @@ module redisContainerApp 'container-app-redis.bicep' = {
 
 // Optional n8n Container App
 resource n8nStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = if (provisionN8N) {
-  name: storageAccountName
+  name: n8nStorageAccountName
 }
 module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
   name: 'n8n-container-app'
