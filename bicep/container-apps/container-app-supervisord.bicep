@@ -31,7 +31,7 @@ var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccount
 var secrets = concat(defaultSecrets, portalEngineSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
-  name: 'container-app-php-volumes'
+  name: 'container-app-supervisord-volumes'
   params: {
     provisionForPortalEngine: false // deliberately don't create a volume mount for Portal Engine build as it is not required for supervisord
     portalEnginePublicBuildStorageMountName: '' 
