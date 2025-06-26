@@ -56,16 +56,47 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   name: customDomain.certificateName
 }]
 
+var envVars = [
+  {
+    name: 'DB_TYPE'
+    value: 'postgresdb'
+  }
+  {
+    name: 'DB_POSTGRESDB_DATABASE'
+    value: databaseName
+  }
+  {
+    name: 'DB_POSTGRESDB_HOST'
+    value: database.properties.fullyQualifiedDomainName
+  }
+  {
+    name: 'DB_POSTGRESDB_PORT'
+    value: '5432'
+  }
+  {
+    name: 'DB_POSTGRESDB_USER'
+    value: databaseUser
+  }
+  {
+    name: 'DB_POSTGRESDB_PASSWORD'
+    secretRef: 'database-password'
+  }
+  {
+    name: 'DB_POSTGRESDB_SCHEMA'
+    value: 'public'
+  }
+]
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
 }
-resource pimcoreAdminPasswordInKeyVault 'Microsoft.KeyVault/vaults/secrets@2024-04-01-preview' existing = {
+resource databasePasswordInKeyVault 'Microsoft.KeyVault/vaults/secrets@2024-04-01-preview' existing = {
   parent: keyVault
   name: databasePasswordSecretName
 }
 var databasePasswordSecret = {
   name: 'database-password'
-  keyVaultUrl: pimcoreAdminPasswordInKeyVault.properties.secretUri
+  keyVaultUrl: databasePasswordInKeyVault.properties.secretUri
   identity: managedIdentityForKeyVaultId
 }
 
@@ -115,36 +146,7 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
             cpu: json(cpuCores)
             memory: memory
           }
-          env: [
-            {
-              name: 'DB_TYPE'
-              value: 'postgresdb'
-            }
-            {
-              name: 'DB_POSTGRESDB_DATABASE'
-              value: databaseName
-            }
-            {
-              name: 'DB_POSTGRESDB_HOST'
-              value: database.properties.fullyQualifiedDomainName
-            }
-            {
-              name: 'DB_POSTGRESDB_PORT'
-              value: '5432'
-            }
-            {
-              name: 'DB_POSTGRESDB_USER'
-              value: databaseUser
-            }
-            {
-              name: 'DB_POSTGRESDB_PASSWORD'
-              secretRef: 'database-password'
-            }
-            {
-              name: 'DB_POSTGRESDB_SCHEMA'
-              value: 'public'
-            }
-          ]
+          env: envVars
           volumeMounts: [
             {
               mountPath: '/home/node/.n8n'
