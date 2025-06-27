@@ -72,8 +72,7 @@
       "value": "shopware-azure-php-test"
     },
     "phpContainerAppCustomDomains": {
-      "value": [
-      ]
+      "value": []
     },
     "phpContainerAppImageName": {
       "value": "php"
@@ -112,13 +111,11 @@
       "value": "018f62358a357230852fd8838c604b60"
     },
     "additionalEnvVars": {
-      "value": [
-      ]
+      "value": []
     },
     "additionalSecrets": {
       "value": {
-        "array": [
-        ]
+        "array": []
       }
     },
     "fileStorageAccountName": {

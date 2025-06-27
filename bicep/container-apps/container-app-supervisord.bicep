@@ -27,7 +27,7 @@ var defaultSecrets = [databaseUrlSecret, storageAccountKeySecret, appSecretSecre
 var secrets = concat(defaultSecrets, additionalSecrets)
 
 module volumesModule './container-apps-volumes.bicep' = {
-  name: 'container-app-php-volumes'
+  name: 'container-app-supervisord-volumes'
   params: {
     additionalVolumesAndMounts: additionalVolumesAndMounts
   }
