@@ -116,6 +116,11 @@ param storageAccountPrivateEndpointName string = '${storageAccountName}-private-
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = false
 param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
+param storageAccountProvisionFrontDoorCdn bool = false
+param storageAccountFrontDoorCustomDomains array = []
+param storageAccountFrontDoorEndpointName string = storageAccountName
+param storageAccountFrontDoorProfileName string = '${storageAccountName}-cdn'
+param storageAccountFrontDoorSku string = 'Standard_AzureFrontDoor'
 module storageAccount 'storage-account/storage-account.bicep' = if (fullProvision) {
   name: 'storage-account'
   dependsOn: [virtualNetwork, backupVault]
@@ -139,6 +144,11 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
     longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
+    provisionFrontDoorCdn: storageAccountProvisionFrontDoorCdn
+    frontDoorCustomDomains: storageAccountFrontDoorCustomDomains
+    frontDoorEndpointName: storageAccountFrontDoorEndpointName
+    frontDoorProfileName: storageAccountFrontDoorProfileName
+    frontDoorSku: storageAccountFrontDoorSku
   }
 }
 

@@ -24,6 +24,12 @@ param longTermBackups bool
 param backupVaultName string
 param longTermBackupRetentionPeriod string
 
+param provisionFrontDoorCdn bool
+param frontDoorSku string
+param frontDoorProfileName string
+param frontDoorEndpointName string
+param frontDoorCustomDomains array
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
   location: location
@@ -111,5 +117,18 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (fu
     storageAccountName: storageAccountName
     containers: [publicContainerName, privateContainerName]
     retentionPeriod: longTermBackupRetentionPeriod
+  }
+}
+
+module frontDoorCdn './front-door-cdn.bicep' = if (fullProvision && provisionFrontDoorCdn) {
+  name: 'front-door-cdn'
+  params: {
+    location: location
+    profileName: frontDoorProfileName
+    endpointName: frontDoorEndpointName
+    storageAccountName: storageAccountName
+    publicContainerName: publicContainerName
+    customDomains: frontDoorCustomDomains
+    sku: frontDoorSku
   }
 }
