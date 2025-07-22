@@ -39,6 +39,8 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
         forwardingProtocol: 'MatchRequest'
         httpsRedirect: 'Enabled'
         enabledState: 'Enabled'
+        customDomains: customDomains
+        linkToDefaultDomain: 'Enabled'
       }
     }
   }
