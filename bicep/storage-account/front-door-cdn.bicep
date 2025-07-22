@@ -16,36 +16,6 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
     name: 'Standard_AzureFrontDoor'
   }
 
-  resource endpoint 'afdEndpoints' = {
-    name: endpointName
-    location: location
-    properties: {
-      enabledState: 'Enabled'
-    }
-
-    resource route 'routes' = {
-      name: 'route-to-storage'
-      properties: {
-        originGroup: {
-          id: frontDoorProfile::originGroup.id
-        }
-        supportedProtocols: [
-          'Http'
-          'Https'
-        ]
-        patternsToMatch: [
-          '/*'
-        ]
-        forwardingProtocol: 'MatchRequest'
-        httpsRedirect: 'Enabled'
-        enabledState: 'Enabled'
-        customDomains: customDomains
-        linkToDefaultDomain: 'Enabled'
-      }
-    }
-  }
-
-  // Child: Origin Group
   resource originGroup 'originGroups' = {
     name: 'storage-origin-group'
     properties: {
@@ -62,7 +32,6 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
       sessionAffinityState: 'Disabled'
     }
 
-    // Child of originGroup: Origin
     resource origin 'origins' = {
       name: 'storage-origin'
       properties: {
@@ -73,6 +42,36 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
         priority: 1
         weight: 1000
         enabledState: 'Enabled'
+      }
+    }
+  }
+
+  resource endpoint 'afdEndpoints' = {
+    name: endpointName
+    location: location
+    properties: {
+      enabledState: 'Enabled'
+    }
+
+    resource route 'routes' = {
+      name: 'route-to-storage'
+      dependsOn: [originGroup::origin]
+      properties: {
+        originGroup: {
+          id: originGroup.id
+        }
+        supportedProtocols: [
+          'Http'
+          'Https'
+        ]
+        patternsToMatch: [
+          '/*'
+        ]
+        forwardingProtocol: 'MatchRequest'
+        httpsRedirect: 'Enabled'
+        enabledState: 'Enabled'
+        customDomains: customDomains
+        linkToDefaultDomain: 'Enabled'
       }
     }
   }
