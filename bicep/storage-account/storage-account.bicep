@@ -24,6 +24,7 @@ param longTermBackups bool
 param backupVaultName string
 param longTermBackupRetentionPeriod string
 
+// Optional Front Door CDN in front of public container
 param provisionFrontDoorCdn bool
 param frontDoorSku string
 param frontDoorProfileName string

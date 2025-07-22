@@ -144,6 +144,7 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
     longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
+    // Optional CDN in front of public container
     provisionFrontDoorCdn: storageAccountProvisionFrontDoorCdn
     frontDoorCustomDomains: storageAccountFrontDoorCustomDomains
     frontDoorEndpointName: storageAccountFrontDoorEndpointName
