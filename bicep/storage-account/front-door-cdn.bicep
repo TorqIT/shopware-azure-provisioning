@@ -11,7 +11,7 @@ var originHost = '${storageAccountName}.blob.${environment().suffixes.storage}'
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
   name: profileName
-  location: location
+  location: 'Global'
   sku: {
     name: 'Standard_AzureFrontDoor'
   }
