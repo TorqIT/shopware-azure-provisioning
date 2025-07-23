@@ -24,7 +24,7 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
         successfulSamplesRequired: 3
       }
       healthProbeSettings: {
-        probePath: '/'
+        probePath: '/${publicContainerName}/*'
         probeProtocol: 'Https'
         probeRequestType: 'HEAD'
         probeIntervalInSeconds: 120
@@ -65,7 +65,7 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
           'Https'
         ]
         patternsToMatch: [
-          '/*'
+          '/${publicContainerName}/*'
         ]
         forwardingProtocol: 'MatchRequest'
         httpsRedirect: 'Enabled'
