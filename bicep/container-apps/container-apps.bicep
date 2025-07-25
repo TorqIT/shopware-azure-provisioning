@@ -68,6 +68,7 @@ param appSalesChannelSnippetsetId string
 param appSecret string
 @secure()
 param appPassword string
+param azureCdnUrl string
 param enableOpensearch bool
 param opensearchUrl string
 param additionalEnvVars array
@@ -158,6 +159,7 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     appSalesChannelCurrencyId: appSalesChannelCurrencyId
     appSalesChannelCountryIso: appSalesChannelCountryIso
     appSalesChannelSnippetsetId: appSalesChannelSnippetsetId
+    azureCdnUrl: azureCdnUrl
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
     databaseUrlSecretRefName: databaseUrlSecretRefName

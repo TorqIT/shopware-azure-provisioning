@@ -85,7 +85,7 @@ module containerRegistry './container-registry/container-registry.bicep' = if (f
     containerRegistryName: containerRegistryName
     sku: containerRegistrySku
     firewallIps: containerRegistryFirewallIps
-    privateDnsZoneId:privateDnsZones.outputs.zoneIdForContainerRegistry
+    privateDnsZoneId: privateDnsZones.outputs.zoneIdForContainerRegistry
     privateEndpointName: containerRegistryPrivateEndpointName
     privateEndpointNicName: containerRegistryPrivateEndpointNicName
     virtualNetworkName: virtualNetworkName
@@ -116,6 +116,11 @@ param storageAccountPrivateEndpointName string = '${storageAccountName}-private-
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = false
 param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
+param storageAccountProvisionFrontDoorCdn bool = false
+param storageAccountFrontDoorCustomDomains array = []
+param storageAccountFrontDoorEndpointName string = '${storageAccountName}-${storageAccountPublicContainerName}'
+param storageAccountFrontDoorProfileName string = '${storageAccountName}-cdn'
+param storageAccountFrontDoorSku string = 'Standard_AzureFrontDoor'
 module storageAccount 'storage-account/storage-account.bicep' = if (fullProvision) {
   name: 'storage-account'
   dependsOn: [virtualNetwork, backupVault]
@@ -139,6 +144,12 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
     longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
+    // Optional CDN in front of public container
+    provisionFrontDoorCdn: storageAccountProvisionFrontDoorCdn
+    frontDoorCustomDomains: storageAccountFrontDoorCustomDomains
+    frontDoorEndpointName: storageAccountFrontDoorEndpointName
+    frontDoorProfileName: storageAccountFrontDoorProfileName
+    frontDoorSku: storageAccountFrontDoorSku
   }
 }
 
@@ -293,6 +304,7 @@ param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string = 'US'
 param appSalesChannelSnippetsetId string = ''
+param azureCdnUrl string = 'https://${storageAccountName}.blob.${environment().suffixes.storage}/${storageAccountPublicContainerName}'
 param enableOpensearch bool = false
 // By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
 param opensearchUrl string = 'services-vm:9200'
@@ -350,6 +362,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     appSalesChannelCurrencyId: appSalesChannelCurrencyId
     appSalesChannelCountryIso: appSalesChannelCountryIso
     appSalesChannelSnippetsetId: appSalesChannelSnippetsetId
+    azureCdnUrl: azureCdnUrl
     virtualNetworkName: virtualNetworkName
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName

@@ -9,6 +9,7 @@ param appSalesChannelId string
 param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string
 param appSalesChannelSnippetsetId string
+param azureCdnUrl string
 
 param enableOpensearch bool
 param opensearchUrl string
@@ -122,7 +123,7 @@ var defaultEnvVars = [
   }
   {
     name: 'AZURE_CDN_URL'
-    value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}/${storageAccountPublicContainerName}'
+    value: azureCdnUrl
   }
   // TODO unsure how necessary the following values are
   {
