@@ -74,6 +74,7 @@ module storageMount './container-apps-environment-mount.bicep' = [for volumeAndM
     mountName: volumeAndMount.mountName
     mountAccessMode: volumeAndMount.mountAccessMode
     storageAccountName: volumeAndMount.storageAccountName
+    storageType: volumeAndMount.?storageType ?? 'NfsAzureFile'
     fileShareName: volumeAndMount.fileShareName
   }
 }]

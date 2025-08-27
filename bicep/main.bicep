@@ -116,8 +116,7 @@ param storageAccountKind string = 'StorageV2'
 param storageAccountAccessTier string = 'Hot'
 param storageAccountContainerName string = 'pimcore'
 param storageAccountAssetsContainerName string = 'pimcore-assets'
-@allowed(['public', 'partial', 'private'])
-param storageAccountAssetsContainerAccessLevel string = 'private'
+param storageAccountFileShares array = []
 param storageAccountFirewallIps array = []
 param storageAccountCdnAccess bool = false
 param storageAccountBackupRetentionDays int = 7
@@ -137,10 +136,10 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     accessTier: storageAccountAccessTier
     kind: storageAccountKind
     sku: storageAccountSku
-    assetsContainerAccessLevel: storageAccountAssetsContainerAccessLevel
     firewallIps: storageAccountFirewallIps
     cdnAssetAccess: storageAccountCdnAccess
     virtualNetworkName: virtualNetworkName
+    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
@@ -150,6 +149,7 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
     longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
+    fileShares: storageAccountFileShares
   }
 }
 
