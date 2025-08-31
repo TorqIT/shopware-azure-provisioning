@@ -4,12 +4,12 @@ on:
   pull_request:
     types: closed
 
-concurrency: 
+concurrency:
   group: ${{ github.repository }}__${{ github.ref }}-ci-close
   cancel-in-progress: true
 
 jobs:
-  deploy-and-test-in-azure: 
+  tear-down-azure-resources:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
               az group delete \
                 --name $RESOURCE_GROUP \
                 --yes
-                
+
       - name: Purge Key Vault
         run: |
           KEY_VAULT=$(jq -r '.parameters.keyVaultName.value' .github/test-files/parameters.json) >> .env

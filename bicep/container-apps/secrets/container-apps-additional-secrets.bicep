@@ -18,7 +18,7 @@ output secrets array = [for i in range(0, length(secrets)): {
   keyVaultUrl: keyVaultSecrets[i].properties.secretUri
   identity: managedIdentityForKeyVaultId
 }]
-// Only define environment variables for secrets with the secretEnvVarNameInContainerApp property
+// Only define environment variables for secrets with the secretEnvVarNameInContainerApp (or envVarNameInContainerApp) property
 var secretsWithEnvVars = filter(secrets, secret => contains(secret, 'secretEnvVarNameInContainerApp'))
 output envVars array = [for secret in secretsWithEnvVars: {
   name: secret.secretEnvVarNameInContainerApp
