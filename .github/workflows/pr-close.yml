@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy-and-test-in-azure: 
+  tear-down-azure-resources: 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
