@@ -147,7 +147,7 @@
           "mountPath": "/var/www/html/public/var/assets"
         },
         {
-          "storageAccountName": "pimcoreazuresatest",
+          "storageAccountName": "shopwareazuresatest",
           "fileShareName": "uploads",
           "mountName": "uploads",
           "mountAccessMode": "ReadWrite",
