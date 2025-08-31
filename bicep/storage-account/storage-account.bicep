@@ -8,6 +8,8 @@ param kind string
 param accessTier string
 param publicContainerName string
 param privateContainerName string
+param fileShares array
+
 param firewallIps array
 
 param shortTermBackupRetentionDays int
@@ -19,17 +21,20 @@ param privateEndpointNicName string
 param virtualNetworkName string
 param virtualNetworkResourceGroupName string
 param virtualNetworkPrivateEndpointSubnetName string
+param virtualNetworkContainerAppsSubnetName string
 
 param longTermBackups bool
 param backupVaultName string
 param longTermBackupRetentionPeriod string
 
-// Optional Front Door CDN in front of public container
-param provisionFrontDoorCdn bool
-param frontDoorSku string
-param frontDoorProfileName string
-param frontDoorEndpointName string
-param frontDoorCustomDomains array
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
+  name: virtualNetworkName
+  scope: resourceGroup(virtualNetworkResourceGroupName)
+}
+resource virtualNetworkContainerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  parent: virtualNetwork
+  name: virtualNetworkContainerAppsSubnetName
+}
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
@@ -44,6 +49,22 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     accessTier: accessTier
     allowBlobPublicAccess: true
     publicNetworkAccess: 'Enabled'
+    networkAcls: {
+      ipRules: [for ip in firewallIps: {value: ip}]
+      virtualNetworkRules: [
+        {
+          // We whitelist the Container Apps subnet in addition to creating a Private Endpoint below.
+          // The Private Endpoint allows the Container App to access the Storage Account via DNS (e.g. using Flysystem),
+          // while the whitelist approach allows for the Container App to mount File Shares as volumes (which as of writing
+          // does not support Private Endpoints)
+          id: virtualNetworkContainerAppsSubnet.id
+          action: 'Allow'
+        }
+        
+      ]
+      defaultAction: 'Deny'
+      bypass: 'None'
+    }
     encryption: {
       services: {
         file: {
@@ -59,7 +80,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     }
   }
 
-  resource blobService 'blobServices' = {
+  resource blobServices 'blobServices' = {
     name: 'default'
     properties: {
       deleteRetentionPolicy: {
@@ -91,6 +112,14 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       }
     }
   }
+
+  resource fileServices 'fileServices' = {
+    name: 'default'
+      resource fileShare 'shares' = [for fileShare in fileShares: {
+        name: fileShare.name
+      }
+    ]
+  }
 }
 
 // We use a Private Endpoint (and Private DNS Zone) to integrate with the Virtual Network
@@ -118,18 +147,5 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (fu
     storageAccountName: storageAccountName
     containers: [publicContainerName, privateContainerName]
     retentionPeriod: longTermBackupRetentionPeriod
-  }
-}
-
-module frontDoorCdn './front-door-cdn.bicep' = if (fullProvision && provisionFrontDoorCdn) {
-  name: 'front-door-cdn'
-  params: {
-    location: location
-    profileName: frontDoorProfileName
-    endpointName: frontDoorEndpointName
-    storageAccountName: storageAccountName
-    publicContainerName: publicContainerName
-    customDomains: frontDoorCustomDomains
-    sku: frontDoorSku
   }
 }

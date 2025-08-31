@@ -110,6 +110,7 @@ param storageAccountKind string = 'StorageV2'
 param storageAccountAccessTier string = 'Hot'
 param storageAccountPublicContainerName string = 'public'
 param storageAccountPrivateContainerName string = 'private'
+param storageAccountFileShares array = []
 param storageAccountFirewallIps array = []
 param storageAccountBackupRetentionDays int = 7
 param storageAccountPrivateEndpointName string = '${storageAccountName}-private-endpoint'
@@ -135,6 +136,7 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     sku: storageAccountSku
     firewallIps: storageAccountFirewallIps
     virtualNetworkName: virtualNetworkName
+    virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
@@ -144,12 +146,7 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     longTermBackups: storageAccountLongTermBackups
     backupVaultName: backupVaultName
     longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
-    // Optional CDN in front of public container
-    provisionFrontDoorCdn: storageAccountProvisionFrontDoorCdn
-    frontDoorCustomDomains: storageAccountFrontDoorCustomDomains
-    frontDoorEndpointName: storageAccountFrontDoorEndpointName
-    frontDoorProfileName: storageAccountFrontDoorProfileName
-    frontDoorSku: storageAccountFrontDoorSku
+    fileShares: storageAccountFileShares
   }
 }
 
