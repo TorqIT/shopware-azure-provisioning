@@ -124,6 +124,9 @@ param storageAccountPrivateEndpointName string = '${storageAccountName}-private-
 param storageAccountPrivateEndpointNicName string = ''
 param storageAccountLongTermBackups bool = true
 param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
+param storageAccountProvisionFrontDoorCdn bool = false
+param storageAccountFrontDoorCdnProfileName string = ''
+param storageAccountFrontDoorCdnEndpointName string = ''
 module storageAccount 'storage-account/storage-account.bicep' = if (fullProvision) {
   name: 'storage-account'
   dependsOn: [virtualNetwork, backupVault]
@@ -150,6 +153,10 @@ module storageAccount 'storage-account/storage-account.bicep' = if (fullProvisio
     backupVaultName: backupVaultName
     longTermBackupRetentionPeriod: storageAccountLongTermBackupRetentionPeriod
     fileShares: storageAccountFileShares
+    provisionFrontDoorCdn: storageAccountProvisionFrontDoorCdn
+    frontDoorCdnProfileName: storageAccountFrontDoorCdnProfileName
+    frontDoorCdnEndpointName: storageAccountFrontDoorCdnEndpointName
+    frontDoorIpRules: phpContainerAppIpSecurityRestrictions // TODO assuming the same IPs that can access the PHP app should also be able to access the CDN - this assumption may not always be true
   }
 }
 

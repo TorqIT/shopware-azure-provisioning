@@ -28,6 +28,11 @@ param longTermBackups bool
 param backupVaultName string
 param longTermBackupRetentionPeriod string
 
+param provisionFrontDoorCdn bool
+param frontDoorCdnProfileName string
+param frontDoorCdnEndpointName string
+param frontDoorIpRules array
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
@@ -48,7 +53,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
     accessTier: accessTier
-    allowBlobPublicAccess: true
+    allowBlobPublicAccess: false
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       ipRules: [for ip in firewallIps: {value: ip}]
@@ -61,9 +66,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
           id: virtualNetworkContainerAppsSubnet.id
           action: 'Allow'
         }
-        
       ]
-      defaultAction: 'Deny'
+      // If using a Front Door - there is currently no clean way to only singularly allow Front Door to access a Storage Account
+      // (without upgrading to the expensive Premium tier), so we must open the Storage Account publicly. Anonymous access to 
+      // blobs is still denied, and access by the Front Door is done via SAS token generated below
+      defaultAction: provisionFrontDoorCdn ? 'Allow' : 'Deny'
       bypass: 'None'
     }
     encryption: {
@@ -101,10 +108,16 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 
     resource storageAccountContainer 'containers' = {
       name: containerName
+      properties: {
+        publicAccess: 'None'
+      }
     }
 
     resource storageAccountContainerAssets 'containers' = {
       name: assetsContainerName
+      properties: {
+        publicAccess: 'None'
+      }
     }
   }
 
@@ -169,5 +182,16 @@ resource cdn 'Microsoft.Cdn/profiles@2022-11-01-preview' = if (cdnAssetAccess) {
         }
       ]
     }
+  }
+}
+
+module frontDoorCdn './storage-account-front-door-cdn.bicep' = if (provisionFrontDoorCdn) {
+  name: 'storage-account-front-door-cdn'
+  params: {
+    frontDoorProfileName: frontDoorCdnProfileName
+    endpointName: frontDoorCdnEndpointName
+    storageAccountName: storageAccountName
+    storageAccountAssetsContainerName: assetsContainerName
+    ipRules: frontDoorIpRules
   }
 }
