@@ -263,14 +263,14 @@ param containerAppsEnvironmentName string
 param containerAppsEnvironmentUseWorkloadProfiles bool = false
 // Init Container App Job 
 param initContainerAppJobName string
-param initContainerAppJobImageName string
+param initContainerAppJobImageName string = 'init'
 param initContainerAppJobCpuCores string = '1.5'
 param initContainerAppJobMemory string = '3Gi'
 param initContainerAppJobReplicaTimeoutSeconds int = 600
 // PHP (web) Container App
 param phpContainerAppExternal bool = true
 param phpContainerAppName string
-param phpContainerAppImageName string
+param phpContainerAppImageName string = 'php'
 param phpContainerAppCustomDomains array = []
 param phpContainerAppCpuCores string = '1.5'
 param phpContainerAppMemory string = '3Gi'
@@ -286,7 +286,7 @@ param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
 // Supervisord Container App
 param supervisordContainerAppName string
-param supervisordContainerAppImageName string = ''
+param supervisordContainerAppImageName string = 'supervisord'
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
 param appEnv string
