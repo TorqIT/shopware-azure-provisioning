@@ -340,7 +340,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     keyVaultName: keyVaultName
-    containerAppsManagedIdentityName: managedIdentityName
+    managedIdentityName: containerAppsManagedIdentityName
     databaseName: databaseName
     databasePasswordSecretNameInKeyVault: databasePasswordSecretName
     databaseServerName: databaseServerName
