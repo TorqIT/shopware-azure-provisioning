@@ -261,6 +261,7 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 // Container Apps
 param containerAppsEnvironmentName string
 param containerAppsEnvironmentUseWorkloadProfiles bool = false
+param containerAppsManagedIdentityName string = '${resourceGroup().name}-container-app-managed-id'
 // Init Container App Job 
 param initContainerAppJobName string
 param initContainerAppJobImageName string = 'init'
@@ -323,6 +324,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
+    managedIdentityName: containerAppsManagedIdentityName
     initContainerAppJobName: initContainerAppJobName
     initContainerAppJobImageName: initContainerAppJobImageName
     initContainerAppJobCpuCores: initContainerAppJobCpuCores

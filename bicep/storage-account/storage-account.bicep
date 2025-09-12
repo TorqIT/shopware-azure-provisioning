@@ -60,7 +60,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
           id: virtualNetworkContainerAppsSubnet.id
           action: 'Allow'
         }
-        
       ]
       defaultAction: 'Allow' // TODO currently this is to allow unrestricted anonymous access to the public container, but we should be implementing a Front Door as a standard that uses a Private Endpoint to proxy reuests to the Storage Account
       bypass: 'None'

@@ -26,6 +26,8 @@ param storageAccountPrivateContainerName string
 
 param containerRegistryName string
 
+param managedIdentityName string
+
 param initContainerAppJobName string
 param initContainerAppJobImageName string
 param initContainerAppJobCpuCores string
@@ -102,7 +104,6 @@ module containerAppsEnvironment 'environment/container-apps-environment.bicep' =
 
 // SECRETS
 // Managed Identity allowing the Container App resources access other resources directly (e.g. Key Vault, Container Registry)
-var managedIdentityName = '${resourceGroup().name}-container-app-managed-id'
 module managedIdentityModule './identity/container-apps-managed-identitity.bicep' = if (fullProvision) {
   name: 'container-apps-managed-identity'
   params: {
