@@ -271,6 +271,7 @@ module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bi
 // Container Apps
 param containerAppsEnvironmentName string
 param containerAppsEnvironmentUseWorkloadProfiles bool = false
+param containerAppsManagedIdentityName string = '${resourceGroup().name}-container-app-managed-id'
 // Init Container App Job
 // TODO for now, this is optional, but will eventually be a mandatory part of Container App infrastructure
 param provisionInit bool = false
@@ -339,6 +340,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     keyVaultName: keyVaultName
+    containerAppsManagedIdentityName: managedIdentityName
     databaseName: databaseName
     databasePasswordSecretNameInKeyVault: databasePasswordSecretName
     databaseServerName: databaseServerName
