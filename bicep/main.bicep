@@ -46,6 +46,7 @@ module keyVaultModule './key-vault/key-vault.bicep' = if (fullProvision && keyVa
   name: 'key-vault'
   dependsOn: [virtualNetwork]
   params: {
+    location: location
     name: keyVaultName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkName: virtualNetworkName
@@ -158,6 +159,7 @@ module fileStorage './file-storage/file-storage.bicep' = if (fullProvision && !e
   name: 'file-storage-account'
   dependsOn: [virtualNetwork]
   params: {
+    location: location
     storageAccountName: fileStorageAccountName
     storageAccountSku: fileStorageAccountSku
     fileShares: map(fileStorageAccountFileShares, (fileShare => {
@@ -255,6 +257,7 @@ param logAnalyticsWorkspaceName string = '${resourceGroupName}-log-analytics'
 module logAnalyticsWorkspace 'log-analytics-workspace/log-analytics-workspace.bicep' = {
   name: 'log-analytics-workspace'
   params: {
+    location: location
     name: logAnalyticsWorkspaceName
   }
 }
@@ -399,6 +402,7 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
   name: 'services-virtual-machine'
   dependsOn: [virtualNetwork]
   params: {
+    location: location
     name: servicesVmName
     adminPublicSshKey: keyVault.getSecret(servicesVmPublicKeyKeyVaultSecretName)
     adminUsername: servicesVmAdminUsername
