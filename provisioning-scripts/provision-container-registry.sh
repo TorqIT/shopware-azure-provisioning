@@ -1,4 +1,5 @@
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
+LOCATION=$(jq -r '.parameters.location.value' $1)
 CONTAINER_REGISTRY_NAME=$(jq -r '.parameters.containerRegistryName.value' $1)
 CONTAINER_REGISTRY_SKU=$(jq -r '.parameters.containerRegistrySku.value // empty' $1)
 
@@ -28,6 +29,7 @@ if [ $resultCode -ne 0 ]; then
     --template-file ./bicep/container-registry/container-registry.bicep \
     --parameters \
       containerRegistryName=$CONTAINER_REGISTRY_NAME \
+      location=$LOCATION \
       sku=$CONTAINER_REGISTRY_SKU
 else
   echo "Container Registry $CONTAINER_REGISTRY_NAME exists!"

@@ -1,4 +1,5 @@
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
+LOCATION=$(jq -r '.parameters.location.value' $1)
 KEY_VAULT_NAME=$(jq -r '.parameters.keyVaultName.value' $1)
 KEY_VAULT_RESOURCE_GROUP_NAME=$(jq -r --arg RESOURCE_GROUP "$RESOURCE_GROUP" '.parameters.keyVaultResourceGroupName.value // $RESOURCE_GROUP' $1)
 
@@ -19,6 +20,7 @@ if [ $returnCode -ne 0 ]; then
     --template-file ./bicep/key-vault/key-vault.bicep \
     --parameters \
       name=$KEY_VAULT_NAME \
+      location=$LOCATION \
       enablePurgeProtection=$KEY_VAULT_ENABLE_PURGE_PROTECTION
 fi
 
