@@ -198,6 +198,7 @@ module criticalMetricAlertsActionGroup 'insights/metric-alerts/metrics-action-gr
 }
 
 // Database
+param databaseLocation string = location
 param databaseServerName string
 param databaseServerVersion string = '8.0.21'
 param databaseAdminUsername string = 'adminuser'
@@ -219,7 +220,7 @@ module database 'database/database.bicep' = {
   name: 'database'
   dependsOn: [virtualNetwork, backupVault, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
-    location: location
+    location: databaseLocation
     fullProvision: fullProvision
     administratorLogin: databaseAdminUsername
     administratorPassword: keyVault.getSecret(databaseAdminPasswordSecretName)
