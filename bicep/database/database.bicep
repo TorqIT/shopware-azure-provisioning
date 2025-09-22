@@ -29,7 +29,7 @@ param databaseBackupsStorageAccountContainerName string
 param virtualNetworkResourceGroupName string
 param virtualNetworkName string
 param virtualNetworkPrivateEndpointsSubnetName string
-
+param privateEndpointName string
 param privateDnsZoneForDatabaseId string
 
 // Optional metric alerts provisioning
@@ -79,7 +79,6 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
   }
 }
 
-var privateEndpointName = '${serverName}-private-endpoint'
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-03-01' = {
   name: privateEndpointName
   location: location
