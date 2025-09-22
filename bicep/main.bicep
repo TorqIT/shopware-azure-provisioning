@@ -218,6 +218,7 @@ param databaseBackupsStorageAccountName string = ''
 param databaseBackupsStorageAccountSku string = 'Standard_LRS'
 param databaseBackupsStorageAccountKind string = 'StorageV2'
 param databaseBackupsStorageAccountContainerName string = 'database'
+param databasePrivateEndpointName string = '${databaseServerName}-private-endpoint'
 module database 'database/database.bicep' = {
   name: 'database'
   dependsOn: [virtualNetwork, backupVault, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
@@ -238,6 +239,7 @@ module database 'database/database.bicep' = {
     shortTermBackupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
     privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
+    privateEndpointName: databasePrivateEndpointName
 
     // Optional long-term backups
     longTermBackups: databaseLongTermBackups
