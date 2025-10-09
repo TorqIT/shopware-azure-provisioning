@@ -219,7 +219,7 @@ param databaseBackupsStorageAccountSku string = 'Standard_LRS'
 param databaseBackupsStorageAccountKind string = 'StorageV2'
 param databaseBackupsStorageAccountContainerName string = 'database'
 param databasePrivateEndpointName string = '${databaseServerName}-private-endpoint'
-module database 'database/database.bicep' = {
+module database 'database/database.bicep' = if (fullProvision) {
   name: 'database'
   dependsOn: [virtualNetwork, backupVault, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
