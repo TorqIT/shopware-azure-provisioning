@@ -13,6 +13,7 @@ param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
 param managedIdentityId string
+param isExternal bool
 
 @secure()
 param databasePasswordSecret object
@@ -49,6 +50,7 @@ var defaultSecrets = [databasePasswordSecret, storageAccountKeySecret]
 var portalEngineSecrets = provisionForPortalEngine ? [portalEngineStorageAccountKeySecret] : []
 var secrets = concat(defaultSecrets, portalEngineSecrets, additionalSecrets)
 
+// Volumes
 module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
   params: {
@@ -58,6 +60,7 @@ module volumesModule './container-apps-volumes.bicep' = {
   }
 }
 
+// Scaling rules
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   name: 'container-app-scale-rules'
   params: {
@@ -68,6 +71,72 @@ module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
     cronScaleRuleDesiredReplicas: cronScaleRuleDesiredReplicas
   }
 }
+
+// Ingress IP security restrictions
+// NOTE TO FUTURE MAINTAINERS: attempts to modularize this part of the file were not successful. We encountered issues
+// with getting the combined array output in a format that the containerapp schema accepted, even though we couldn't
+// see any difference between such an output vs creating the array in-line here.
+// Per https://github.com/microsoft/azure-container-apps/issues/1542, if a Container App has restricted ingress,
+// DigiCert's IPs must be allowed access to the app in order for managed certificates to be issued. The 
+// list here was generated from https://knowledge.digicert.com/alerts/ip-address-domain-validation. 
+var digiCertIpAllowances array = [
+  {
+    name: 'DigiCert IP 1'
+    action: 'Allow'
+    ipAddressRange: '216.168.249.9'
+  }
+  {
+    name: 'DigiCert IP 2'
+    action: 'Allow'
+    ipAddressRange: '216.168.240.4'
+  }
+  {
+    name: 'DigiCert IP 3'
+    action: 'Allow'
+    ipAddressRange: '216.168.247.9'
+  }
+  {
+    name: 'DigiCert IP 4'
+    action: 'Allow'
+    ipAddressRange: '202.65.16.4'
+  }
+  {
+    name: 'DigiCert IP 5'
+    action: 'Allow'
+    ipAddressRange: '54.185.245.130'
+  }
+  {
+    name: 'DigiCert IP 6'
+    action: 'Allow'
+    ipAddressRange: '13.58.90.0'
+  }
+  {
+    name: 'DigiCert IP 7'
+    action: 'Allow'
+    ipAddressRange: '52.17.48.104'
+  }
+  {
+    name: 'DigiCert IP 8'
+    action: 'Allow'
+    ipAddressRange: '18.193.239.14'
+  }
+  {
+    name: 'DigiCert IP 9'
+    action: 'Allow'
+    ipAddressRange: '54.227.165.213'
+  }
+  {
+    name: 'DigiCert IP 10'
+    action: 'Allow'
+    ipAddressRange: '54.241.89.140'
+  }
+]
+// If the app is external with ingress restrictions applied, we need to allow the DigiCert IPs above in order for managed certificates 
+// to be automatically deployed. If no rules are defined or the app is not externally accessible, we must not set any 
+// rules at all (i.e. ingress should be unrestricted).
+var ipSecurityRestrictionsConsolidated = (!empty(ipSecurityRestrictions) && isExternal) 
+  ? concat(ipSecurityRestrictions, digiCertIpAllowances)
+  : null
 
 resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
   name: containerAppName
@@ -108,7 +177,7 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
             bindingType: 'SniEnabled'
             certificateId: certificates[i].id
         }]
-        ipSecurityRestrictions: ipSecurityRestrictions
+        ipSecurityRestrictions: ipSecurityRestrictionsConsolidated
       }
     }
     template: {

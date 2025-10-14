@@ -269,6 +269,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     minReplicas: phpContainerAppMinReplicas
     maxReplicas: phpContainerAppMaxReplicas
     customDomains: phpContainerAppCustomDomains
+    isExternal: phpContainerAppExternal
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     managedIdentityId: managedIdentity.id
     databasePasswordSecret: databasePasswordSecret
