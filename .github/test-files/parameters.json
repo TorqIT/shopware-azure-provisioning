@@ -87,6 +87,20 @@
     "phpContainerAppMinReplicas": {
       "value": 0
     },
+    "phpContainerAppIpSecurityRestrictions": {
+      "value": [
+        {
+          "name": "Test rule 1",
+          "action": "Allow",
+          "ipAddressRange": "206.172.88.232"
+        },
+        {
+          "name": "Test rule 2",
+          "action": "Allow",
+          "ipAddressRange": "206.172.88.233"
+        }
+      ]
+    },
     "supervisordContainerAppName": {
       "value": "shopware-azure-supervisord-test"
     },
