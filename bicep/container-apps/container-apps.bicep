@@ -212,9 +212,10 @@ module phpContainerApp 'container-app-php.bicep' = {
     memory: phpContainerAppMemory
     minReplicas: phpContainerAppMinReplicas
     maxReplicas: phpContainerAppMaxReplicas
+    customDomains: phpContainerAppCustomDomains
+    isExternal: phpContainerAppExternal
     ipSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     environmentVariables: environmentVariables.outputs.envVars
-    customDomains: phpContainerAppCustomDomains
     managedIdentityId: managedIdentity.id
     databaseUrlSecret: databaseUrlSecret
     storageAccountKeySecret: storageAccountKeySecret
