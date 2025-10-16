@@ -70,7 +70,9 @@ resource cdnRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2025-06-01' = {
       '/*'
     ]
     ruleSets: [
-      storageAccountRuleSet
+      {
+        id: storageAccountRuleSet.id
+      }
     ]
     forwardingProtocol: 'MatchRequest'
     httpsRedirect: 'Enabled'
