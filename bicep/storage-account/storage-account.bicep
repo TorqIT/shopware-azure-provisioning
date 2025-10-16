@@ -27,6 +27,10 @@ param longTermBackups bool
 param backupVaultName string
 param longTermBackupRetentionPeriod string
 
+param provisionFrontDoorCdn bool
+param frontDoorCdnProfileName string
+param frontDoorCdnEndpointName string
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
@@ -61,7 +65,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
           action: 'Allow'
         }
       ]
-      defaultAction: 'Allow' // TODO currently this is to allow unrestricted anonymous access to the public container, but we should be implementing a Front Door as a standard that uses a Private Endpoint to proxy reuests to the Storage Account
+      defaultAction: 'Allow'
       bypass: 'None'
     }
     encryption: {
@@ -146,5 +150,15 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (fu
     storageAccountName: storageAccountName
     containers: [publicContainerName, privateContainerName]
     retentionPeriod: longTermBackupRetentionPeriod
+  }
+}
+
+module frontDoorCdn './storage-account-front-door-cdn.bicep' = if (provisionFrontDoorCdn) {
+  name: 'storage-account-front-door-cdn'
+  params: {
+    frontDoorProfileName: frontDoorCdnProfileName
+    endpointName: frontDoorCdnEndpointName
+    storageAccountName: storageAccountName
+    storageAccountPublicContainerName: publicContainerName
   }
 }

@@ -51,6 +51,15 @@
     "storageAccountLongTermBackups": {
       "value": false
     },
+    "storageAccountProvisionFrontDoorCdn": {
+      "value": true
+    },
+    "storageAccountFrontDoorCdnProfileName": {
+      "value": "shopware-azure-cdn-test"
+    },
+    "storageAccountFrontDoorCdnEndpointName": {
+      "value": "shopware-azure-cdn-endpoint-test"
+    },
     "databaseServerName": {
       "value": "shopware-azure-db-test"
     },
