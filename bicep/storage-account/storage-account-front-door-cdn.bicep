@@ -5,8 +5,6 @@ param endpointName string
 param storageAccountName string
 param storageAccountPublicContainerName string
 
-param ipRules array
-
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-06-01' = {
   name: frontDoorProfileName
   location: 'global'
@@ -75,76 +73,5 @@ resource cdnRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2025-06-01' = {
     httpsRedirect: 'Enabled'
     enabledState: 'Enabled'
     linkToDefaultDomain: 'Enabled'
-  }
-}
-
-resource cdnSecurityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2025-06-01' = {
-  name: 'cdn-security-policy'
-  parent: frontDoorProfile
-  properties: {
-    parameters: {
-      type: 'WebApplicationFirewall'
-      wafPolicy: {
-        id: cdnWafPolicy.id
-      }
-      associations: [
-        {
-          domains: [
-            {
-              id: endpoint.id
-            }
-          ]
-          patternsToMatch: [
-            '/*'
-          ]
-        }
-      ]
-    }
-  }
-}
-
-var ipAllowances = map(filter(ipRules, ipRule => ipRule.action == 'Allow'), ipRule => ipRule.ipAddressRange)
-resource cdnWafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2025-03-01' = if (!empty(ipAllowances)) {
-  name: 'cdnWafPolicy'
-  location: location
-  sku: {
-    name: 'Standard_AzureFrontDoor'
-  }
-  properties: {
-    customRules: {
-      rules: [
-        // IP rule allowances
-        {
-          name: 'ipAllowances'
-          ruleType: 'MatchRule'
-          priority: 100
-          matchConditions: [
-            {
-              operator: 'IPMatch'
-              matchVariable: 'SocketAddr'
-              matchValue: ipAllowances
-            }
-          ]
-          action: 'Allow'
-        }
-        // Catch all rule to block everything else
-        {
-          name: 'catchAllBlock'
-          priority: 200
-          ruleType: 'MatchRule'
-          matchConditions: [
-            {
-              operator: 'IPMatch'
-              matchVariable: 'SocketAddr'
-              matchValue: [
-                '0.0.0.0/0'
-                '::/0'
-              ]
-            }
-          ]
-          action: 'Block'
-        }
-      ]
-    }
   }
 }
