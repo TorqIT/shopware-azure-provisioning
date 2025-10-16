@@ -69,9 +69,38 @@ resource cdnRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2025-06-01' = {
     patternsToMatch: [
       '/*'
     ]
+    ruleSets: [
+      storageAccountRuleSet
+    ]
     forwardingProtocol: 'MatchRequest'
     httpsRedirect: 'Enabled'
     enabledState: 'Enabled'
     linkToDefaultDomain: 'Enabled'
+  }
+}
+
+resource storageAccountRuleSet 'Microsoft.Cdn/profiles/ruleSets@2025-06-01' = {
+  parent: frontDoorProfile
+  name: 'storageAccount'
+
+  // Rule to route all requests to public container
+  resource publicContainerRewrite 'rules' = {
+    name: 'publicContainerRewrite'
+    properties: {
+      order: 1
+      conditions: [
+      ]
+      actions: [
+        {
+          name: 'UrlRewrite'
+          parameters: {
+            typeName: 'DeliveryRuleUrlRewriteActionParameters'
+            sourcePattern: '/'
+            destination: '/${storageAccountPublicContainerName}/{url_path}'
+            preserveUnmatchedPath: false
+          }
+        }
+      ]
+    }
   }
 }
