@@ -26,56 +26,78 @@ param servicesVmSubnetName string
 @description('Address space to allocate for the services VM. Note that a subnet of at least /29 is required.')
 param servicesVmSubnetAddressSpace string
 
-var defaultSubnets = [
-  {
-    name: containerAppsSubnetName
-    properties: {
-      addressPrefix: containerAppsSubnetAddressSpace
-      // When using workload profiles with Container Apps requires the subnet to be delegated to Microsoft.App/environments;
-      // for some reason, using a Consumption-only plan does not work with this setup
-      delegations: containerAppsEnvironmentUseWorkloadProfiles ? [
-        {
-          name: 'Microsoft.App/environments'
-          properties: {
-            serviceName: 'Microsoft.App/environments'
-          }
-        }
-      ] : []
-      serviceEndpoints: [
-        {
-          service: 'Microsoft.Storage'
-        }
-        {
-          service: 'Microsoft.KeyVault'
-        }
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-11-01' = {
+  name: virtualNetworkName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        virtualNetworkAddressSpace
       ]
     }
   }
-  {
-    name: databaseSubnetName
-    properties: {
-      addressPrefix: databaseSubnetAddressSpace
-      delegations: [
-        {
-          name: 'Microsoft.DBforMySQL/flexibleServers'
-          properties: {
-            serviceName: 'Microsoft.DBforMySQL/flexibleServers'
-          }
+  // VERY IMPORTANT - the subnets property is deliberately excluded so that any subnets
+  // that are not managed in the list below are untouched. Adding subnets: [] would result
+  // in the existing subnets on the VNet being destroyed.
+}
+
+// SUBNETS
+
+resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
+  name: containerAppsSubnetName
+  parent: virtualNetwork
+  properties: {
+    addressPrefix: containerAppsSubnetAddressSpace
+    // When using workload profiles with Container Apps requires the subnet to be delegated to Microsoft.App/environments;
+    // for some reason, using a Consumption-only plan does not work with this setup
+    delegations: containerAppsEnvironmentUseWorkloadProfiles ? [
+      {
+        name: 'Microsoft.App/environments'
+        properties: {
+          serviceName: 'Microsoft.App/environments'
         }
-      ]
-    }
+      }
+    ] : []
+    serviceEndpoints: [
+      {
+        service: 'Microsoft.Storage'
+      }
+      {
+        service: 'Microsoft.KeyVault'
+      }
+    ]
   }
-]
+}
+
+resource databaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
+  name: databaseSubnetName
+  parent: virtualNetwork
+  properties: {
+    addressPrefix: databaseSubnetAddressSpace
+    delegations: [
+      {
+        name: 'Microsoft.DBforMySQL/flexibleServers'
+        properties: {
+          serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+        }
+      }
+    ]
+  }
+}
+
 // TODO this is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
 // that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
-var privateEndpointsSubnet = (privateEndpointsSubnetName != containerAppsSubnetName) ? [{
+resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = if (privateEndpointsSubnetName != containerAppsSubnetName) {
   name: privateEndpointsSubnetName
+  parent: virtualNetwork
   properties: {
     addressPrefix: privateEndpointsSubnetAddressSpace
   }
-}]: []
-var n8nPostgresSubnet = provisionN8N ? [{
+}
+
+resource n8nDatabaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = if (provisionN8N) {
   name: n8nDatabaseSubnetName
+  parent: virtualNetwork
   properties: {
     addressPrefix: n8nDatabaseSubnetAddressSpace
     delegations: [
@@ -87,24 +109,12 @@ var n8nPostgresSubnet = provisionN8N ? [{
       }
     ]
   }
-}] : []
-var servicesVmSubnet = provisionServicesVM ? [{
+}
+
+resource servicesVmSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = if (provisionServicesVM) {
   name: servicesVmSubnetName
+  parent: virtualNetwork
   properties: {
     addressPrefix: servicesVmSubnetAddressSpace
-  }
-}] : []
-var subnets = concat(defaultSubnets, privateEndpointsSubnet, n8nPostgresSubnet, servicesVmSubnet)
-
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2019-11-01' = {
-  name: virtualNetworkName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        virtualNetworkAddressSpace
-      ]
-    }
-    subnets: subnets
   }
 }
