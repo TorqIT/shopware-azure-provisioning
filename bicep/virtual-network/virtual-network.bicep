@@ -31,6 +31,9 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
       ]
     }
   }
+  // VERY IMPORTANT - the subnets property is deliberately excluded so that any subnets
+  // that are not managed in the list below are untouched. Adding subnets: [] would result
+  // in the existing subnets on the VNet being destroyed.
 }
 
 resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
