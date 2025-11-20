@@ -12,7 +12,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
 }
 
 resource alert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
-  name: '${containerAppName}-memory-alert'
+  name: '${containerAppName}-restarts-alert'
   location: 'Global'
   properties: {
     description: 'Alert when total restarts of replica is 3 or more over the last 5 minutes'
