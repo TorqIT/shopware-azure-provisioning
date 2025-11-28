@@ -154,31 +154,6 @@ resource storageAccountRuleSet 'Microsoft.Cdn/profiles/ruleSets@2025-06-01' = {
   }
 }
 
-resource cdnSecurityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2025-06-01' = {
-  name: 'cdn-security-policy'
-  parent: frontDoorProfile
-  properties: {
-    parameters: {
-      type: 'WebApplicationFirewall'
-      wafPolicy: {
-        id: cdnWafPolicy.id
-      }
-      associations: [
-        {
-          domains: [
-            {
-              id: endpoint.id
-            }
-          ]
-          patternsToMatch: [
-            '/*'
-          ]
-        }
-      ]
-    }
-  }
-}
-
 var ipAllowances = map(filter(ipRules, ipRule => ipRule.action == 'Allow'), ipRule => ipRule.ipAddressRange)
 resource cdnWafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2025-03-01' = if (!empty(ipAllowances)) {
   name: 'cdnWafPolicy'
@@ -219,6 +194,31 @@ resource cdnWafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies
             }
           ]
           action: 'Block'
+        }
+      ]
+    }
+  }
+}
+
+resource cdnSecurityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2025-06-01' = if (!empty(ipAllowances)) {
+  name: 'cdn-security-policy'
+  parent: frontDoorProfile
+  properties: {
+    parameters: {
+      type: 'WebApplicationFirewall'
+      wafPolicy: {
+        id: cdnWafPolicy.id
+      }
+      associations: [
+        {
+          domains: [
+            {
+              id: endpoint.id
+            }
+          ]
+          patternsToMatch: [
+            '/*'
+          ]
         }
       ]
     }
