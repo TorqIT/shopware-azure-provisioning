@@ -101,6 +101,7 @@ param n8nDatabaseServerName string
 param n8nDatabaseName string
 param n8nDatabaseAdminUser string
 param n8nDatabaseAdminPasswordSecretName string
+param n8nWebhookUrl string
 param n8nContainerAppProvisionCronScaleRule bool
 param n8nContainerAppCronScaleRuleDesiredReplicas int
 param n8nContainerAppCronScaleRuleStartSchedule string
@@ -354,6 +355,7 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
     databaseName: n8nDatabaseName
     databaseUser: n8nDatabaseAdminUser
     databasePasswordSecretName: n8nDatabaseAdminPasswordSecretName
+    webhookUrl: n8nWebhookUrl
 
     // Optional scaling rules
     provisionCronScaleRule: n8nContainerAppProvisionCronScaleRule

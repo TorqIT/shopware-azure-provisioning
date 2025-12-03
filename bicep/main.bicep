@@ -420,6 +420,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     n8nDatabaseName: n8nDatabaseName
     n8nDatabaseAdminUser: n8nDatabaseAdminUser
     n8nDatabaseAdminPasswordSecretName: n8nDatabaseAdminPasswordKeyVaultSecretName
+    n8nWebhookUrl: n8nWebhookUrl
     n8nStorageAccountName: n8nDataStorageAccountName
     n8nStorageAccountFileShareName: n8nDataStorageAccountFileShareName
     n8nContainerAppVolumeName: n8nContainerAppVolumeName
@@ -516,6 +517,7 @@ param n8nDatabaseStorageSizeGB int = 32
 param n8nDatabaseBackupRetentionDays int = 7
 param n8nVirtualNetworkDatabaseSubnetName string = 'postgres'
 param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
+param n8nWebhookUrl string = ''
 module n8n './n8n/n8n.bicep' = if (fullProvision && provisionN8N) {
   name: 'n8n'
   dependsOn: [virtualNetwork]

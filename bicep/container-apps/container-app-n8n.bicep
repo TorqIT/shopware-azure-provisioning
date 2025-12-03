@@ -24,6 +24,8 @@ param databaseName string
 param databaseUser string
 param databasePasswordSecretName string
 
+param webhookUrl string
+
 param provisionCronScaleRule bool
 param cronScaleRuleDesiredReplicas int
 param cronScaleRuleStartSchedule string
@@ -84,6 +86,10 @@ var envVars = [
   {
     name: 'DB_POSTGRESDB_SCHEMA'
     value: 'public'
+  }
+  {
+    name: 'WEBHOOK_URL'
+    value: webhookUrl
   }
 ]
 
