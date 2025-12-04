@@ -7,4 +7,11 @@
 RESOURCE_GROUP=$(jq -r '.parameters.resourceGroupName.value' $1)
 SUPERVISORD_CONTAINER_APP=$(jq -r '.parameters.supervisordContainerAppName.value' $1)
 
-az containerapp exec --resource-group $RESOURCE_GROUP --name $SUPERVISORD_CONTAINER_APP --command bash
+az containerapp exec \
+  --resource-group $RESOURCE_GROUP \
+  --name $SUPERVISORD_CONTAINER_APP \
+  --command "runuser -u www-data -- /bin/bash"
+
+# Restore terminal on exit due to Azure CLI bug
+stty sane 2>/dev/null
+reset 2>/dev/null
