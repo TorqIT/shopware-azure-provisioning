@@ -286,7 +286,9 @@ param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
 param phpContainerAppIpSecurityRestrictions array = []
 param phpContainerAppInternalPort int = 80
-// Optional scale rules
+// Optional scaling rules
+param phpContainerAppProvisionHttpScaleRule bool = true
+param phpContainerAppHttpScaleRuleConcurrentRequestsThreshold int = 20
 param phpContainerAppProvisionCronScaleRule bool = false
 param phpContainerAppCronScaleRuleDesiredReplicas int = 1
 param phpContainerAppCronScaleRuleStartSchedule string = ''
@@ -347,6 +349,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
     phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions
     phpContainerAppInternalPort: phpContainerAppInternalPort
+    phpContainerAppProvisionHttpScaleRule: phpContainerAppProvisionHttpScaleRule
+    phpContainerAppHttpScaleRuleConcurrentRequestsThreshold: phpContainerAppHttpScaleRuleConcurrentRequestsThreshold
     phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
     phpContainerAppCronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
     phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
