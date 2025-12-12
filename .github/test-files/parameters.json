@@ -96,6 +96,12 @@
     "phpContainerAppMinReplicas": {
       "value": 0
     },
+    "phpContainerAppProvisionHttpScaleRule": {
+      "value": true
+    },
+    "phpContainerAppHttpScaleRuleConcurrentRequestsThreshold": {
+      "value": 30
+    },
     "phpContainerAppIpSecurityRestrictions": {
       "value": [
         {

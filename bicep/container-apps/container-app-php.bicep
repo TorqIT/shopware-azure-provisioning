@@ -26,6 +26,8 @@ param appSecretSecret object
 param additionalSecrets array
 
 // Optional scaling rules
+param provisionHttpScaleRule bool
+param httpScaleRuleConcurrentRequestsThreshold int
 param provisionCronScaleRule bool
 param cronScaleRuleDesiredReplicas int
 param cronScaleRuleStartSchedule string
@@ -58,6 +60,8 @@ module volumesModule './container-apps-volumes.bicep' = {
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
   name: 'container-app-scale-rules'
   params: {
+    provisionHttpScaleRule: provisionHttpScaleRule
+    httpScaleRuleConcurrentRequestsThreshold: httpScaleRuleConcurrentRequestsThreshold
     provisionCronScaleRule: provisionCronScaleRule
     cronScaleRuleTimezone: cronScaleRuleTimezone
     cronScaleRuleStartSchedule: cronScaleRuleStartSchedule
