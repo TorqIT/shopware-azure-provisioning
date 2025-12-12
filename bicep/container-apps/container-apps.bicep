@@ -45,6 +45,8 @@ param phpContainerAppMinReplicas int
 param phpContainerAppMaxReplicas int
 param phpContainerAppIpSecurityRestrictions array
 // Optional scale rules
+param phpContainerAppProvisionHttpScaleRule bool
+param phpContainerAppHttpScaleRuleConcurrentRequestsThreshold int
 param phpContainerAppProvisionCronScaleRule bool
 param phpContainerAppCronScaleRuleDesiredReplicas int
 param phpContainerAppCronScaleRuleStartSchedule string
@@ -102,6 +104,8 @@ param n8nDatabaseName string
 param n8nDatabaseAdminUser string
 param n8nDatabaseAdminPasswordSecretName string
 param n8nWebhookUrl string
+param n8nContainerAppProvisionHttpScaleRule bool
+param n8nContainerAppHttpScaleRuleConcurrentRequestsThreshold int
 param n8nContainerAppProvisionCronScaleRule bool
 param n8nContainerAppCronScaleRuleDesiredReplicas int
 param n8nContainerAppCronScaleRuleStartSchedule string
@@ -284,6 +288,8 @@ module phpContainerApp 'container-app-php.bicep' = {
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
 
     // Optional scaling rules
+    provisionHttpScaleRule: phpContainerAppProvisionHttpScaleRule
+    httpScaleRuleConcurrentRequestsThreshold: phpContainerAppHttpScaleRuleConcurrentRequestsThreshold
     provisionCronScaleRule: phpContainerAppProvisionCronScaleRule
     cronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
     cronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
@@ -358,6 +364,8 @@ module n8nContainerApp './container-app-n8n.bicep' = if (provisionN8N) {
     webhookUrl: n8nWebhookUrl
 
     // Optional scaling rules
+    provisionHttpScaleRule: n8nContainerAppProvisionHttpScaleRule
+    httpScaleRuleConcurrentRequestsThreshold: n8nContainerAppHttpScaleRuleConcurrentRequestsThreshold
     provisionCronScaleRule: n8nContainerAppProvisionCronScaleRule
     cronScaleRuleDesiredReplicas: n8nContainerAppCronScaleRuleDesiredReplicas
     cronScaleRuleStartSchedule: n8nContainerAppCronScaleRuleStartSchedule

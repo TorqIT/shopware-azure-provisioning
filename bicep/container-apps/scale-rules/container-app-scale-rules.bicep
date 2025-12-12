@@ -1,15 +1,17 @@
+param provisionHttpScaleRule bool
 param provisionCronScaleRule bool
 param cronScaleRuleDesiredReplicas int
 param cronScaleRuleStartSchedule string
 param cronScaleRuleEndSchedule string
 param cronScaleRuleTimezone string
+param httpScaleRuleConcurrentRequestsThreshold int
 
-var defaultScaleRules = [
+var httpScaleRule = [
   {
     name: 'default-http-scale-rule'
     http: {
       metadata: {
-        concurrentRequests: string(50)
+        concurrentRequests: string(httpScaleRuleConcurrentRequestsThreshold)
       }
     }
   }
@@ -26,7 +28,7 @@ module cronScaleRule './container-app-cron-scale-rule.bicep' = if (provisionCron
 }
 
 var scaleRules = concat(
-  defaultScaleRules, 
+  provisionHttpScaleRule ? httpScaleRule : [],
   provisionCronScaleRule ? [cronScaleRule.outputs.cronScaleRule] : []
 )
 

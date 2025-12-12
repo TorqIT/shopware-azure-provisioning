@@ -299,6 +299,8 @@ param phpContainerAppMinReplicas int = 1
 param phpContainerAppMaxReplicas int = 1
 param phpContainerAppIpSecurityRestrictions array = []
 // Optional scaling rules
+param phpContainerAppProvisionHttpScaleRule bool = true
+param phpContainerAppHttpScaleRuleConcurrentRequestsThreshold int = 20
 param phpContainerAppProvisionCronScaleRule bool = false
 param phpContainerAppCronScaleRuleDesiredReplicas int = 1
 param phpContainerAppCronScaleRuleStartSchedule string = ''
@@ -394,6 +396,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
 
     // Optional scaling rules
+    phpContainerAppProvisionHttpScaleRule: phpContainerAppProvisionHttpScaleRule
+    phpContainerAppHttpScaleRuleConcurrentRequestsThreshold: phpContainerAppHttpScaleRuleConcurrentRequestsThreshold
     phpContainerAppProvisionCronScaleRule: phpContainerAppProvisionCronScaleRule
     phpContainerAppCronScaleRuleDesiredReplicas: phpContainerAppCronScaleRuleDesiredReplicas
     phpContainerAppCronScaleRuleStartSchedule: phpContainerAppCronScaleRuleStartSchedule
@@ -424,6 +428,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     n8nStorageAccountName: n8nDataStorageAccountName
     n8nStorageAccountFileShareName: n8nDataStorageAccountFileShareName
     n8nContainerAppVolumeName: n8nContainerAppVolumeName
+    n8nContainerAppProvisionHttpScaleRule: n8nContainerAppProvisionHttpScaleRule
+    n8nContainerAppHttpScaleRuleConcurrentRequestsThreshold: n8nContainerAppHttpScaleRuleConcurrentRequestsThreshold
     n8nContainerAppProvisionCronScaleRule: n8nContainerAppProvisionCronScaleRule
     n8nContainerAppCronScaleRuleDesiredReplicas: n8nContainerAppCronScaleRuleDesiredReplicas
     n8nContainerAppCronScaleRuleEndSchedule: n8nContainerAppCronScaleRuleEndSchedule
@@ -494,6 +500,8 @@ param n8nContainerAppMemory string = '0.5Gi'
 param n8nContainerAppCustomDomains array = []
 param n8nContainerAppMinReplicas int = 1
 param n8nContainerAppMaxReplicas int = 1
+param n8nContainerAppProvisionHttpScaleRule bool = false
+param n8nContainerAppHttpScaleRuleConcurrentRequestsThreshold int = 50
 param n8nContainerAppProvisionCronScaleRule bool = false 
 param n8nContainerAppCronScaleRuleDesiredReplicas int = 1
 param n8nContainerAppCronScaleRuleTimezone string = 'Etc/UTC'
