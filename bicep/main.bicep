@@ -320,8 +320,11 @@ param redisContainerAppMaxMemorySetting string = '256mb'
 @allowed(['0', '1'])
 param appDebug string
 param appEnv string
+// Deprecated - was wrongly named, pimcoreDevMode should be used instead
 @allowed(['0', '1'])
 param pimcoreDev string
+@allowed(['0', '1'])
+param pimcoreDevMode string = pimcoreDev
 param pimcoreEnvironment string
 param redisDb string
 param redisSessionDb string
@@ -371,7 +374,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
     phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions
-    pimcoreDev: pimcoreDev
+    pimcoreDevMode: pimcoreDevMode
     pimcoreEnvironment: pimcoreEnvironment
     redisContainerAppName: redisContainerAppName
     redisDb: redisDb

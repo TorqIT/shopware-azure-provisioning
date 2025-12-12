@@ -67,7 +67,7 @@ param appDebug string
 param appEnv string
 param databaseName string
 param databaseUser string
-param pimcoreDev string
+param pimcoreDevMode string
 param pimcoreEnvironment string
 param redisDb string
 param redisSessionDb string
@@ -206,7 +206,7 @@ module environmentVariables 'container-apps-env-variables.bicep' = {
     databaseName: databaseName
     databaseUser: databaseUser
     databasePasswordSecretRefName: databasePasswordSecretRefName
-    pimcoreDev: pimcoreDev
+    pimcoreDevMode: pimcoreDevMode
     pimcoreEnvironment: pimcoreEnvironment
     redisHost: redisContainerAppName
     redisDb: redisDb
