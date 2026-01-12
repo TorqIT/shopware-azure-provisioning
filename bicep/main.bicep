@@ -121,7 +121,7 @@ param storageAccountLongTermBackupRetentionPeriod string = 'P365D'
 param storageAccountProvisionFrontDoorCdn bool = false
 param storageAccountFrontDoorCdnProfileName string = ''
 param storageAccountFrontDoorCdnEndpointName string = ''
-module storageAccount 'storage-account/storage-account.bicep' = if (fullProvision) {
+module storageAccount 'storage-account/storage-account.bicep' = {
   name: 'storage-account'
   dependsOn: [virtualNetwork, backupVault]
   params: {
