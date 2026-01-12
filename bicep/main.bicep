@@ -210,6 +210,7 @@ module criticalMetricAlertsActionGroup 'insights/metric-alerts/metrics-action-gr
 }
 
 // Database
+param skipDatabase bool = false
 param databaseServerName string
 param databaseServerVersion string = '8.0.21'
 param databaseAdminUsername string = 'adminuser'
@@ -228,7 +229,7 @@ param databaseBackupsStorageAccountSku string = 'Standard_LRS'
 param databaseBackupsStorageAccountKind string = 'StorageV2'
 param databaseBackupsStorageAccountContainerName string = 'database'
 param databasePrivateEndpointName string = '${databaseServerName}-private-endpoint'
-module database 'database/database.bicep' = {
+module database 'database/database.bicep' = if (!skipDatabase) {
   name: 'database'
   dependsOn: [virtualNetwork, backupVault, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
