@@ -126,7 +126,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 }
 
 // We use a Private Endpoint (and Private DNS Zone) to integrate with the Virtual Network
-module storageAccountPrivateEndpoint './storage-account-private-endpoint.bicep' = {
+module storageAccountPrivateEndpoint './storage-account-private-endpoint.bicep' = if (fullProvision) {
   name: 'storage-account-private-endpoint'
   dependsOn: [storageAccount]
   params: {
@@ -153,7 +153,7 @@ module storageAccountBackupVault './storage-account-backup-vault.bicep' = if (fu
   }
 }
 
-module frontDoorCdn './storage-account-front-door-cdn.bicep' = if (provisionFrontDoorCdn) {
+module frontDoorCdn './storage-account-front-door-cdn.bicep' = if (fullProvision && provisionFrontDoorCdn) {
   name: 'storage-account-front-door-cdn'
   params: {
     frontDoorProfileName: frontDoorCdnProfileName
