@@ -68,6 +68,7 @@ param privateDnsZoneForDatabaseName string = 'privatelink.mysql.database.azure.c
 param privateDnsZoneForStorageAccountsName string = 'privatelink.blob.${environment().suffixes.storage}'
 module privateDnsZones './private-dns-zones/private-dns-zones.bicep' = if (fullProvision) {
   name: 'private-dns-zones'
+  dependsOn: [virtualNetwork]
   params:{
     privateDnsZonesResourceGroupName: privateDnsZonesResourceGroupName
     virtualNetworkName: virtualNetworkName
