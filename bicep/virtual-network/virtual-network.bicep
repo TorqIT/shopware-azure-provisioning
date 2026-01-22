@@ -36,13 +36,15 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
   // in the existing subnets on the VNet being destroyed.
 }
 
-resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
+// SUBNETS
+// Each subnet must wait for the previous one to be created, otherwise simultaneous operations will try to update the VNet and fail - hence the dependsOn properties
+
+resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
+  name: containerAppsSubnetName
   parent: virtualNetwork
   name: containerAppsSubnetName
   properties: {
     addressPrefix: containerAppsSubnetAddressSpace
-    // When using workload profiles with Container Apps requires the subnet to be delegated to Microsoft.App/environments;
-    // for some reason, using a Consumption-only plan does not work with this setup
     delegations: containerAppsEnvironmentUseWorkloadProfiles ? [
       {
         name: 'Microsoft.App/environments'
@@ -50,7 +52,7 @@ resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-
           serviceName: 'Microsoft.App/environments'
         }
       }
-    ] : []
+    ]: []
     serviceEndpoints: [
       {
         service: 'Microsoft.Storage'
@@ -62,29 +64,10 @@ resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-
   }
 }
 
-resource databaseSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
-  parent: virtualNetwork
-  name: databaseSubnetName
-  dependsOn: [containerAppsSubnet] // hacky workaround as Azure does not support subnets being deployed in parallel
-  properties: {
-    addressPrefix: databaseSubnetAddressSpace
-    delegations: [
-      {
-        name: 'Microsoft.DBforMySQL/flexibleServers'
-        properties: {
-          serviceName: 'Microsoft.DBforMySQL/flexibleServers'
-        }
-      }
-    ]
-  }
-}
-
-// TODO the condition here is a leftover of placing Private Endpoints improperly into the Container Apps subnet. This is to accommodate legacy apps
-// that use this setup, but all new applications should provision a separate subnet for Private Endpoints.
-resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = if (privateEndpointsSubnetName != containerAppsSubnetName) {
-  parent: virtualNetwork
+resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
   name: privateEndpointsSubnetName
-  dependsOn: [containerAppsSubnet, databaseSubnet] // hacky workaround as Azure does not support subnets being deployed in parallel
+  parent: virtualNetwork
+  dependsOn: [containerAppsSubnet]
   properties: {
     addressPrefix: privateEndpointsSubnetAddressSpace
   }
@@ -92,8 +75,24 @@ resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-
 
 resource servicesVmSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = if (provisionServicesVM) {
   parent: virtualNetwork
+  dependsOn: [privateEndpointsSubnet]
+  properties: {
+    addressPrefix: n8nDatabaseSubnetAddressSpace
+    delegations: [
+      {
+        name: 'Microsoft.DBforPostgreSQL/flexibleServers'
+        properties: {
+          serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
+        }
+      }
+    ]
+  }
+}
+
+resource servicesVmSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = if (provisionServicesVM) {
   name: servicesVmSubnetName
-  dependsOn: [containerAppsSubnet, databaseSubnet, privateEndpointsSubnet] // hacky workaround as Azure does not support subnets being deployed in parallel
+  parent: virtualNetwork
+  dependsOn: [privateEndpointsSubnet]
   properties: {
     addressPrefix: servicesVmSubnetAddressSpace
   }
