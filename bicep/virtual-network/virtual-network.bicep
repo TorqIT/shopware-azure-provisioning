@@ -42,7 +42,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
 resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
   name: containerAppsSubnetName
   parent: virtualNetwork
-  name: containerAppsSubnetName
   properties: {
     addressPrefix: containerAppsSubnetAddressSpace
     delegations: containerAppsEnvironmentUseWorkloadProfiles ? [
@@ -70,22 +69,6 @@ resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-
   dependsOn: [containerAppsSubnet]
   properties: {
     addressPrefix: privateEndpointsSubnetAddressSpace
-  }
-}
-
-resource servicesVmSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = if (provisionServicesVM) {
-  parent: virtualNetwork
-  dependsOn: [privateEndpointsSubnet]
-  properties: {
-    addressPrefix: n8nDatabaseSubnetAddressSpace
-    delegations: [
-      {
-        name: 'Microsoft.DBforPostgreSQL/flexibleServers'
-        properties: {
-          serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
-        }
-      }
-    ]
   }
 }
 
