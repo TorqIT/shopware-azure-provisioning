@@ -80,7 +80,7 @@ jobs:
       - name: Provision the Azure environment
         id: deploy
         run: |
-          mv ${{ inputs.PARAMETERS_FILE }} parameters.json
+          mv "${{ inputs.PARAMETERS_FILE }}" parameters.json
           docker compose \
             --file ${{ inputs.DOCKER_COMPOSE_FILE }} \
             exec ${{ inputs.AZURE_DOCKER_COMPOSE_SERVICE }} \
