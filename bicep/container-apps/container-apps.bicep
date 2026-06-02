@@ -83,6 +83,8 @@ param additionalVolumesAndMounts array
 param provisionMetricAlerts bool
 param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
+param phpContainerAppResponseTimeAlertThreshold int
+param phpContainerAppResponseTimeAlertTimeWindow string
 
 // ENVIRONMENT
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
@@ -265,5 +267,7 @@ module alerts './alerts/container-app-alerts.bicep' = [for containerAppName in [
   params: {
     containerAppName: containerAppName
     generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    responseTimeAlertThreshold: phpContainerAppResponseTimeAlertThreshold
+    responseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
   }
-}] 
+}]
