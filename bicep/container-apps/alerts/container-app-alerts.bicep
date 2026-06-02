@@ -1,6 +1,5 @@
 param containerAppName string
 param generalMetricAlertsActionGroupName string
-
 param responseTimeAlertThreshold int
 param responseTimeAlertTimeWindow string
 
