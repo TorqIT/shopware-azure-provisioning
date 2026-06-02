@@ -27,8 +27,8 @@ resource alert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
       'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
       allOf: [
         {
-          name: 'RequestLatency'
-          metricName: 'RequestLatency'
+          name: 'ResponseTime'
+          metricName: 'ResponseTime'
           timeAggregation: 'Average'
           operator: 'GreaterThan'
           threshold: threshold
