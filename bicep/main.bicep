@@ -293,7 +293,7 @@ param phpContainerAppCronScaleRuleDesiredReplicas int = 1
 param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
-param phpContainerAppResponseTimeAlertThreshold int = 3000
+param phpContainerAppResponseTimeAlertThreshold int = 5000
 param phpContainerAppResponseTimeAlertTimeWindow string = 'PT5M'
 // Supervisord Container App
 param supervisordContainerAppName string
