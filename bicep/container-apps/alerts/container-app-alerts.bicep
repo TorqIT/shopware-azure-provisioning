@@ -3,6 +3,10 @@ param generalMetricAlertsActionGroupName string
 param responseTimeAlertThreshold int
 param responseTimeAlertTimeWindow string
 
+resource containerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
+  name: containerAppName
+}
+
 module memoryAlerts './container-app-memory-alerts.bicep' = {
   name: '${containerAppName}-memory-alerts'
   params: {
@@ -26,5 +30,6 @@ module responseTimeAlert './container-app-response-time-alert.bicep' = {
     generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
     threshold: responseTimeAlertThreshold
     alertTimeWindow: responseTimeAlertTimeWindow
+    ingressEnabled: containerApp.properties.configuration.?ingress != null
   }
 }

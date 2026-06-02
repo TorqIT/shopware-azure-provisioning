@@ -3,6 +3,7 @@ param generalMetricAlertsActionGroupName string
 
 param threshold int
 param alertTimeWindow string
+param ingressEnabled bool
 
 resource actionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
   name: generalMetricAlertsActionGroupName
@@ -11,7 +12,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
   name: containerAppName
 }
 
-resource alert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+resource alert 'Microsoft.Insights/metricAlerts@2018-03-01' = if (ingressEnabled) {
   name: '${containerAppName}-response-time-alert'
   location: 'Global'
   properties: {
