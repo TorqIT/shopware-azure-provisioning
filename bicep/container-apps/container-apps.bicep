@@ -80,6 +80,8 @@ param additionalVolumesAndMounts array
 param provisionMetricAlerts bool
 param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
+param phpContainerAppResponseTimeAlertThreshold int
+param phpContainerAppResponseTimeAlertTimeWindow string
 
 // Optional Portal Engine provisioning
 param provisionForPortalEngine bool
@@ -383,5 +385,7 @@ module alerts './alerts/container-app-alerts.bicep' = [for containerAppName in [
   params: {
     containerAppName: containerAppName
     generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    responseTimeAlertThreshold: phpContainerAppResponseTimeAlertThreshold
+    responseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
   }
-}] 
+}]

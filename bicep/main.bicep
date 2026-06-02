@@ -305,6 +305,8 @@ param phpContainerAppCronScaleRuleDesiredReplicas int = 1
 param phpContainerAppCronScaleRuleStartSchedule string = ''
 param phpContainerAppCronScaleRuleEndSchedule string = ''
 param phpContainerAppCronScaleRuleTimezone string = ''
+param phpContainerAppResponseTimeAlertThreshold int = 5000
+param phpContainerAppResponseTimeAlertTimeWindow string = 'PT5M'
 // Supervisord Container App
 param supervisordContainerAppName string
 param supervisordContainerAppImageName string = 'supervisord'
@@ -398,6 +400,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     provisionMetricAlerts: provisionMetricAlerts
     generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
     criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
+    phpContainerAppResponseTimeAlertThreshold: phpContainerAppResponseTimeAlertThreshold
+    phpContainerAppResponseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
 
     // Optional scaling rules
     phpContainerAppProvisionHttpScaleRule: phpContainerAppProvisionHttpScaleRule
