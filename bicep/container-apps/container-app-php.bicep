@@ -6,6 +6,13 @@ param imageName string
 param customDomains array
 param cpuCores string
 param memory string
+param provisionStartupProbe bool
+param startupProbePath string
+param provisionLivenessProbe bool
+param livenessProbePath string
+param provisionReadinessProbe bool
+param readinessProbePath string
+param probePort int
 param minReplicas int
 param maxReplicas int
 param isExternal bool
@@ -53,6 +60,20 @@ module volumesModule './container-apps-volumes.bicep' = {
   name: 'container-app-php-volumes'
   params: {
     additionalVolumesAndMounts: additionalVolumesAndMounts
+  }
+}
+
+// Health probes
+module probesModule './container-app-probes.bicep' = {
+  name: 'container-app-php-probes'
+  params: {
+    provisionStartupProbe: provisionStartupProbe
+    startupProbePath: startupProbePath
+    provisionLivenessProbe: provisionLivenessProbe
+    livenessProbePath: livenessProbePath
+    provisionReadinessProbe: provisionReadinessProbe
+    readinessProbePath: readinessProbePath
+    probePort: probePort
   }
 }
 
@@ -180,16 +201,19 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
     }
     template: {
       containers: [
-        {
-          name: imageName
-          image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-          env: environmentVariables
-          resources: {
-            cpu: json(cpuCores)
-            memory: memory
-          }
-          volumeMounts: volumesModule.outputs.volumeMounts
-        }
+        union(
+          {
+            name: imageName
+            image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
+            env: environmentVariables
+            resources: {
+              cpu: json(cpuCores)
+              memory: memory
+            }
+            volumeMounts: volumesModule.outputs.volumeMounts
+          },
+          length(probesModule.outputs.probes) > 0 ? { probes: probesModule.outputs.probes } : {}
+        )
       ]
       volumes: volumesModule.outputs.volumes
       scale: {

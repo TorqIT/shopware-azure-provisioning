@@ -38,6 +38,13 @@ param phpContainerAppExternal bool
 param phpContainerAppCustomDomains array
 param phpContainerAppName string
 param phpContainerAppImageName string
+param phpContainerAppProvisionStartupProbe bool
+param phpContainerAppStartupProbePath string
+param phpContainerAppProvisionLivenessProbe bool
+param phpContainerAppLivenessProbePath string
+param phpContainerAppProvisionReadinessProbe bool
+param phpContainerAppReadinessProbePath string
+param phpContainerAppProbePort int
 param phpContainerAppCpuCores string
 param phpContainerAppMemory string
 param phpContainerAppMinReplicas int
@@ -215,6 +222,13 @@ module phpContainerApp 'container-app-php.bicep' = {
     containerRegistryName: containerRegistryName
     cpuCores: phpContainerAppCpuCores
     memory: phpContainerAppMemory
+    provisionStartupProbe: phpContainerAppProvisionStartupProbe
+    startupProbePath: phpContainerAppStartupProbePath
+    provisionLivenessProbe: phpContainerAppProvisionLivenessProbe
+    livenessProbePath: phpContainerAppLivenessProbePath
+    provisionReadinessProbe: phpContainerAppProvisionReadinessProbe
+    readinessProbePath: phpContainerAppReadinessProbePath
+    probePort: phpContainerAppProbePort
     minReplicas: phpContainerAppMinReplicas
     maxReplicas: phpContainerAppMaxReplicas
     customDomains: phpContainerAppCustomDomains
