@@ -293,10 +293,19 @@ param phpContainerAppImageName string = 'php'
 // Optional health probes - when none are enabled, Azure's default probes are used
 param phpContainerAppProvisionStartupProbe bool = false
 param phpContainerAppStartupProbePath string = '/'
+param phpContainerAppStartupProbeInitialDelaySeconds int = 0
+param phpContainerAppStartupProbePeriodSeconds int = 10
+param phpContainerAppStartupProbeFailureThreshold int = 3
 param phpContainerAppProvisionLivenessProbe bool = false
 param phpContainerAppLivenessProbePath string = '/'
+param phpContainerAppLivenessProbeInitialDelaySeconds int = 0
+param phpContainerAppLivenessProbePeriodSeconds int = 10
+param phpContainerAppLivenessProbeFailureThreshold int = 3
 param phpContainerAppProvisionReadinessProbe bool = false
 param phpContainerAppReadinessProbePath string = '/'
+param phpContainerAppReadinessProbeInitialDelaySeconds int = 0
+param phpContainerAppReadinessProbePeriodSeconds int = 10
+param phpContainerAppReadinessProbeFailureThreshold int = 3
 param phpContainerAppProbePort int = 80
 param phpContainerAppCustomDomains array = []
 param phpContainerAppCpuCores string = '1.5'
@@ -381,10 +390,19 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppExternal: phpContainerAppExternal
     phpContainerAppProvisionStartupProbe: phpContainerAppProvisionStartupProbe
     phpContainerAppStartupProbePath: phpContainerAppStartupProbePath
+    phpContainerAppStartupProbeInitialDelaySeconds: phpContainerAppStartupProbeInitialDelaySeconds
+    phpContainerAppStartupProbePeriodSeconds: phpContainerAppStartupProbePeriodSeconds
+    phpContainerAppStartupProbeFailureThreshold: phpContainerAppStartupProbeFailureThreshold
     phpContainerAppProvisionLivenessProbe: phpContainerAppProvisionLivenessProbe
     phpContainerAppLivenessProbePath: phpContainerAppLivenessProbePath
+    phpContainerAppLivenessProbeInitialDelaySeconds: phpContainerAppLivenessProbeInitialDelaySeconds
+    phpContainerAppLivenessProbePeriodSeconds: phpContainerAppLivenessProbePeriodSeconds
+    phpContainerAppLivenessProbeFailureThreshold: phpContainerAppLivenessProbeFailureThreshold
     phpContainerAppProvisionReadinessProbe: phpContainerAppProvisionReadinessProbe
     phpContainerAppReadinessProbePath: phpContainerAppReadinessProbePath
+    phpContainerAppReadinessProbeInitialDelaySeconds: phpContainerAppReadinessProbeInitialDelaySeconds
+    phpContainerAppReadinessProbePeriodSeconds: phpContainerAppReadinessProbePeriodSeconds
+    phpContainerAppReadinessProbeFailureThreshold: phpContainerAppReadinessProbeFailureThreshold
     phpContainerAppProbePort: phpContainerAppProbePort
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
