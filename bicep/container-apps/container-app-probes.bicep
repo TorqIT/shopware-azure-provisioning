@@ -17,47 +17,48 @@ param readinessProbePeriodSeconds int
 param readinessProbeFailureThreshold int
 
 param probePort int
+param probeScheme string
+
+var isTcp = probeScheme == 'TCP'
+var tcpSocketConfig = { tcpSocket: { port: probePort } }
+var startupHttpConfig = { httpGet: { scheme: probeScheme, port: probePort, path: startupProbePath } }
+var livenessHttpConfig = { httpGet: { scheme: probeScheme, port: probePort, path: livenessProbePath } }
+var readinessHttpConfig = { httpGet: { scheme: probeScheme, port: probePort, path: readinessProbePath } }
 
 var startupProbe = provisionStartupProbe ? [
-  {
-    type: 'Startup'
-    httpGet: {
-      scheme: 'HTTP'
-      port: probePort
-      path: startupProbePath
-    }
-    initialDelaySeconds: startupProbeInitialDelaySeconds
-    periodSeconds: startupProbePeriodSeconds
-    failureThreshold: startupProbeFailureThreshold
-  }
+  union(
+    {
+      type: 'Startup'
+      initialDelaySeconds: startupProbeInitialDelaySeconds
+      periodSeconds: startupProbePeriodSeconds
+      failureThreshold: startupProbeFailureThreshold
+    },
+    isTcp ? tcpSocketConfig : startupHttpConfig
+  )
 ] : []
 
 var livenessProbe = provisionLivenessProbe ? [
-  {
-    type: 'Liveness'
-    httpGet: {
-      scheme: 'HTTP'
-      port: probePort
-      path: livenessProbePath
-    }
-    initialDelaySeconds: livenessProbeInitialDelaySeconds
-    periodSeconds: livenessProbePeriodSeconds
-    failureThreshold: livenessProbeFailureThreshold
-  }
+  union(
+    {
+      type: 'Liveness'
+      initialDelaySeconds: livenessProbeInitialDelaySeconds
+      periodSeconds: livenessProbePeriodSeconds
+      failureThreshold: livenessProbeFailureThreshold
+    },
+    isTcp ? tcpSocketConfig : livenessHttpConfig
+  )
 ] : []
 
 var readinessProbe = provisionReadinessProbe ? [
-  {
-    type: 'Readiness'
-    httpGet: {
-      scheme: 'HTTP'
-      port: probePort
-      path: readinessProbePath
-    }
-    initialDelaySeconds: readinessProbeInitialDelaySeconds
-    periodSeconds: readinessProbePeriodSeconds
-    failureThreshold: readinessProbeFailureThreshold
-  }
+  union(
+    {
+      type: 'Readiness'
+      initialDelaySeconds: readinessProbeInitialDelaySeconds
+      periodSeconds: readinessProbePeriodSeconds
+      failureThreshold: readinessProbeFailureThreshold
+    },
+    isTcp ? tcpSocketConfig : readinessHttpConfig
+  )
 ] : []
 
 output probes array = concat(startupProbe, livenessProbe, readinessProbe)

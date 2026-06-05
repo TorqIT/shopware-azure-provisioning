@@ -307,6 +307,8 @@ param phpContainerAppReadinessProbeInitialDelaySeconds int = 0
 param phpContainerAppReadinessProbePeriodSeconds int = 10
 param phpContainerAppReadinessProbeFailureThreshold int = 3
 param phpContainerAppProbePort int = 80
+@allowed(['HTTP', 'HTTPS', 'TCP'])
+param phpContainerAppProbeScheme string = 'HTTP'
 param phpContainerAppCustomDomains array = []
 param phpContainerAppCpuCores string = '1.5'
 param phpContainerAppMemory string = '3Gi'
@@ -404,6 +406,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppReadinessProbePeriodSeconds: phpContainerAppReadinessProbePeriodSeconds
     phpContainerAppReadinessProbeFailureThreshold: phpContainerAppReadinessProbeFailureThreshold
     phpContainerAppProbePort: phpContainerAppProbePort
+    phpContainerAppProbeScheme: phpContainerAppProbeScheme
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
     phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions

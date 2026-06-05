@@ -54,6 +54,7 @@ param phpContainerAppReadinessProbeInitialDelaySeconds int
 param phpContainerAppReadinessProbePeriodSeconds int
 param phpContainerAppReadinessProbeFailureThreshold int
 param phpContainerAppProbePort int
+param phpContainerAppProbeScheme string
 param phpContainerAppCpuCores string
 param phpContainerAppMemory string
 param phpContainerAppMinReplicas int
@@ -304,6 +305,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     readinessProbePeriodSeconds: phpContainerAppReadinessProbePeriodSeconds
     readinessProbeFailureThreshold: phpContainerAppReadinessProbeFailureThreshold
     probePort: phpContainerAppProbePort
+    probeScheme: phpContainerAppProbeScheme
     minReplicas: phpContainerAppMinReplicas
     maxReplicas: phpContainerAppMaxReplicas
     customDomains: phpContainerAppCustomDomains
