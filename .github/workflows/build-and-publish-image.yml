@@ -2,13 +2,14 @@ name: Build and publish Docker image
 
 on:
   push:
-    branches: 
-      - '*'
+    branches:
+      - "*"
     tags:
       - "v*.*.*"
-  workflow_call: 
+  workflow_call:
+  workflow_dispatch:
 
-concurrency: 
+concurrency:
   group: ${{ github.repository }}__${{ github.ref }}-cd
   cancel-in-progress: true
 
@@ -51,7 +52,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-      
+
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
@@ -60,7 +61,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
-      
+
       - name: Test Docker image
         run: |
           docker run ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test /bin/bash -c 'az bicep build -f bicep/main.bicep'
