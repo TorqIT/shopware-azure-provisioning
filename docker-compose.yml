@@ -5,4 +5,4 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/azure
-      - ./.github/test-files/parameters.json:/azure/parameters.json
+      - ./.github/ci/parameters.json:/azure/parameters.json

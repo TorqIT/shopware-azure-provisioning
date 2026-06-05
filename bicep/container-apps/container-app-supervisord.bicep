@@ -53,6 +53,13 @@ resource supervisordContainerApp 'Microsoft.App/containerApps@2024-10-02-preview
           server: '${containerRegistryName}.azurecr.io'
         }
       ]
+      ...(internalIngress ? {
+        ingress: {
+          external: false
+          allowInsecure: true
+          targetPort: 9001
+        }
+      } : {})
     }
     template: {
       containers: [

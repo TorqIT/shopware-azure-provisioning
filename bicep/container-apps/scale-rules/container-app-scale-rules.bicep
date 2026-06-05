@@ -29,7 +29,7 @@ module cronScaleRule './container-app-cron-scale-rule.bicep' = if (provisionCron
 
 var scaleRules = concat(
   provisionHttpScaleRule ? httpScaleRule : [],
-  provisionCronScaleRule ? [cronScaleRule.outputs.cronScaleRule] : []
+  provisionCronScaleRule ? [cronScaleRule!.outputs.cronScaleRule] : []
 )
 
 output scaleRules array = scaleRules

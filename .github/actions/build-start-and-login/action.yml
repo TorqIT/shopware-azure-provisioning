@@ -1,24 +1,24 @@
 name: ''
 description: ''
 inputs:
-  TAG:
-    required: true
-    description: ""
   DOCKER_COMPOSE_FILE:
     required: false
     description: ""
-    default: ./.github/test-files/docker-compose.yml
+    default: "./.github/ci/docker-compose.yml"
   PARAMETERS_FILE:
     required: false
     description: ""
-    default: ./.github/test-files/parameters.json
+    default: "./.github/ci/parameters.json"
   SERVICE_PRINCIPAL_ID:
     required: true
     description: ""
   SERVICE_PRINCIPAL_PASSWORD:
     required: true
     description: ""
-  
+  AZURE_DOCKER_COMPOSE_SERVICE:
+    required: false
+    description: "Name of the service in the Docker Compose file that is used for running Azure CLI commands"
+    default: azure
 
 runs:
   using: "composite"
@@ -27,10 +27,10 @@ runs:
       shell: bash
       run: |
         touch .env
-        TAG=${{ inputs.TAG }} >> .env
         docker compose \
           --file ${{ inputs.DOCKER_COMPOSE_FILE }} \
-          up -d --force-recreate
+          up -d --force-recreate \
+          ${{ inputs.AZURE_DOCKER_COMPOSE_SERVICE }}
 
     - name: Log in to Azure via service principal
       shell: bash
