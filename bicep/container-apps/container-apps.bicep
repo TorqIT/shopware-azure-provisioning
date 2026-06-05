@@ -38,7 +38,23 @@ param phpContainerAppExternal bool
 param phpContainerAppCustomDomains array
 param phpContainerAppName string
 param phpContainerAppImageName string
-param phpContainerAppUseProbes bool
+param phpContainerAppProvisionStartupProbe bool
+param phpContainerAppStartupProbePath string
+param phpContainerAppStartupProbeInitialDelaySeconds int
+param phpContainerAppStartupProbePeriodSeconds int
+param phpContainerAppStartupProbeFailureThreshold int
+param phpContainerAppProvisionLivenessProbe bool
+param phpContainerAppLivenessProbePath string
+param phpContainerAppLivenessProbeInitialDelaySeconds int
+param phpContainerAppLivenessProbePeriodSeconds int
+param phpContainerAppLivenessProbeFailureThreshold int
+param phpContainerAppProvisionReadinessProbe bool
+param phpContainerAppReadinessProbePath string
+param phpContainerAppReadinessProbeInitialDelaySeconds int
+param phpContainerAppReadinessProbePeriodSeconds int
+param phpContainerAppReadinessProbeFailureThreshold int
+param phpContainerAppProbePort int
+param phpContainerAppProbeScheme string
 param phpContainerAppCpuCores string
 param phpContainerAppMemory string
 param phpContainerAppMinReplicas int
@@ -273,7 +289,23 @@ module phpContainerApp 'container-app-php.bicep' = {
     containerRegistryName: containerRegistryName
     cpuCores: phpContainerAppCpuCores
     memory: phpContainerAppMemory
-    useProbes: phpContainerAppUseProbes
+    provisionStartupProbe: phpContainerAppProvisionStartupProbe
+    startupProbePath: phpContainerAppStartupProbePath
+    startupProbeInitialDelaySeconds: phpContainerAppStartupProbeInitialDelaySeconds
+    startupProbePeriodSeconds: phpContainerAppStartupProbePeriodSeconds
+    startupProbeFailureThreshold: phpContainerAppStartupProbeFailureThreshold
+    provisionLivenessProbe: phpContainerAppProvisionLivenessProbe
+    livenessProbePath: phpContainerAppLivenessProbePath
+    livenessProbeInitialDelaySeconds: phpContainerAppLivenessProbeInitialDelaySeconds
+    livenessProbePeriodSeconds: phpContainerAppLivenessProbePeriodSeconds
+    livenessProbeFailureThreshold: phpContainerAppLivenessProbeFailureThreshold
+    provisionReadinessProbe: phpContainerAppProvisionReadinessProbe
+    readinessProbePath: phpContainerAppReadinessProbePath
+    readinessProbeInitialDelaySeconds: phpContainerAppReadinessProbeInitialDelaySeconds
+    readinessProbePeriodSeconds: phpContainerAppReadinessProbePeriodSeconds
+    readinessProbeFailureThreshold: phpContainerAppReadinessProbeFailureThreshold
+    probePort: phpContainerAppProbePort
+    probeScheme: phpContainerAppProbeScheme
     minReplicas: phpContainerAppMinReplicas
     maxReplicas: phpContainerAppMaxReplicas
     customDomains: phpContainerAppCustomDomains

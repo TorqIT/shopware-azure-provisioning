@@ -8,7 +8,23 @@ param containerRegistryName string
 param customDomains array
 param cpuCores string
 param memory string
-param useProbes bool
+param provisionStartupProbe bool
+param startupProbePath string
+param startupProbeInitialDelaySeconds int
+param startupProbePeriodSeconds int
+param startupProbeFailureThreshold int
+param provisionLivenessProbe bool
+param livenessProbePath string
+param livenessProbeInitialDelaySeconds int
+param livenessProbePeriodSeconds int
+param livenessProbeFailureThreshold int
+param provisionReadinessProbe bool
+param readinessProbePath string
+param readinessProbeInitialDelaySeconds int
+param readinessProbePeriodSeconds int
+param readinessProbeFailureThreshold int
+param probePort int
+param probeScheme string
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
@@ -59,6 +75,30 @@ module volumesModule './container-apps-volumes.bicep' = {
     provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
     additionalVolumesAndMounts: additionalVolumesAndMounts
+  }
+}
+
+// Health probes
+module probesModule './container-app-probes.bicep' = {
+  name: 'container-app-php-probes'
+  params: {
+    provisionStartupProbe: provisionStartupProbe
+    startupProbePath: startupProbePath
+    startupProbeInitialDelaySeconds: startupProbeInitialDelaySeconds
+    startupProbePeriodSeconds: startupProbePeriodSeconds
+    startupProbeFailureThreshold: startupProbeFailureThreshold
+    provisionLivenessProbe: provisionLivenessProbe
+    livenessProbePath: livenessProbePath
+    livenessProbeInitialDelaySeconds: livenessProbeInitialDelaySeconds
+    livenessProbePeriodSeconds: livenessProbePeriodSeconds
+    livenessProbeFailureThreshold: livenessProbeFailureThreshold
+    provisionReadinessProbe: provisionReadinessProbe
+    readinessProbePath: readinessProbePath
+    readinessProbeInitialDelaySeconds: readinessProbeInitialDelaySeconds
+    readinessProbePeriodSeconds: readinessProbePeriodSeconds
+    readinessProbeFailureThreshold: readinessProbeFailureThreshold
+    probePort: probePort
+    probeScheme: probeScheme
   }
 }
 
@@ -194,23 +234,8 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
             cpu: json(cpuCores)
             memory: memory
           }
-          probes: useProbes ? [
-            { 
-              type: 'Startup'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            }
-            { 
-              type: 'Liveness'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            }
-          ]: []
           volumeMounts: volumesModule.outputs.volumeMounts
+          probes: length(probesModule.outputs.probes) > 0 ? probesModule.outputs.probes : null
         }
       ]
       volumes: volumesModule.outputs.volumes
