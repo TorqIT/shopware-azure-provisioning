@@ -22,6 +22,7 @@ var startupProbe = provisionStartupProbe ? [
   {
     type: 'Startup'
     httpGet: {
+      scheme: 'HTTP'
       port: probePort
       path: startupProbePath
     }
@@ -35,6 +36,7 @@ var livenessProbe = provisionLivenessProbe ? [
   {
     type: 'Liveness'
     httpGet: {
+      scheme: 'HTTP'
       port: probePort
       path: livenessProbePath
     }
@@ -48,6 +50,7 @@ var readinessProbe = provisionReadinessProbe ? [
   {
     type: 'Readiness'
     httpGet: {
+      scheme: 'HTTP'
       port: probePort
       path: readinessProbePath
     }
