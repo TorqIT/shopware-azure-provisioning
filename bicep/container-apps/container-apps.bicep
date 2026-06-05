@@ -57,7 +57,6 @@ param supervisordContainerAppName string
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string
 param supervisordContainerAppMemory string
-param supervisordContainerAppInternalIngress bool
 
 param appEnv string
 param appDebug string

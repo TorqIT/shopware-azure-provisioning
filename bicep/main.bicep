@@ -137,7 +137,7 @@ module storageAccount 'storage-account/storage-account.bicep' = {
     virtualNetworkPrivateEndpointSubnetName: virtualNetworkPrivateEndpointsSubnetName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     shortTermBackupRetentionDays: storageAccountBackupRetentionDays
-    privateDnsZoneId: privateDnsZones!.outputs.zoneIdForStorageAccounts
+    privateDnsZoneId: privateDnsZones.outputs.zoneIdForStorageAccounts
     privateEndpointName: storageAccountPrivateEndpointName
     privateEndpointNicName: storageAccountPrivateEndpointNicName
     longTermBackups: storageAccountLongTermBackups
@@ -236,9 +236,9 @@ module database 'database/database.bicep' = if (!skipDatabase) {
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkPrivateEndpointsSubnetName: virtualNetworkPrivateEndpointsSubnetName
-    shortTermBackupRetentionDays: databaseShortTermBackupRetentionDays
+    shortTermBackupRetentionDays: databaseBackupRetentionDays
     geoRedundantBackup: databaseGeoRedundantBackup
-    privateDnsZoneForDatabaseId: privateDnsZones!.outputs.zoneIdForDatabase
+    privateDnsZoneForDatabaseId: privateDnsZones.outputs.zoneIdForDatabase
     privateEndpointName: databasePrivateEndpointName
 
     // Optional long-term backups

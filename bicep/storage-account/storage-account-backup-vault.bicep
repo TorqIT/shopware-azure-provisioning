@@ -53,7 +53,7 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-09-01
           schedule: {
             repeatingTimeIntervals: [
                 // This does not seem to function without a "start" date, so we place an arbitrary one here
-                'R/2023-07-01T00:00:00+00:00/P1D'
+                'R/2023-07-01T00:00:00+00:00/P1M'
             ]
             timeZone: 'UTC'
           }

@@ -135,7 +135,7 @@ module databaseBackupsStorageAccount './database-backups-storage-account.bicep' 
   }
 }
 
-module cpuUsageAlerts './alerts/database-cpu-alerts.bicep' = if (provisionMetricAlerts) {
+module cpuUsageAlert './alerts/database-cpu-alerts.bicep' = if (provisionMetricAlerts) {
   name: 'database-cpu-usage-alerts'
   dependsOn: [databaseServer]
   params: {
