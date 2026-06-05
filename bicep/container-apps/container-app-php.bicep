@@ -8,7 +8,13 @@ param containerRegistryName string
 param customDomains array
 param cpuCores string
 param memory string
-param useProbes bool
+param provisionStartupProbe bool
+param startupProbePath string
+param provisionLivenessProbe bool
+param livenessProbePath string
+param provisionReadinessProbe bool
+param readinessProbePath string
+param probePort int
 param minReplicas int
 param maxReplicas int
 param ipSecurityRestrictions array
@@ -59,6 +65,20 @@ module volumesModule './container-apps-volumes.bicep' = {
     provisionForPortalEngine: provisionForPortalEngine
     portalEnginePublicBuildStorageMountName: portalEnginePublicBuildStorageMountName
     additionalVolumesAndMounts: additionalVolumesAndMounts
+  }
+}
+
+// Health probes
+module probesModule './container-app-probes.bicep' = {
+  name: 'container-app-php-probes'
+  params: {
+    provisionStartupProbe: provisionStartupProbe
+    startupProbePath: startupProbePath
+    provisionLivenessProbe: provisionLivenessProbe
+    livenessProbePath: livenessProbePath
+    provisionReadinessProbe: provisionReadinessProbe
+    readinessProbePath: readinessProbePath
+    probePort: probePort
   }
 }
 
@@ -186,32 +206,19 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
     }
     template: {
       containers: [
-        {
-          name: imageName
-          image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-          env: environmentVariables
-          resources: {
-            cpu: json(cpuCores)
-            memory: memory
-          }
-          probes: useProbes ? [
-            { 
-              type: 'Startup'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
+        union(
+          {
+            name: imageName
+            image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
+            env: environmentVariables
+            resources: {
+              cpu: json(cpuCores)
+              memory: memory
             }
-            { 
-              type: 'Liveness'
-              httpGet: {
-                port: 80
-                path: '/'
-              }
-            }
-          ]: []
-          volumeMounts: volumesModule.outputs.volumeMounts
-        }
+            volumeMounts: volumesModule.outputs.volumeMounts
+          },
+          length(probesModule.outputs.probes) > 0 ? { probes: probesModule.outputs.probes } : {}
+        )
       ]
       volumes: volumesModule.outputs.volumes
       scale: {
