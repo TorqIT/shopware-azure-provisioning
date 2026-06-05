@@ -201,19 +201,17 @@ resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
     }
     template: {
       containers: [
-        union(
-          {
-            name: imageName
-            image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
-            env: environmentVariables
-            resources: {
-              cpu: json(cpuCores)
-              memory: memory
-            }
-            volumeMounts: volumesModule.outputs.volumeMounts
-          },
-          length(probesModule.outputs.probes) > 0 ? { probes: probesModule.outputs.probes } : {}
-        )
+        {
+          name: imageName
+          image: '${containerRegistryName}.azurecr.io/${imageName}:latest'
+          env: environmentVariables
+          resources: {
+            cpu: json(cpuCores)
+            memory: memory
+          }
+          volumeMounts: volumesModule.outputs.volumeMounts
+          probes: length(probesModule.outputs.probes) > 0 ? probesModule.outputs.probes : null
+        }
       ]
       volumes: volumesModule.outputs.volumes
       scale: {
