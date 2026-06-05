@@ -102,6 +102,21 @@
     "phpContainerAppHttpScaleRuleConcurrentRequestsThreshold": {
       "value": 30
     },
+    "phpContainerAppProvisionStartupProbe": {
+      "value": true
+    },
+    "phpContainerAppStartupProbePath": {
+      "value": "/"
+    },
+    "phpContainerAppStartupProbeInitialDelaySeconds": {
+      "value": 60
+    },
+    "phpContainerAppStartupProbePeriodSeconds": {
+      "value": 10
+    },
+    "phpContainerAppStartupProbeFailureThreshold": {
+      "value": 30
+    },
     "phpContainerAppIpSecurityRestrictions": {
       "value": [
         {
