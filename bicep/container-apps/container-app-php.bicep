@@ -8,10 +8,19 @@ param cpuCores string
 param memory string
 param provisionStartupProbe bool
 param startupProbePath string
+param startupProbeInitialDelaySeconds int
+param startupProbePeriodSeconds int
+param startupProbeFailureThreshold int
 param provisionLivenessProbe bool
 param livenessProbePath string
+param livenessProbeInitialDelaySeconds int
+param livenessProbePeriodSeconds int
+param livenessProbeFailureThreshold int
 param provisionReadinessProbe bool
 param readinessProbePath string
+param readinessProbeInitialDelaySeconds int
+param readinessProbePeriodSeconds int
+param readinessProbeFailureThreshold int
 param probePort int
 param minReplicas int
 param maxReplicas int
@@ -69,10 +78,19 @@ module probesModule './container-app-probes.bicep' = {
   params: {
     provisionStartupProbe: provisionStartupProbe
     startupProbePath: startupProbePath
+    startupProbeInitialDelaySeconds: startupProbeInitialDelaySeconds
+    startupProbePeriodSeconds: startupProbePeriodSeconds
+    startupProbeFailureThreshold: startupProbeFailureThreshold
     provisionLivenessProbe: provisionLivenessProbe
     livenessProbePath: livenessProbePath
+    livenessProbeInitialDelaySeconds: livenessProbeInitialDelaySeconds
+    livenessProbePeriodSeconds: livenessProbePeriodSeconds
+    livenessProbeFailureThreshold: livenessProbeFailureThreshold
     provisionReadinessProbe: provisionReadinessProbe
     readinessProbePath: readinessProbePath
+    readinessProbeInitialDelaySeconds: readinessProbeInitialDelaySeconds
+    readinessProbePeriodSeconds: readinessProbePeriodSeconds
+    readinessProbeFailureThreshold: readinessProbeFailureThreshold
     probePort: probePort
   }
 }
