@@ -278,6 +278,14 @@ param initContainerAppJobReplicaTimeoutSeconds int = 600
 param phpContainerAppExternal bool = true
 param phpContainerAppName string
 param phpContainerAppImageName string = 'php'
+// Optional health probes - when none are enabled, Azure's default probes are used
+param phpContainerAppProvisionStartupProbe bool = false
+param phpContainerAppStartupProbePath string = '/'
+param phpContainerAppProvisionLivenessProbe bool = false
+param phpContainerAppLivenessProbePath string = '/'
+param phpContainerAppProvisionReadinessProbe bool = false
+param phpContainerAppReadinessProbePath string = '/'
+param phpContainerAppProbePort int = 80
 param phpContainerAppCustomDomains array = []
 param phpContainerAppCpuCores string = '1.5'
 param phpContainerAppMemory string = '3Gi'
@@ -346,6 +354,13 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppCpuCores: phpContainerAppCpuCores
     phpContainerAppMemory: phpContainerAppMemory
     phpContainerAppExternal: phpContainerAppExternal
+    phpContainerAppProvisionStartupProbe: phpContainerAppProvisionStartupProbe
+    phpContainerAppStartupProbePath: phpContainerAppStartupProbePath
+    phpContainerAppProvisionLivenessProbe: phpContainerAppProvisionLivenessProbe
+    phpContainerAppLivenessProbePath: phpContainerAppLivenessProbePath
+    phpContainerAppProvisionReadinessProbe: phpContainerAppProvisionReadinessProbe
+    phpContainerAppReadinessProbePath: phpContainerAppReadinessProbePath
+    phpContainerAppProbePort: phpContainerAppProbePort
     phpContainerAppMinReplicas: phpContainerAppMinReplicas
     phpContainerAppMaxReplicas: phpContainerAppMaxReplicas
     phpContainerAppIpSecurityRestrictions: phpContainerAppIpSecurityRestrictions
