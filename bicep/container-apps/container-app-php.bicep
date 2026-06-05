@@ -22,6 +22,7 @@ param readinessProbeInitialDelaySeconds int
 param readinessProbePeriodSeconds int
 param readinessProbeFailureThreshold int
 param probePort int
+param probeScheme string
 param minReplicas int
 param maxReplicas int
 param isExternal bool
@@ -92,6 +93,7 @@ module probesModule './container-app-probes.bicep' = {
     readinessProbePeriodSeconds: readinessProbePeriodSeconds
     readinessProbeFailureThreshold: readinessProbeFailureThreshold
     probePort: probePort
+    probeScheme: probeScheme
   }
 }
 
