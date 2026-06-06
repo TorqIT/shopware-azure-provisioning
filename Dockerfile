@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azure-cli
+FROM mcr.microsoft.com/azure-cli@sha256:e02c9723b6e2296e98f54eeb3630b95206aef06aa04251e097ce8390904ba396
 
 # Install required packages
 RUN tdnf install -y curl tar jq vim
