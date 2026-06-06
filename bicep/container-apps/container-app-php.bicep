@@ -179,8 +179,8 @@ var digiCertIpAllowances array = [
 // If the app is external with ingress restrictions applied, we need to allow the DigiCert IPs above in order for managed certificates 
 // to be automatically deployed. If no rules are defined or the app is not externally accessible, we must not set any 
 // rules at all (i.e. ingress should be unrestricted).
-var ipSecurityRestrictionsConsolidated = (!empty(ipSecurityRestrictions) && isExternal) 
-  ? concat(ipSecurityRestrictions, digiCertIpAllowances)
+var ipSecurityRestrictionsConsolidated = (!empty(ipSecurityRestrictions) && isExternal)
+  ? (ipSecurityRestrictions[0].action == 'Allow' ? concat(ipSecurityRestrictions, digiCertIpAllowances) : ipSecurityRestrictions)
   : null
 
 resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
