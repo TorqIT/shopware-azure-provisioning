@@ -3,18 +3,21 @@ param startupProbePath string
 param startupProbeInitialDelaySeconds int
 param startupProbePeriodSeconds int
 param startupProbeFailureThreshold int
+param startupProbeTimeoutSeconds int
 
 param provisionLivenessProbe bool
 param livenessProbePath string
 param livenessProbeInitialDelaySeconds int
 param livenessProbePeriodSeconds int
 param livenessProbeFailureThreshold int
+param livenessProbeTimeoutSeconds int
 
 param provisionReadinessProbe bool
 param readinessProbePath string
 param readinessProbeInitialDelaySeconds int
 param readinessProbePeriodSeconds int
 param readinessProbeFailureThreshold int
+param readinessProbeTimeoutSeconds int
 
 param probePort int
 param probeScheme string
@@ -32,6 +35,7 @@ var startupProbe = provisionStartupProbe ? [
       initialDelaySeconds: startupProbeInitialDelaySeconds
       periodSeconds: startupProbePeriodSeconds
       failureThreshold: startupProbeFailureThreshold
+      timeoutSeconds: startupProbeTimeoutSeconds
     },
     isTcp ? tcpSocketConfig : startupHttpConfig
   )
@@ -44,6 +48,7 @@ var livenessProbe = provisionLivenessProbe ? [
       initialDelaySeconds: livenessProbeInitialDelaySeconds
       periodSeconds: livenessProbePeriodSeconds
       failureThreshold: livenessProbeFailureThreshold
+      timeoutSeconds: livenessProbeTimeoutSeconds
     },
     isTcp ? tcpSocketConfig : livenessHttpConfig
   )
@@ -56,6 +61,7 @@ var readinessProbe = provisionReadinessProbe ? [
       initialDelaySeconds: readinessProbeInitialDelaySeconds
       periodSeconds: readinessProbePeriodSeconds
       failureThreshold: readinessProbeFailureThreshold
+      timeoutSeconds: readinessProbeTimeoutSeconds
     },
     isTcp ? tcpSocketConfig : readinessHttpConfig
   )
