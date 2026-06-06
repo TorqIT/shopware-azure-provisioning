@@ -11,16 +11,19 @@ param startupProbePath string
 param startupProbeInitialDelaySeconds int
 param startupProbePeriodSeconds int
 param startupProbeFailureThreshold int
+param startupProbeTimeoutSeconds int
 param provisionLivenessProbe bool
 param livenessProbePath string
 param livenessProbeInitialDelaySeconds int
 param livenessProbePeriodSeconds int
 param livenessProbeFailureThreshold int
+param livenessProbeTimeoutSeconds int
 param provisionReadinessProbe bool
 param readinessProbePath string
 param readinessProbeInitialDelaySeconds int
 param readinessProbePeriodSeconds int
 param readinessProbeFailureThreshold int
+param readinessProbeTimeoutSeconds int
 param probePort int
 param probeScheme string
 param minReplicas int
@@ -82,16 +85,19 @@ module probesModule './container-app-probes.bicep' = {
     startupProbeInitialDelaySeconds: startupProbeInitialDelaySeconds
     startupProbePeriodSeconds: startupProbePeriodSeconds
     startupProbeFailureThreshold: startupProbeFailureThreshold
+    startupProbeTimeoutSeconds: startupProbeTimeoutSeconds
     provisionLivenessProbe: provisionLivenessProbe
     livenessProbePath: livenessProbePath
     livenessProbeInitialDelaySeconds: livenessProbeInitialDelaySeconds
     livenessProbePeriodSeconds: livenessProbePeriodSeconds
     livenessProbeFailureThreshold: livenessProbeFailureThreshold
+    livenessProbeTimeoutSeconds: livenessProbeTimeoutSeconds
     provisionReadinessProbe: provisionReadinessProbe
     readinessProbePath: readinessProbePath
     readinessProbeInitialDelaySeconds: readinessProbeInitialDelaySeconds
     readinessProbePeriodSeconds: readinessProbePeriodSeconds
     readinessProbeFailureThreshold: readinessProbeFailureThreshold
+    readinessProbeTimeoutSeconds: readinessProbeTimeoutSeconds
     probePort: probePort
     probeScheme: probeScheme
   }
@@ -173,8 +179,8 @@ var digiCertIpAllowances array = [
 // If the app is external with ingress restrictions applied, we need to allow the DigiCert IPs above in order for managed certificates 
 // to be automatically deployed. If no rules are defined or the app is not externally accessible, we must not set any 
 // rules at all (i.e. ingress should be unrestricted).
-var ipSecurityRestrictionsConsolidated = (!empty(ipSecurityRestrictions) && isExternal) 
-  ? concat(ipSecurityRestrictions, digiCertIpAllowances)
+var ipSecurityRestrictionsConsolidated = (!empty(ipSecurityRestrictions) && isExternal)
+  ? (ipSecurityRestrictions[0].action == 'Allow' ? concat(ipSecurityRestrictions, digiCertIpAllowances) : ipSecurityRestrictions)
   : null
 
 resource phpContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
