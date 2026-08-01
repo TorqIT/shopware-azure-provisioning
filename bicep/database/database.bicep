@@ -37,11 +37,11 @@ param provisionMetricAlerts bool
 param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroupName)
   name: virtualNetworkName
 }
-resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkPrivateEndpointsSubnetName
 }
@@ -79,7 +79,7 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-03-01' = {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-07-01' = {
   name: privateEndpointName
   location: location
   properties: {

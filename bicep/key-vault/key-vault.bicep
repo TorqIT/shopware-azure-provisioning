@@ -8,16 +8,16 @@ param virtualNetworkContainerAppsSubnetName string = ''
 
 param enablePurgeProtection bool = true
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-03-01' existing = if (virtualNetworkName != '') {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' existing = if (virtualNetworkName != '') {
   scope: resourceGroup(virtualNetworkResourceGroupName)
   name: virtualNetworkName
 }
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' existing = if (virtualNetworkContainerAppsSubnetName != '') {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = if (virtualNetworkContainerAppsSubnetName != '') {
   parent: virtualNetwork
   name: virtualNetworkContainerAppsSubnetName
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   location: location
   name: name
   properties: {

@@ -8,21 +8,21 @@ param virtualNetworkSubnetName string
 param privateEndpointName string
 param privateEndpointNicName string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: storageAccountName
   scope: resourceGroup()
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
 }
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkSubnetName
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' = {
   name: privateEndpointName
   location: location
   properties: {

@@ -14,11 +14,11 @@ param logAnalyticsSharedKey string
 
 param additionalVolumesAndMounts array
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroup)
   name: virtualNetworkName
 }
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkSubnetName
 }

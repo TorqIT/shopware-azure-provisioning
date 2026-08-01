@@ -28,16 +28,16 @@ var networkSecurityGroupName = '${name}-nsg'
 var publicIPAddressName = '${name}-public-ip'
 var networkInterfaceName = '${name}-net-int'
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-01-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
 }
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-01-01' existing = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
   name: virtualNetworkSubnetName
   parent: virtualNetwork
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-03-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -58,7 +58,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2024-03-0
   }
 }
 
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2024-03-01' = {
+resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
   name: publicIPAddressName
   location: location
   sku: {
@@ -71,7 +71,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2024-03-01' = {
   }
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2024-03-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   name: networkInterfaceName
   location: location
   properties: {
@@ -95,7 +95,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2024-03-01' = {
   }
 }
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2024-11-01' = {
   name: name
   location: location
   properties: {

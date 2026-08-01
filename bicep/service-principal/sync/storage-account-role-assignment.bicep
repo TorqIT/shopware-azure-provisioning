@@ -4,7 +4,7 @@ param serverName string
 param servicePrincipalId string
 param roleDefintionId string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2025-08-01' existing = {
   name: serverName
 }
 
