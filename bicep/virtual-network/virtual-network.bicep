@@ -52,14 +52,14 @@ resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-
   parent: virtualNetwork
   properties: {
     addressPrefix: containerAppsSubnetAddressSpace
-    delegations: [
+    delegations: (containerAppsEnvironmentUseWorkloadProfiles) ? [
       {
         name: 'Microsoft.App/environments'
         properties: {
           serviceName: 'Microsoft.App/environments'
         }
       }
-    ]
+    ] : []
     natGateway: containerAppsEnvironmentUseWorkloadProfiles ? {
       id: natGateway!.outputs.natGatewayId 
     }: null
