@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azure-cli@sha256:23b520868509add054d385d90dc3fc5268f10a2f58947a994e30babe938e31ae
+FROM mcr.microsoft.com/azure-cli@sha256:f2e73db53c04ca82a675f1ecaa7051c42886932d45656789f90038673a42db9a
 
 # Install required packages
 RUN tdnf update -y; \

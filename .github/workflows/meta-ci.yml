@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Lint Bicep files
         run: find . -type f -name '*.bicep' -print0 | xargs -0 -P0 -n1 bicep lint
 
       - name: Run Checkov SAST scan
-        uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7 # v12
+        uses: bridgecrewio/checkov-action@1246d92f57abae29d5db5f9aeeed2a9813e52d7d # v12
         env:
           CHECKOV_OUTPUT_CODE_LINE_LIMIT: 1000
           LOG_LEVEL: debug
