@@ -31,7 +31,7 @@ resource redisContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
       containers: [
         {
           name: 'redis'
-          image: 'docker.io/redis:8.8.0-alpine'
+          image: 'docker.io/redis:8.10.0-alpine'
           command: [
             'redis-server'
             '--maxmemory ${maxMemorySetting}'
