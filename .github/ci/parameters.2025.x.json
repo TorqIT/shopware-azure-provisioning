@@ -58,7 +58,7 @@
       "value": "pim-2025x-azure-cae-ci"
     },
     "containerAppsEnvironmentUseWorkloadProfiles": {
-      "value": false
+      "value": true
     },
     "provisionInit": {
       "value": true

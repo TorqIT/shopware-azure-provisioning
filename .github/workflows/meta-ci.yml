@@ -85,6 +85,7 @@ jobs:
     name: "Build and test Azure image against Pimcore skeleton"
     if: ${{ github.event_name == 'pull_request' }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - version: 2025.x

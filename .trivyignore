@@ -1,4 +1,18 @@
-# CVE-2026-39822: Go stdlib symlink traversal in os.Root - fixed in Go 1.26.5
-# Docker has not yet released a static binary compiled with Go 1.26.5.
-# Remove this entry once Docker releases a version that resolves this (tracked by Renovate).
-CVE-2026-39822
+# Go stdlib CVEs in the Docker static binary — fixed in Go 1.26.6, but no Docker
+# release has been built with Go 1.26.6 yet. Remove once Docker ships a version
+# that resolves these (tracked by Renovate via the DOCKER_VERSION env var).
+CVE-2026-33818
+CVE-2026-39821
+CVE-2026-46600
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+
+# pip vendor CVEs — pip 26.2.1 (latest) bundles msgpack 1.1.2 and setuptools 70.3.0
+# in pip/_vendor/ as private internal copies (importable only via pip._vendor.*, not
+# by user code). The user-facing packages are at patched versions (msgpack 1.2.1,
+# setuptools 84.0.0). Remove once pip ships updated vendor deps.
+GHSA-6v7p-g79w-8964
+CVE-2025-47273

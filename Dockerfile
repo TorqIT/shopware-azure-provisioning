@@ -5,11 +5,14 @@ RUN tdnf update -y; \
     tdnf install -y curl tar jq vim; \
     PYTHONPATH=/usr/lib/az/lib/python3.12/site-packages \
         python3.12 -m pip install --upgrade --prefix /usr/lib/az \
-        "PyJWT>=2.13.0" "cryptography>=50.0.0"
+        "PyJWT>=2.13.0" "cryptography>=50.0.0"; \
+    PYTHONPATH=/usr/lib/az/lib/python3.12/site-packages \
+        python3.12 -m pip install --upgrade --prefix /usr \
+        "msgpack>=1.2.1" "setuptools>=78.1.1"
 
 # Install Docker
 ENV DOCKER_CHANNEL=stable
-ENV DOCKER_VERSION=29.6.1
+ENV DOCKER_VERSION=29.7.2
 ENV DOCKER_API_VERSION=1.52
 RUN curl -fsSL "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/x86_64/docker-${DOCKER_VERSION}.tgz" | tar -xzC /usr/local/bin --strip=1 docker/docker
 
