@@ -22,6 +22,11 @@ param virtualNetworkResourceGroupName string
 param virtualNetworkContainerAppsSubnetName string
 param virtualNetworkDatabaseSubnetName string
 
+// Optional metric alerts provisioning
+param provisionMetricAlerts bool = false
+param generalMetricAlertsActionGroupName string = ''
+param criticalMetricAlertsActionGroupName string = ''
+
 module n8nFileStorage './n8n-file-storage.bicep' = {
   name: 'n8n-file-storage'
   params: {
@@ -52,5 +57,10 @@ module n8nPostgresDatabase './n8n-database.bicep' = {
     virtualNetworkName: virtualNetworkName
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkDatabaseSubnetName: virtualNetworkDatabaseSubnetName
+
+    // Optional metric alerts
+    provisionMetricAlerts: provisionMetricAlerts
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
   }
 }

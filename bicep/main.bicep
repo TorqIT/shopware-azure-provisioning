@@ -537,6 +537,8 @@ module containerApps 'container-apps/container-apps.bicep' = {
     n8nContainerAppCronScaleRuleEndSchedule: n8nContainerAppCronScaleRuleEndSchedule
     n8nContainerAppCronScaleRuleStartSchedule: n8nContainerAppCronScaleRuleStartSchedule
     n8nContainerAppCronScaleRuleTimezone: n8nContainerAppCronScaleRuleTimezone
+    n8nContainerAppResponseTimeAlertThreshold: n8nContainerAppResponseTimeAlertThreshold
+    n8nContainerAppResponseTimeAlertTimeWindow: n8nContainerAppResponseTimeAlertTimeWindow
   }
 }
 
@@ -628,9 +630,11 @@ param n8nDatabaseBackupRetentionDays int = 7
 param n8nVirtualNetworkDatabaseSubnetName string = 'postgres'
 param n8nVirtualNetworkDatabaseSubnetAddressSpace string = '10.0.4.0/28'
 param n8nWebhookUrl string = ''
+param n8nContainerAppResponseTimeAlertThreshold int = 5000
+param n8nContainerAppResponseTimeAlertTimeWindow string = 'PT5M'
 module n8n './n8n/n8n.bicep' = if (fullProvision && provisionN8N) {
   name: 'n8n'
-  dependsOn: [virtualNetwork]
+  dependsOn: [virtualNetwork, generalMetricAlertsActionGroup, criticalMetricAlertsActionGroup]
   params: {
     // Note that the n8n Container App is provisioned above as part of the containerApps module
     location: location
@@ -652,6 +656,11 @@ module n8n './n8n/n8n.bicep' = if (fullProvision && provisionN8N) {
     virtualNetworkResourceGroupName: virtualNetworkResourceGroupName
     virtualNetworkContainerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkDatabaseSubnetName: n8nVirtualNetworkDatabaseSubnetName
+
+    // Optional metric alerts
+    provisionMetricAlerts: provisionMetricAlerts
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
   }
 }
 

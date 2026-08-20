@@ -14,6 +14,11 @@ param databaseStorageSizeGB int
 param databaseBackupRetentionDays int
 param databaseName string
 
+// Optional metric alerts provisioning
+param provisionMetricAlerts bool = false
+param generalMetricAlertsActionGroupName string = ''
+param criticalMetricAlertsActionGroupName string = ''
+
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
@@ -75,5 +80,15 @@ resource postgresDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-
       source: 'user-override'
       value: 'OFF'
     }
+  }
+}
+
+module databaseAlerts './alerts/n8n-database-alerts.bicep' = if (provisionMetricAlerts) {
+  name: 'n8n-database-alerts'
+  dependsOn: [postgresDatabase]
+  params: {
+    databaseServerName: databaseServerName
+    generalActionGroupName: generalMetricAlertsActionGroupName
+    criticalActionGroupName: criticalMetricAlertsActionGroupName
   }
 }

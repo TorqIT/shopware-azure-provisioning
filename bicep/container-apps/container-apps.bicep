@@ -160,6 +160,8 @@ param n8nContainerAppCronScaleRuleDesiredReplicas int
 param n8nContainerAppCronScaleRuleStartSchedule string
 param n8nContainerAppCronScaleRuleEndSchedule string
 param n8nContainerAppCronScaleRuleTimezone string
+param n8nContainerAppResponseTimeAlertThreshold int
+param n8nContainerAppResponseTimeAlertTimeWindow string
 
 // ENVIRONMENT
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
@@ -519,3 +521,15 @@ module alerts './alerts/container-app-alerts.bicep' = [for containerAppName in [
     responseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
   }
 }]
+
+// Optional n8n metric alerts
+module n8nAlerts './alerts/container-app-alerts.bicep' = if (provisionMetricAlerts && provisionN8N) {
+  name: '${n8nContainerAppName}-alerts'
+  dependsOn: [n8nContainerApp]
+  params: {
+    containerAppName: n8nContainerAppName
+    generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
+    responseTimeAlertThreshold: n8nContainerAppResponseTimeAlertThreshold
+    responseTimeAlertTimeWindow: n8nContainerAppResponseTimeAlertTimeWindow
+  }
+}
