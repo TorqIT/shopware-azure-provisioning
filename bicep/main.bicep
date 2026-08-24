@@ -427,6 +427,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     supervisordContainerAppImageName: supervisordContainerAppImageName
     supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
     supervisordContainerAppMemory: supervisordContainerAppMemory
+    supervisordContainerAppInternalIngress: supervisordContainerAppInternalIngress
     appEnv: appEnv
     appDebug: appDebug
     appUrl: appUrl

@@ -23,7 +23,6 @@ param databasePassword string
 param storageAccountName string
 param storageAccountPublicContainerName string
 param storageAccountPrivateContainerName string
-param databasePasswordSecretNameInKeyVault string
 
 param containerRegistryName string
 
