@@ -3,6 +3,8 @@ param location string = resourceGroup().location
 param containerAppsEnvironmentName string
 param containerAppName string
 param imageName string
+param defaultEnvVars array
+param containerRegistryName string
 param customDomains array
 param cpuCores string
 param memory string
@@ -34,8 +36,6 @@ param managedIdentityId string
 param environmentVariables array
 param internalPort int
 param additionalVolumesAndMounts array
-
-param containerRegistryName string
 
 @secure()
 param databaseUrlSecret object

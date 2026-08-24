@@ -23,7 +23,10 @@ param databaseServerName string
 param databaseServerVersion string
 param databaseName string
 param databaseUser string
+param databasePasswordSecretRefName string
 param databaseUrlSecretRefName string
+param provisionOpensearch bool
+param opensearchContainerAppName string
 
 param additionalVars array
 
@@ -125,6 +128,10 @@ var defaultEnvVars = [
     name: 'AZURE_CDN_URL'
     value: azureCdnUrl
   }
+  {
+    name: 'DATABASE_URL'
+    secretRef: databaseUrlSecretRefName
+  }
   // TODO unsure how necessary the following values are
   {
     name: 'SHOPWARE_SKIP_WEBINSTALLER'
@@ -148,7 +155,14 @@ var defaultEnvVars = [
   }
 ]
 
-var opensearchVars = enableOpensearch ? [
+resource opensearchContainerApp 'Microsoft.App/containerApps@2026-01-01' existing = if (!empty(opensearchContainerAppName)) {
+  name: opensearchContainerAppName
+}
+var opensearchEnvVars = provisionOpensearch ? [
+  {
+    name: 'OPENSEARCH_HOST'
+    value: 'https://${opensearchContainerApp!.properties.configuration.ingress.fqdn}:443'
+  }
   {
     name: 'SHOPWARE_ES_ENABLED'
     value: '1'
@@ -187,4 +201,4 @@ var opensearchVars = enableOpensearch ? [
   }
 ]: []
 
-output envVars array = concat(defaultEnvVars, opensearchVars, additionalVars)
+output envVars array = concat(defaultEnvVars, additionalVars, opensearchEnvVars)

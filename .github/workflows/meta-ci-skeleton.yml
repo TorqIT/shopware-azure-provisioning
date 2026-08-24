@@ -1,0 +1,69 @@
+name: CI for a single Shopware version
+
+on:
+  workflow_call:
+    inputs:
+      VERSION:
+        required: true
+        type: string
+        description: "The Shopware version (e.g. 6.7). Also used as the GitHub Environment name for looking up variables/secrets"
+      SKELETON_REF:
+        required: true
+        type: string
+        description: "The branch/ref of TorqIT/shopware-skeleton to deploy"
+      SERVICE_PRINCIPAL_ID:
+        required: true
+        type: string
+        description: "Azure Service Principal ID"
+    secrets:
+      SERVICE_PRINCIPAL_PASSWORD:
+        required: true
+      SHOPWARE_COMPOSER_TOKEN:
+        required: true
+      GH_APP_ID:
+        required: true
+      GH_APP_PRIVATE_KEY:
+        required: true
+
+jobs:
+  provision:
+    name: Provision Azure environment
+    uses: ./.github/workflows/provision-azure-environment.yml
+    with:
+      SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
+      ENVIRONMENT: ${{ inputs.VERSION }}
+      SKIP_IF_EXISTS: false
+      PARAMETERS_FILE: ./.github/ci/parameters.${{ inputs.VERSION }}.json
+      BUILD_IMAGE: true
+    secrets:
+      SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+      SHOPWARE_COMPOSER_TOKEN: ${{ secrets.SHOPWARE_COMPOSER_TOKEN }}
+
+  deploy-skeleton:
+    name: Deploy Shopware Skeleton to Azure Container Apps
+    needs: [provision]
+    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@upstream-merge-202608
+    with:
+      ENVIRONMENT: ${{ inputs.VERSION }}
+      PROJECT_REPOSITORY: TorqIT/shopware-skeleton
+      PROJECT_REPOSITORY_REF: ${{ inputs.SKELETON_REF }}
+      GITHUB_APP_CHECKOUT: true
+    secrets:
+      SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
+      SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+      SHOPWARE_COMPOSER_TOKEN: ${{ secrets.SHOPWARE_COMPOSER_TOKEN }}
+      GITHUB_APP_ID: ${{ secrets.GH_APP_ID }}
+      GITHUB_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+  post-url:
+    name: Post Container App URL to PR
+    needs: [deploy-skeleton]
+    uses: ./.github/workflows/post-container-app-url-to-pr.yml
+    with:
+      ENVIRONMENT: ${{ inputs.VERSION }}
+      PARAMETERS_FILE: ./.github/ci/parameters.${{ inputs.VERSION }}.json
+      SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
+      BUILD_IMAGE: true
+    secrets:
+      SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+      SHOPWARE_COMPOSER_TOKEN: ${{ secrets.SHOPWARE_COMPOSER_TOKEN }}

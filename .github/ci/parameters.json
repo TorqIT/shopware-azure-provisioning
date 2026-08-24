@@ -90,9 +90,6 @@
     "phpContainerAppCustomDomains": {
       "value": []
     },
-    "phpContainerAppImageName": {
-      "value": "php"
-    },
     "phpContainerAppMinReplicas": {
       "value": 0
     },
@@ -142,6 +139,15 @@
     },
     "supervisordContainerAppMemory": {
       "value": "1Gi"
+    },
+    "provisionOpensearch": {
+      "value": true
+    },
+    "opensearchContainerAppName": {
+      "value": "shopware-azure-opnsrch-ci"
+    },
+    "appDebug": {
+      "value": "1"
     },
     "appEnv": {
       "value": "test_env"

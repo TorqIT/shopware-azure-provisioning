@@ -8,6 +8,8 @@ param containerRegistryName string
 param cpuCores string
 param memory string
 param managedIdentityId string
+param internalIngress bool
+
 param additionalVolumesAndMounts array
 
 @secure()

@@ -1,17 +1,39 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "schedule": ["on Monday"],
+  "updateNotScheduled": false,
   "packageRules": [
     {
       "matchManagers": ["github-actions", "dockerfile", "bicep"],
       "pinDigests": true,
-      "groupName": "Weekly dependency updates",
-      "schedule": ["on monday"]
+      "groupName": "Weekly dependency updates"
+    },
+    {
+      "matchManagers": ["regex"],
+      "groupName": "Weekly dependency updates"
     },
     {
       "matchManagers": ["github-actions"],
       "matchPackagePrefixes": ["TorqIT/"],
-      "pinDigests": false,
+      "pinDigests": false
+    },
+    {
+      "matchUpdateTypes": ["major"],
       "enabled": false
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["\\.bicep$"],
+      "matchStrings": ["image: '(?<depName>[^:]+):(?<currentValue>[^']+)'"],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["ENV DOCKER_VERSION=(?<currentValue>[\\d.]+)"],
+      "depNameTemplate": "docker/cli",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v(?<version>.*)$"
     }
   ]
 }

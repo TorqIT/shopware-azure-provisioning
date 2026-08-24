@@ -5,7 +5,7 @@ param virtualNetworkResourceGroupName string
 
 param provisionZoneForContainerRegistry bool
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
 }

@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    tags: ["v*.*.*"]
+
+concurrency:
+  group: ci__${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: torqit/shopware-azure-provisioning
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+
+      - name: Lint Bicep files
+        run: find . -type f -name '*.bicep' -print0 | xargs -0 -P0 -n1 bicep lint
+
+      - name: Run Checkov SAST scan
+        uses: bridgecrewio/checkov-action@59b9d7edfcad5b87fbe3f473a9a134a721ad03f8 # v12
+        env:
+          CHECKOV_OUTPUT_CODE_LINE_LIMIT: 1000
+          LOG_LEVEL: debug
+        with:
+          directory: bicep
+          framework: bicep
+          output_format: cli
+          soft_fail: false
+
+      - name: Set up Docker
+        uses: TorqIT/shopware-github-actions-workflows/.github/actions/setup-docker@v7
+        with:
+          CONTAINER_REGISTRY: ${{ env.REGISTRY }}
+          CONTAINER_REGISTRY_USERNAME: ${{ github.actor }}
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=pr
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: Build Azure image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          context: .
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ci
+
+      - name: Run Trivy vulnerability scanner on image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ci"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          scanners: "vuln"
+          severity: "CRITICAL,HIGH"
+
+      - name: Push Azure image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  skeleton-ci:
+    name: "Build and test Azure image against Shopware skeleton"
+    if: ${{ github.event_name == 'pull_request' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: 6.7
+            skeleton_ref: main
+    uses: ./.github/workflows/meta-ci-skeleton.yml
+    with:
+      VERSION: ${{ matrix.version }}
+      SKELETON_REF: ${{ matrix.skeleton_ref }}
+      SERVICE_PRINCIPAL_ID: ${{ vars.SERVICE_PRINCIPAL_ID }}
+    secrets:
+      SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+      SHOPWARE_COMPOSER_TOKEN: ${{ secrets.SHOPWARE_COMPOSER_TOKEN }}
+      GH_APP_ID: ${{ secrets.GH_APP_ID }}
+      GH_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+  update-major-release-tag:
+    name: Update major release tag
+    if: github.event_name == 'release'
+    needs: [CI]
+    uses: TorqIT/github-actions-workflows/.github/workflows/update-major-release-tag.yml@v1

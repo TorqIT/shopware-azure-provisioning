@@ -23,6 +23,7 @@ param databasePassword string
 param storageAccountName string
 param storageAccountPublicContainerName string
 param storageAccountPrivateContainerName string
+param databasePasswordSecretNameInKeyVault string
 
 param containerRegistryName string
 
@@ -77,6 +78,7 @@ param supervisordContainerAppName string
 param supervisordContainerAppImageName string
 param supervisordContainerAppCpuCores string
 param supervisordContainerAppMemory string
+param supervisordContainerAppInternalIngress bool
 
 param appEnv string
 param appDebug string
@@ -105,6 +107,19 @@ param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
 param phpContainerAppResponseTimeAlertThreshold int
 param phpContainerAppResponseTimeAlertTimeWindow string
+
+// Optional (until v3) Opensearch Container App
+param provisionOpensearch bool
+param opensearchContainerAppName string
+param opensearchContainerAppCpuCores string
+param opensearchContainerAppMemory string
+param opensearchContainerAppMinReplicas int
+param opensearchContainerAppMaxReplicas int
+param opensearchContainerAppsEnvironmentStorageMountName string
+param opensearchStorageAccountFileShareName string
+param opensearchContainerAppVolumeName string
+param opensearchContainerAppJavaOpts string
+param opensearchContainerAppAutoCreateIndex bool
 
 // ENVIRONMENT
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
@@ -146,6 +161,8 @@ var databaseUrlSecret = {
   name: databaseUrlSecretRefName
   value: databaseUrl
 }
+// Set up common secrets for the init, PHP and supervisord Container Apps 
+var databasePasswordSecretRefName = 'database-password'
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
@@ -169,9 +186,11 @@ module additionalSecretsModule './secrets/container-apps-additional-secrets.bice
   }
 }
 
-// Environment variables
-module environmentVariables './container-apps-env-variables.bicep' = {
-  name: 'container-apps-env-vars'
+// ENV VARS
+// Set up common environment variables for the init, PHP and supervisord Container Apps
+module environmentVariables 'container-apps-env-variables.bicep' = {
+  name: 'environment-variables'
+  dependsOn: provisionOpensearch ? [opensearchContainerApp] : []
   params: {
     appEnv: appEnv
     appDebug: appDebug
@@ -192,6 +211,9 @@ module environmentVariables './container-apps-env-variables.bicep' = {
     databaseServerVersion: databaseServerVersion
     databaseName: databaseName
     databaseUser: databaseUser
+    databasePasswordSecretRefName: databasePasswordSecretRefName
+    provisionOpensearch: provisionOpensearch
+    opensearchContainerAppName: opensearchContainerAppName
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountPrivateContainerName: storageAccountPrivateContainerName
@@ -217,6 +239,9 @@ module initContainerAppJob 'container-app-job-init.bicep' = {
     storageAccountKeySecret: storageAccountKeySecret
     appSecretSecret: appSecretSecret
     appPassword: appPassword
+    databaseServerName: databaseServerName
+    databaseName: databaseName
+    databaseUser: databaseUser
     managedIdentityId: managedIdentity.id
     additionalSecrets: additionalSecretsModule.outputs.secrets
     additionalVolumesAndMounts: additionalVolumesAndMounts
@@ -231,6 +256,7 @@ module phpContainerApp 'container-app-php.bicep' = {
     containerAppsEnvironmentName: containerAppsEnvironmentName
     containerAppName: phpContainerAppName
     imageName: phpContainerAppImageName
+    defaultEnvVars: environmentVariables.outputs.envVars
     containerRegistryName: containerRegistryName
     cpuCores: phpContainerAppCpuCores
     memory: phpContainerAppMemory
@@ -297,6 +323,31 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     appSecretSecret: appSecretSecret
     additionalSecrets: additionalSecretsModule.outputs.secrets
     additionalVolumesAndMounts: additionalVolumesAndMounts
+    internalIngress: supervisordContainerAppInternalIngress
+  }
+}
+
+// Optional (until v3) Opensearch Container App
+module opensearchContainerApp 'container-app-opensearch.bicep' = if (provisionOpensearch) {
+  name: 'opensearch-container-app'
+  dependsOn: [containerAppsEnvironment]
+  params: {
+    location: location
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppName: opensearchContainerAppName
+    cpuCores: opensearchContainerAppCpuCores
+    memory: opensearchContainerAppMemory
+    minReplicas: opensearchContainerAppMinReplicas
+    maxReplicas: opensearchContainerAppMaxReplicas
+    containerAppsEnvironmentStorageMountName: opensearchContainerAppsEnvironmentStorageMountName
+    storageAccountFileShareName: opensearchStorageAccountFileShareName
+    volumeName: opensearchContainerAppVolumeName
+    keyVaultName: keyVaultName
+    managedIdentityForKeyVaultId: managedIdentity.id
+    storageAccountKey: storageAccount.listKeys().keys[0].value
+    storageAccountName: storageAccountName
+    javaOpts: opensearchContainerAppJavaOpts
+    autoCreateIndex: opensearchContainerAppAutoCreateIndex
   }
 }
 

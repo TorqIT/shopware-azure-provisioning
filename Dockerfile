@@ -1,11 +1,18 @@
-FROM mcr.microsoft.com/azure-cli@sha256:e02c9723b6e2296e98f54eeb3630b95206aef06aa04251e097ce8390904ba396
+FROM mcr.microsoft.com/azure-cli@sha256:f2e73db53c04ca82a675f1ecaa7051c42886932d45656789f90038673a42db9a
 
 # Install required packages
-RUN tdnf install -y curl tar jq vim
+RUN tdnf update -y; \
+    tdnf install -y curl tar jq vim; \
+    PYTHONPATH=/usr/lib/az/lib/python3.12/site-packages \
+        python3.12 -m pip install --upgrade --prefix /usr/lib/az \
+        "PyJWT>=2.13.0" "cryptography>=50.0.0"; \
+    PYTHONPATH=/usr/lib/az/lib/python3.12/site-packages \
+        python3.12 -m pip install --upgrade --prefix /usr \
+        "msgpack>=1.2.1" "setuptools>=78.1.1"
 
 # Install Docker
 ENV DOCKER_CHANNEL=stable
-ENV DOCKER_VERSION=29.1.3
+ENV DOCKER_VERSION=29.7.2
 ENV DOCKER_API_VERSION=1.52
 RUN curl -fsSL "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/x86_64/docker-${DOCKER_VERSION}.tgz" | tar -xzC /usr/local/bin --strip=1 docker/docker
 
