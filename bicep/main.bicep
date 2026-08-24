@@ -341,8 +341,8 @@ param opensearchContainerAppVolumeName string = 'opensearch-storage'
 param opensearchContainerAppJavaOpts string = '-Xms512m -Xmx512m'
 param opensearchContainerAppAutoCreateIndex bool = false
 // Symfony/Shopware runtime variables
-@allowed(['0', '1'])
 param appEnv string
+@allowed(['0', '1'])
 param appDebug string = '1'
 param appUrl string
 param appSecretSecretName string = 'app-secret'
