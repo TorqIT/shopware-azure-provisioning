@@ -48,6 +48,7 @@ jobs:
       PROJECT_REPOSITORY: TorqIT/shopware-skeleton
       PROJECT_REPOSITORY_REF: ${{ inputs.SKELETON_REF }}
       GITHUB_APP_CHECKOUT: true
+      SHOPWARE_ROOT: src
     secrets:
       SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
       SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
