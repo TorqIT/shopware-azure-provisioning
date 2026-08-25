@@ -89,7 +89,7 @@ jobs:
       matrix:
         include:
           - version: 6.7
-            skeleton_ref: main
+            skeleton_ref: fix/default-env-vars
     uses: ./.github/workflows/meta-ci-skeleton.yml
     with:
       VERSION: ${{ matrix.version }}
