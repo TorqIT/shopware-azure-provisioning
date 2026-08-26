@@ -54,7 +54,7 @@ jobs:
     needs: [provision]
     uses: TorqIT/pimcore-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@v7
     with:
-      ENVIRONMENT: ${{ inputs.PARAMETERS_FILE }}
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       PROJECT_REPOSITORY: TorqIT/pimcore-skeleton
       PROJECT_REPOSITORY_REF: ${{ inputs.SKELETON_REF }}
       GITHUB_APP_CHECKOUT: true
