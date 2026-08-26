@@ -3,14 +3,18 @@ name: CI for a single Pimcore version
 on:
   workflow_call:
     inputs:
-      VERSION:
+      GITHUB_ENVIRONMENT:
         required: true
         type: string
-        description: "The Pimcore version (e.g. 2025.x, 2026.x). Also used as the GitHub Environment name for looking up variables/secrets"
+        description: "The GitHub environment to use when pulling variables and secrets"
       SKELETON_REF:
         required: true
         type: string
         description: "The branch/ref of TorqIT/pimcore-skeleton to deploy"
+      PARAMETERS_FILE:
+        required: true
+        type: string
+        description: "The path to the parameters.json file to use when provisioning the Azure environment"
       SERVICE_PRINCIPAL_ID:
         required: true
         type: string
@@ -35,9 +39,9 @@ jobs:
     uses: ./.github/workflows/provision-azure-environment.yml
     with:
       SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
-      ENVIRONMENT: ${{ inputs.VERSION }}
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       SKIP_IF_EXISTS: false
-      PARAMETERS_FILE: ./.github/ci/parameters.${{ inputs.VERSION }}.json
+      PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
       BUILD_IMAGE: true
     secrets:
       SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
@@ -50,7 +54,7 @@ jobs:
     needs: [provision]
     uses: TorqIT/pimcore-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@v7
     with:
-      ENVIRONMENT: ${{ inputs.VERSION }}
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       PROJECT_REPOSITORY: TorqIT/pimcore-skeleton
       PROJECT_REPOSITORY_REF: ${{ inputs.SKELETON_REF }}
       GITHUB_APP_CHECKOUT: true
@@ -68,8 +72,8 @@ jobs:
     needs: [deploy-skeleton]
     uses: ./.github/workflows/post-container-app-url-to-pr.yml
     with:
-      ENVIRONMENT: ${{ inputs.VERSION }}
-      PARAMETERS_FILE: ./.github/ci/parameters.${{ inputs.VERSION }}.json
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
+      PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
       SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
       BUILD_IMAGE: true
     secrets:

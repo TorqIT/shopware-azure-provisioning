@@ -20,6 +20,11 @@ on:
         type: boolean
         default: false
         description: "Whether to build the provisioning Docker image before starting the container. Will attempt to use Dockerfile at the root of the project."
+      IMAGE_TAG:
+        required: false
+        type: string
+        description: "The image tag to use - if BUILD_IMAGE is false, this is the tag that will be pulled"
+        default: "2"
 
     secrets:
       SERVICE_PRINCIPAL_PASSWORD:
@@ -65,6 +70,7 @@ jobs:
           SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
           PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE}}
           BUILD_IMAGE: "${{ inputs.BUILD_IMAGE }}"
+          IMAGE_TAG: ${{ inputs.IMAGE_TAG }}
 
       - name: Get container app URL
         id: get-url

@@ -5,6 +5,10 @@ inputs:
     required: false
     description: "Whether to build the image first"
     default: "false"
+  IMAGE_TAG:
+    required: false
+    description: "The image tag to use - if BUILD_IMAGE is false, this is the tag that will be pulled"
+    default: "2"
   PARAMETERS_FILE:
     required: true
     description: "Path to the parameters file containing parameters for provisioning the Azure environment"
@@ -25,18 +29,19 @@ runs:
         current_dir=$(pwd)
         cd ${{ github.workspace }}
         docker build \
-          -t ghcr.io/torqit/pimcore-azure-provisioning:2 \
+          -t ghcr.io/torqit/pimcore-azure-provisioning:${{ inputs.IMAGE_TAG }} \
           .
         cd $current_dir
 
     - name: Start container
       shell: bash
       run: |
+        parameters_file=$(realpath "${{ inputs.PARAMETERS_FILE }}")
         docker run -d \
           --name azure \
-          --volume ${{ inputs.PARAMETERS_FILE }}:/azure/parameters.json \
+          --volume "$parameters_file":/azure/parameters.json \
           --volume /var/run/docker.sock:/var/run/docker.sock:ro \
-          ghcr.io/torqit/pimcore-azure-provisioning:2
+          ghcr.io/torqit/pimcore-azure-provisioning:${{ inputs.IMAGE_TAG }}
 
     - name: Log in to Azure via service principal
       shell: bash
