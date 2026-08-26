@@ -91,7 +91,7 @@ jobs:
           # TODO actually incorrect - should be 6.6
           - github_environment: 6.7
             skeleton_ref: fix/default-env-vars
-            parameters_file: ".github/ci/parameters.6.7.json"
+            parameters_file: .github/ci/parameters.6.7.json
     uses: ./.github/workflows/meta-ci-skeleton.yml
     with:
       GITHUB_ENVIRONMENT: ${{ matrix.github_environment }}
