@@ -36,9 +36,10 @@ runs:
     - name: Start container
       shell: bash
       run: |
+        parameters_file=$(realpath "${{ inputs.PARAMETERS_FILE }}")
         docker run -d \
           --name azure \
-          --volume ${{ inputs.PARAMETERS_FILE }}:/azure/parameters.json \
+          --volume "$parameters_file":/azure/parameters.json \
           --volume /var/run/docker.sock:/var/run/docker.sock:ro \
           ghcr.io/torqit/pimcore-azure-provisioning:${{ inputs.IMAGE_TAG }}
 
