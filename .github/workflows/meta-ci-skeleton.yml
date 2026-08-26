@@ -48,7 +48,7 @@ jobs:
     needs: [provision]
     uses: TorqIT/shopware-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@upstream-merge-202608
     with:
-      ENVIRONMENT: ${{ inputs.PARAMETERS_FILE }}
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       PROJECT_REPOSITORY: TorqIT/shopware-skeleton
       PROJECT_REPOSITORY_REF: ${{ inputs.SKELETON_REF }}
       GITHUB_APP_CHECKOUT: true
