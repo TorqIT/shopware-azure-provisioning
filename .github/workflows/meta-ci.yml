@@ -88,12 +88,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - version: 6.7
+          # TODO actually incorrect - should be 6.6
+          - github_environment: 6.7
             skeleton_ref: fix/default-env-vars
+            parameters_file: ".github/ci/parameters.6.7.json"
     uses: ./.github/workflows/meta-ci-skeleton.yml
     with:
-      VERSION: ${{ matrix.version }}
+      GITHUB_ENVIRONMENT: ${{ matrix.github_environment }}
       SKELETON_REF: ${{ matrix.skeleton_ref }}
+      PARAMETERS_FILE: ${{ matrix.parameters_file }}
       SERVICE_PRINCIPAL_ID: ${{ vars.CI_SERVICE_PRINCIPAL_ID }}
     secrets:
       SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.CI_SERVICE_PRINCIPAL_PASSWORD }}

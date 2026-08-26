@@ -3,14 +3,18 @@ name: CI for a single Shopware version
 on:
   workflow_call:
     inputs:
-      VERSION:
+      GITHUB_ENVIRONMENT:
         required: true
         type: string
-        description: "The Shopware version (e.g. 6.7). Also used as the GitHub Environment name for looking up variables/secrets"
+        description: "The GitHub environment to use when pulling variables and secrets"
       SKELETON_REF:
         required: true
         type: string
         description: "The branch/ref of TorqIT/shopware-skeleton to deploy"
+      PARAMETERS_FILE:
+        required: true
+        type: string
+        description: "The path to the parameters.json file to use when provisioning the Azure environment"
       SERVICE_PRINCIPAL_ID:
         required: true
         type: string
@@ -31,9 +35,9 @@ jobs:
     uses: ./.github/workflows/provision-azure-environment.yml
     with:
       SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
-      ENVIRONMENT: ${{ inputs.VERSION }}
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       SKIP_IF_EXISTS: false
-      PARAMETERS_FILE: ./.github/ci/parameters.${{ inputs.VERSION }}.json
+      PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
       BUILD_IMAGE: true
     secrets:
       SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
@@ -44,7 +48,7 @@ jobs:
     needs: [provision]
     uses: TorqIT/shopware-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@upstream-merge-202608
     with:
-      ENVIRONMENT: ${{ inputs.VERSION }}
+      ENVIRONMENT: ${{ inputs.PARAMETERS_FILE }}
       PROJECT_REPOSITORY: TorqIT/shopware-skeleton
       PROJECT_REPOSITORY_REF: ${{ inputs.SKELETON_REF }}
       GITHUB_APP_CHECKOUT: true
@@ -61,8 +65,8 @@ jobs:
     needs: [deploy-skeleton]
     uses: ./.github/workflows/post-container-app-url-to-pr.yml
     with:
-      ENVIRONMENT: ${{ inputs.VERSION }}
-      PARAMETERS_FILE: ./.github/ci/parameters.${{ inputs.VERSION }}.json
+      ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
+      PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
       SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
       BUILD_IMAGE: true
     secrets:

@@ -25,6 +25,11 @@ on:
         type: boolean
         default: false
         description: "Whether to build the provisioning Docker image before starting the container. Will attempt to use Dockerfile at the root of the project."
+      IMAGE_TAG:
+        required: false
+        type: string
+        default: "2"
+        description: "The tag to use for the provisioning image"
     secrets:
       SERVICE_PRINCIPAL_PASSWORD:
         required: true
@@ -64,6 +69,7 @@ jobs:
           SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
           PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
           BUILD_IMAGE: "${{ inputs.BUILD_IMAGE }}"
+          IMAGE_TAG: ${{ inputs.IMAGE_TAG }}
 
       # TODO this should ideally be a script in the container itself
       - name: Provision the Azure environment
