@@ -90,10 +90,10 @@ jobs:
         include:
           - github_environment: 2025.x
             skeleton_ref: 2025.x-azure
-            parameters_file: ".github/ci/parameters.2025.x.json"
+            parameters_file: .github/ci/parameters.2025.x.json
           - github_environment: 2026.x
             skeleton_ref: 2026.x-azure
-            parameters_file: ".github/ci/parameters.2026.x.json"
+            parameters_file: .github/ci/parameters.2026.x.json
     uses: ./.github/workflows/meta-ci-skeleton.yml
     with:
       GITHUB_ENVIRONMENT: ${{ matrix.github_environment }}
