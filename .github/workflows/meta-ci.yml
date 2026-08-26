@@ -4,6 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   push:
+    tags: ["v*.*.*"]
 
 concurrency:
   group: ci__${{ github.event.pull_request.number }}
@@ -112,5 +113,3 @@ jobs:
     if: github.event_name == 'release'
     needs: [CI]
     uses: TorqIT/github-actions-workflows/.github/workflows/update-major-release-tag.yml@v1
-
-    
