@@ -16,6 +16,11 @@ on:
         type: boolean
         default: false
         description: "Whether to build the Azure Docker image. Defaults to false"
+      IMAGE_TAG:
+        required: false
+        type: string
+        description: "The image tag to use - if BUILD_IMAGE is false, this is the tag that will be pulled"
+        default: "2"
       FAIL_ON_ERROR:
         required: false
         type: boolean
@@ -60,6 +65,7 @@ jobs:
           SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
           SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
           PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
+          IMAGE_TAG: ${{ inputs.IMAGE_TAG }}
 
       - name: Delete Resource Group
         continue-on-error: ${{ !inputs.FAIL_ON_ERROR }}
