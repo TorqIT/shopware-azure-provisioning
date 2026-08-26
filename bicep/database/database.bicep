@@ -80,6 +80,15 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
       collation: 'utf8mb4_unicode_ci'
     }
   }
+
+  // TODO disabled for now until we can figure out how to enable SSL from Shopware's Doctrine
+  resource disableSecureTransport 'configurations' = {
+    name: 'require_secure_transport'
+    properties: {
+      value: 'OFF'
+      source: 'user-override'
+    }
+  }
 }
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-10-01' = {
