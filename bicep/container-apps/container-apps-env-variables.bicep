@@ -158,10 +158,11 @@ var defaultEnvVars = [
 resource opensearchContainerApp 'Microsoft.App/containerApps@2026-01-01' existing = if (!empty(opensearchContainerAppName)) {
   name: opensearchContainerAppName
 }
-var opensearchEnvVars = provisionOpensearch ? [
+var realOpensearchUrl = opensearchContainerApp != null ? 'https://${opensearchContainerApp!.properties.configuration.ingress.fqdn}:443' : opensearchUrl
+var opensearchEnvVars = enableOpensearch ? [
   {
     name: 'OPENSEARCH_HOST'
-    value: 'https://${opensearchContainerApp!.properties.configuration.ingress.fqdn}:443'
+    value: realOpensearchUrl
   }
   {
     name: 'SHOPWARE_ES_ENABLED'
@@ -169,7 +170,7 @@ var opensearchEnvVars = provisionOpensearch ? [
   }
   {
     name: 'OPENSEARCH_URL'
-    value: opensearchUrl
+    value: realOpensearchUrl
   }
   {
     name: 'SHOPWARE_ES_INDEXING_ENABLED'
@@ -185,7 +186,7 @@ var opensearchEnvVars = provisionOpensearch ? [
   }
   {
     name: 'ADMIN_OPENSEARCH_URL'
-    value: opensearchUrl
+    value: realOpensearchUrl
   }
   {
     name: 'SHOPWARE_ADMIN_ES_ENABLED'
