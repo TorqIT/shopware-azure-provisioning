@@ -46,7 +46,7 @@ jobs:
         id: branch-tag
         if: github.event_name == 'pull_request'
         run: |
-          sanitized=$(echo "${{ github.head_ref }}" | tr -c 'a-zA-Z0-9._-' '-')
+          sanitized=$(printf '%s' "${{ github.head_ref }}" | tr -c 'a-zA-Z0-9._-' '-')
           echo "tag=$sanitized" >> "$GITHUB_OUTPUT"
 
       - name: Extract metadata (tags, labels) for Docker
