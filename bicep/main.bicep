@@ -14,6 +14,8 @@ param virtualNetworkDatabaseSubnetName string = 'database'
 param virtualNetworkDatabaseSubnetAddressSpace string = '10.0.2.0/28'
 param virtualNetworkPrivateEndpointsSubnetName string = 'private-endpoints'
 param virtualNetworkPrivateEndpointsSubnetAddressSpace string = '10.0.5.0/28'
+param virtualNetworkContainerAppsSubnetNatGatewayName string = '${containerAppsEnvironmentName}-nat-gw'
+param virtualNetworkContainerAppsSubnetNatGatewayPublicIpName string = '${virtualNetworkContainerAppsSubnetNatGatewayName}-pip'
 module virtualNetwork 'virtual-network/virtual-network.bicep' = if (fullProvision && virtualNetworkResourceGroupName == resourceGroup().name) {
   name: 'virtual-network'
   params: {
@@ -22,7 +24,10 @@ module virtualNetwork 'virtual-network/virtual-network.bicep' = if (fullProvisio
     virtualNetworkAddressSpace: virtualNetworkAddressSpace
     containerAppsSubnetName: virtualNetworkContainerAppsSubnetName
     containerAppsSubnetAddressSpace:  virtualNetworkContainerAppsSubnetAddressSpace
+    containerAppsSubnetNatGatewayName: virtualNetworkContainerAppsSubnetNatGatewayName
+    containerAppsSubnetNatGatewayPublicIpName: virtualNetworkContainerAppsSubnetNatGatewayPublicIpName
     containerAppsEnvironmentUseWorkloadProfiles: containerAppsEnvironmentUseWorkloadProfiles
+    containerAppsEnvironmentName: containerAppsEnvironmentName
     databaseSubnetAddressSpace: virtualNetworkDatabaseSubnetAddressSpace
     databaseSubnetName: virtualNetworkDatabaseSubnetName
     privateEndpointsSubnetName: virtualNetworkPrivateEndpointsSubnetName
@@ -322,7 +327,22 @@ param supervisordContainerAppName string
 param supervisordContainerAppImageName string = 'supervisord'
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
+param supervisordContainerAppInternalIngress bool = false
+// Optional (until v3) Opensearch Container App
+param provisionOpensearch bool = false
+param opensearchContainerAppName string = ''
+param opensearchContainerAppCpuCores string = '0.5'
+param opensearchContainerAppMemory string = '1Gi'
+param opensearchContainerAppMinReplicas int = 1
+param opensearchContainerAppMaxReplicas int = 1
+param opensearchContainerAppsEnvironmentStorageMountName string = 'opensearch-storage'
+param opensearchStorageAccountFileShareName string = 'opensearch'
+param opensearchContainerAppVolumeName string = 'opensearch-storage'
+param opensearchContainerAppJavaOpts string = '-Xms512m -Xmx512m'
+param opensearchContainerAppAutoCreateIndex bool = false
+// Symfony/Shopware runtime variables
 param appEnv string
+@allowed(['0', '1'])
 param appDebug string = '1'
 param appUrl string
 param appSecretSecretName string = 'app-secret'
@@ -335,7 +355,7 @@ param appSalesChannelCurrencyId string
 param appSalesChannelCountryIso string = 'US'
 param appSalesChannelSnippetsetId string = ''
 param azureCdnUrl string = 'https://${storageAccountName}.blob.${environment().suffixes.storage}/${storageAccountPublicContainerName}'
-param enableOpensearch bool = false
+param enableOpensearch bool = true
 // By default assume that Opensearch is provisioned on the Services VM (below) on port 9200
 param opensearchUrl string = 'services-vm:9200'
 param additionalEnvVars array = []
@@ -357,6 +377,10 @@ module containerApps 'container-apps/container-apps.bicep' = {
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     containerRegistryName: containerRegistryName
     managedIdentityName: containerAppsManagedIdentityName
+    databaseName: databaseName
+    databaseServerName: databaseServerName
+    databaseServerVersion: databaseServerVersion
+    databaseUser: databaseAdminUsername
     initContainerAppJobName: initContainerAppJobName
     initContainerAppJobImageName: initContainerAppJobImageName
     initContainerAppJobCpuCores: initContainerAppJobCpuCores
@@ -403,6 +427,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     supervisordContainerAppImageName: supervisordContainerAppImageName
     supervisordContainerAppCpuCores: supervisordContainerAppCpuCores
     supervisordContainerAppMemory: supervisordContainerAppMemory
+    supervisordContainerAppInternalIngress: supervisordContainerAppInternalIngress
     appEnv: appEnv
     appDebug: appDebug
     appUrl: appUrl
@@ -420,11 +445,7 @@ module containerApps 'container-apps/container-apps.bicep' = {
     virtualNetworkSubnetName: virtualNetworkContainerAppsSubnetName
     virtualNetworkResourceGroup: virtualNetworkResourceGroupName
     keyVaultName: keyVaultName
-    databaseServerName: databaseServerName
-    databaseUser: databaseAdminUsername
     databasePassword: keyVault.getSecret(databaseAdminPasswordSecretName)
-    databaseName: databaseName
-    databaseServerVersion: databaseServerVersion
     storageAccountName: storageAccountName
     storageAccountPublicContainerName: storageAccountPublicContainerName
     storageAccountPrivateContainerName: storageAccountPrivateContainerName
@@ -437,6 +458,20 @@ module containerApps 'container-apps/container-apps.bicep' = {
     criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
     phpContainerAppResponseTimeAlertThreshold: phpContainerAppResponseTimeAlertThreshold
     phpContainerAppResponseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
+    
+    // Optional (until v3) Opensearch provisioning
+    provisionOpensearch: provisionOpensearch
+    opensearchContainerAppName: opensearchContainerAppName
+    opensearchContainerAppCpuCores: opensearchContainerAppCpuCores
+    opensearchContainerAppMemory: opensearchContainerAppMemory
+    opensearchContainerAppMinReplicas: opensearchContainerAppMinReplicas
+    opensearchContainerAppMaxReplicas: opensearchContainerAppMaxReplicas
+    opensearchContainerAppsEnvironmentStorageMountName: opensearchContainerAppsEnvironmentStorageMountName
+    opensearchStorageAccountFileShareName: opensearchStorageAccountFileShareName
+    opensearchContainerAppVolumeName: opensearchContainerAppVolumeName
+    opensearchContainerAppJavaOpts: opensearchContainerAppJavaOpts
+    opensearchContainerAppAutoCreateIndex: opensearchContainerAppAutoCreateIndex
+
   }
 }
 

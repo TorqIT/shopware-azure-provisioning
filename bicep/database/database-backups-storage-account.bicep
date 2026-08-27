@@ -6,6 +6,9 @@ param kind string
 param containerName string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  //checkov:skip=CKV_AZURE_43: storage account name is parameterized and validated by the calling template
+  //checkov:skip=CKV_AZURE_59: publicNetworkAccess must be Enabled so the backup script can temporarily add its IP to the firewall
+  //checkov:skip=CKV_AZURE_206: replication SKU is parameterized; LRS is acceptable for backup storage
   name: storageAccountName
   location: location
   sku: {
@@ -16,13 +19,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     minimumTlsVersion: 'TLS1_2'
     allowSharedKeyAccess: true
     accessTier: 'Cool'
-    allowBlobPublicAccess: true
+    allowBlobPublicAccess: false
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       // Backup operation will temporarily add its IP to the firewall, then immediately remove it
       ipRules: []
       defaultAction: 'Deny'
-      bypass: 'None'
+      bypass: 'AzureServices'
     }
     encryption: {
       services: {

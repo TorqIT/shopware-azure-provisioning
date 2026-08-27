@@ -4,9 +4,12 @@ param virtualNetworkName string
 param virtualNetworkAddressSpace string
 
 param containerAppsSubnetName string
-@description('Address space to allocate for the Container Apps subnet. Note that a subnet of at least /23 is required, and it must occupied exclusively by the Container Apps Environment and its Apps.')
+@description('Address space to allocate for the Container Apps subnet. Note that a subnet of at least /23 is required, and it must be occupied exclusively by the Container Apps Environment and its Apps.')
 param containerAppsSubnetAddressSpace string
 param containerAppsEnvironmentUseWorkloadProfiles bool
+param containerAppsEnvironmentName string
+param containerAppsSubnetNatGatewayName string
+param containerAppsSubnetNatGatewayPublicIpName string
 
 param databaseSubnetName string
 @description('Address space to allocate for the database subnet. Note that a subnet of at least /29 is required and it must be a delegated subnet occupied exclusively by the database.')
@@ -44,7 +47,7 @@ resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-
   parent: virtualNetwork
   properties: {
     addressPrefix: containerAppsSubnetAddressSpace
-    delegations: containerAppsEnvironmentUseWorkloadProfiles ? [
+    delegations: (containerAppsEnvironmentUseWorkloadProfiles) ? [
       {
         name: 'Microsoft.App/environments'
         properties: {
@@ -52,6 +55,9 @@ resource containerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-
         }
       }
     ] : []
+    natGateway: containerAppsEnvironmentUseWorkloadProfiles ? {
+      id: natGateway!.outputs.natGatewayId 
+    }: null
     serviceEndpoints: [
       {
         service: 'Microsoft.Storage'
@@ -78,5 +84,15 @@ resource servicesVmSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01'
   dependsOn: [privateEndpointsSubnet]
   properties: {
     addressPrefix: servicesVmSubnetAddressSpace
+  }
+}
+
+// NAT Gateway - required when using Container Apps workload profiles to get a single static outbound IP
+module natGateway './nat-gateway.bicep' = if (containerAppsEnvironmentUseWorkloadProfiles) {
+  name: 'nat-gateway'
+  params: {
+    location: location
+    name: containerAppsSubnetNatGatewayName
+    publicIpName: containerAppsSubnetNatGatewayPublicIpName
   }
 }

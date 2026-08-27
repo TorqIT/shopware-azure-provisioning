@@ -9,7 +9,7 @@
       "value": "6f8ae12a-9b31-4877-b46f-c0590040b1fb"
     },
     "resourceGroupName": {
-      "value": "Shopware-Azure-Test"
+      "value": "Shopware-66-Azure-CI"
     },
     "provisionServicePrincipal": {
       "value": false
@@ -18,7 +18,7 @@
       "value": "canadacentral"
     },
     "keyVaultName": {
-      "value": "shopware-azure-kv-test"
+      "value": "shopware-66-azure-kv-ci"
     },
     "keyVaultEnablePurgeProtection": {
       "value": false
@@ -27,19 +27,13 @@
       "value": true
     },
     "containerRegistryName": {
-      "value": "shopwareazurecrtest"
-    },
-    "containerRegistrySku": {
-      "value": "Basic"
+      "value": "shopware66azurecrci"
     },
     "virtualNetworkName": {
-      "value": "shopware-azure-vnet-test"
-    },
-    "virtualNetworkPrivateEndpointsSubnetName": {
-      "value": "private-endpoints"
+      "value": "shopware-66-azure-vnet-ci"
     },
     "storageAccountName": {
-      "value": "shopwareazuresatest"
+      "value": "shopware66azuresaci"
     },
     "storageAccountFileShares": {
       "value": [
@@ -55,22 +49,22 @@
       "value": true
     },
     "storageAccountFrontDoorCdnProfileName": {
-      "value": "shopware-azure-cdn-test"
+      "value": "shopware-66-azure-cdn-ci"
     },
     "storageAccountFrontDoorCdnEndpointName": {
-      "value": "shopware-azure-cdn-endpoint-test"
+      "value": "shopware-66-azure-cdn-endpoint-ci"
     },
     "databaseServerName": {
-      "value": "shopware-azure-db-test"
+      "value": "shopware-66-azure-db-ci"
     },
     "containerAppsEnvironmentName": {
-      "value": "shopware-azure-cae-test"
+      "value": "shopware-66-azure-cae-ci"
     },
     "containerAppsEnvironmentUseWorkloadProfiles": {
       "value": true
     },
     "initContainerAppJobName": {
-      "value": "shopware-azure-init-test"
+      "value": "shopware-66-azure-init-ci"
     },
     "initContainerAppJobImageName": {
       "value": "init"
@@ -85,13 +79,10 @@
       "value": true
     },
     "phpContainerAppName": {
-      "value": "shopware-azure-php-test"
+      "value": "shopware-66-azure-php-ci"
     },
     "phpContainerAppCustomDomains": {
       "value": []
-    },
-    "phpContainerAppImageName": {
-      "value": "php"
     },
     "phpContainerAppMinReplicas": {
       "value": 0
@@ -119,20 +110,10 @@
     },
     "phpContainerAppIpSecurityRestrictions": {
       "value": [
-        {
-          "name": "Test rule 1",
-          "action": "Allow",
-          "ipAddressRange": "206.172.88.232"
-        },
-        {
-          "name": "Test rule 2",
-          "action": "Allow",
-          "ipAddressRange": "206.172.88.233"
-        }
       ]
     },
     "supervisordContainerAppName": {
-      "value": "shopware-azure-supervisord-test"
+      "value": "shopware-66-azure-supervisord-ci"
     },
     "supervisordContainerAppImageName": {
       "value": "supervisord"
@@ -142,6 +123,15 @@
     },
     "supervisordContainerAppMemory": {
       "value": "1Gi"
+    },
+    "provisionOpensearch": {
+      "value": true
+    },
+    "opensearchContainerAppName": {
+      "value": "shopware-66-azure-opnsrch-ci"
+    },
+    "appDebug": {
+      "value": "1"
     },
     "appEnv": {
       "value": "test_env"
@@ -156,7 +146,7 @@
       "value": "My Sales Channel"
     },
     "appSalesChannelCurrencyId": {
-      "value": "018f62358a357230852fd8838c604b60"
+      "value": "b7d2554b0ce847cd82f3ac9bd1c0dfca"
     },
     "appSalesChannelId": {
       "value": "018f62358a357230852fd8838c604b60"
@@ -170,7 +160,7 @@
       }
     },
     "fileStorageAccountName": {
-      "value": "shopwareazurefilestest"
+      "value": "shopware66azurefilesci"
     },
     "fileStorageAccountFileShares": {
       "value": [
@@ -183,7 +173,7 @@
     "additionalVolumesAndMounts": {
       "value": [
         {
-          "storageAccountName": "shopwareazurefilestest",
+          "storageAccountName": "shopware66azurefilesci",
           "fileShareName": "assets",
           "mountName": "assets",
           "mountAccessMode": "ReadWrite",
@@ -191,7 +181,7 @@
           "mountPath": "/var/www/html/public/var/assets"
         },
         {
-          "storageAccountName": "shopwareazuresatest",
+          "storageAccountName": "shopware66azuresaci",
           "fileShareName": "uploads",
           "mountName": "uploads",
           "mountAccessMode": "ReadWrite",

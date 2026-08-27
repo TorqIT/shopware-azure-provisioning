@@ -31,11 +31,11 @@ param provisionFrontDoorCdn bool
 param frontDoorCdnProfileName string
 param frontDoorCdnEndpointName string
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-10-01' existing = {
   name: virtualNetworkName
   scope: resourceGroup(virtualNetworkResourceGroupName)
 }
-resource virtualNetworkContainerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+resource virtualNetworkContainerAppsSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-10-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkContainerAppsSubnetName
 }

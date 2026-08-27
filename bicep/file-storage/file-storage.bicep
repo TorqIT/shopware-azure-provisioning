@@ -11,11 +11,11 @@ param virtualNetworkSubnetName string
 
 // TODO short-term and long-term backups
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-10-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroupName)
   name: virtualNetworkName
 }
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-10-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkSubnetName
 }

@@ -37,16 +37,19 @@ param provisionMetricAlerts bool
 param generalMetricAlertsActionGroupName string
 param criticalMetricAlertsActionGroupName string
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-09-01' existing = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
   scope: resourceGroup(virtualNetworkResourceGroupName)
   name: virtualNetworkName
 }
-resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' existing = {
+resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {
   parent: virtualNetwork
   name: virtualNetworkPrivateEndpointsSubnetName
 }
 
 resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
+  //checkov:skip=CKV_AZURE_53: public network access is intentionally enabled to support firewall-based integrations alongside the private endpoint
+  //checkov:skip=CKV_AZURE_94: geo-redundant backup is intentionally parameterizable; callers set this based on environment requirements
+  //checkov:skip=CKV_AZURE_96: infrastructure encryption property does not exist on MySQL Flexible Server; check incorrectly applied from Azure SQL
   name: serverName
   location: location
   sku: {
@@ -77,9 +80,18 @@ resource databaseServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
       collation: 'utf8mb4_unicode_ci'
     }
   }
+
+  // TODO disabled for now until we can figure out how to enable SSL from Shopware's Doctrine
+  resource disableSecureTransport 'configurations' = {
+    name: 'require_secure_transport'
+    properties: {
+      value: 'OFF'
+      source: 'user-override'
+    }
+  }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-03-01' = {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-10-01' = {
   name: privateEndpointName
   location: location
   properties: {

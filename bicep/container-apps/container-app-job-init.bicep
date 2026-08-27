@@ -10,6 +10,11 @@ param replicaTimeoutSeconds int
 param additionalVolumesAndMounts array
 
 param containerRegistryName string
+
+param databaseServerName string
+param databaseUser string
+param databaseName string
+
 param managedIdentityId string
 
 @secure()
