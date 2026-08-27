@@ -19,13 +19,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - parameters-file: "./.github/ci/parameters.2025.x.json"
-          - parameters-file: "./.github/ci/parameters.2026.x.json"
+          - parameters-file: "./.github/ci/parameters.6.6.json"
     uses: ./.github/workflows/tear-down-azure-resources.yml
     with:
-      SERVICE_PRINCIPAL_ID: ${{ vars.SERVICE_PRINCIPAL_ID }}
+      SERVICE_PRINCIPAL_ID: ${{ vars.CI_SERVICE_PRINCIPAL_ID }}
       PARAMETERS_FILE: ${{ matrix.parameters-file }}
       BUILD_IMAGE: true
       FAIL_ON_ERROR: ${{ github.event_name == 'pull_request' }}
     secrets:
-      SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+      SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.CI_SERVICE_PRINCIPAL_PASSWORD }}
