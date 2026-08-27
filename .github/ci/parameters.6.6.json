@@ -9,7 +9,7 @@
       "value": "6f8ae12a-9b31-4877-b46f-c0590040b1fb"
     },
     "resourceGroupName": {
-      "value": "Shopware-6.6-Azure-CI"
+      "value": "Shopware-66-Azure-CI"
     },
     "provisionServicePrincipal": {
       "value": false
