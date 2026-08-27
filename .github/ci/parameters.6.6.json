@@ -27,7 +27,7 @@
       "value": true
     },
     "containerRegistryName": {
-      "value": "shopwareazurecrci"
+      "value": "shopware66azurecrci"
     },
     "virtualNetworkName": {
       "value": "shopware-66-azure-vnet-ci"
