@@ -84,6 +84,29 @@ jobs:
                 [ ${{ inputs.SKIP_IF_EXISTS }} == 'true' ]; then
               echo "Resource Group $resourceGroup already exists, skipping provisioning as SKIP_IF_EXISTS is set to true."
             else
+              echo "Creating Resource Group $resourceGroup..."
+              location=$(jq -r ".parameters.location.value" parameters.json)
+              az group create --name $resourceGroup --location $location
+
+              echo "Creating Key Vault..."
+              ./provisioning-scripts/provision-key-vault.sh parameters.json
+
+              echo "Setting required Shopware secrets in Key Vault..."
+              keyVaultName=$(jq -r ".parameters.keyVaultName.value" parameters.json)
+              keyVaultResourceGroupName=$(jq -r --arg RESOURCE_GROUP "$resourceGroup" ".parameters.keyVaultResourceGroupName.value // \$RESOURCE_GROUP" parameters.json)
+              az keyvault network-rule add \
+                --name $keyVaultName \
+                --resource-group $keyVaultResourceGroupName \
+                --ip-address $(curl ipinfo.io/ip)
+              az keyvault secret set \
+                --vault-name $keyVaultName \
+                --name "app-password" \
+                --value "shopware"
+              az keyvault network-rule remove \
+                --name $keyVaultName \
+                --resource-group $keyVaultResourceGroupName \
+                --ip-address $(curl ipinfo.io/ip)
+
               ./provision.sh parameters.json
             fi
           '
