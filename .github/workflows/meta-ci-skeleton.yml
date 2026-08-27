@@ -46,7 +46,7 @@ jobs:
   deploy-skeleton:
     name: Deploy Shopware Skeleton to Azure Container Apps
     needs: [provision]
-    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@upstream-merge-202608
+    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/deploy-to-azure-container-apps.yml@v8
     with:
       ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       PROJECT_REPOSITORY: TorqIT/shopware-skeleton
