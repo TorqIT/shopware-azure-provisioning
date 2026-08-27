@@ -42,6 +42,13 @@ jobs:
           CONTAINER_REGISTRY_USERNAME: ${{ github.actor }}
           CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Compute sanitized branch tag
+        id: branch-tag
+        if: github.event_name == 'pull_request'
+        run: |
+          sanitized=$(echo "${{ github.head_ref }}" | tr -c 'a-zA-Z0-9._-' '-')
+          echo "tag=$sanitized" >> "$GITHUB_OUTPUT"
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
@@ -49,7 +56,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=pr
-            type=ref,event=branch
+            type=raw,value=${{ steps.branch-tag.outputs.tag }},enable=${{ github.event_name == 'pull_request' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
