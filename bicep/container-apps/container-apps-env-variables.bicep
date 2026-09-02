@@ -156,9 +156,10 @@ var defaultEnvVars = [
 ]
 
 resource opensearchContainerApp 'Microsoft.App/containerApps@2026-01-01' existing = if (provisionOpensearch) {
-  name: !empty(opensearchContainerAppName) ? opensearchContainerAppName : 'placeholder'
+  name: provisionOpensearch ? opensearchContainerAppName : 'placeholder'
 }
-var realOpensearchUrl = opensearchContainerApp != null ? 'https://${opensearchContainerApp!.properties.configuration.ingress.fqdn}:443' : opensearchUrl
+var opensearchContainerAppFqdn = provisionOpensearch ? opensearchContainerApp!.properties.configuration.ingress.fqdn : ''
+var realOpensearchUrl = provisionOpensearch ? 'https://${opensearchContainerAppFqdn}:443' : opensearchUrl
 var opensearchEnvVars = enableOpensearch ? [
   {
     name: 'OPENSEARCH_HOST'
