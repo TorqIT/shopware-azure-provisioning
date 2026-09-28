@@ -25,8 +25,6 @@ param databaseName string
 param databaseUser string
 param databasePasswordSecretRefName string
 param databaseUrlSecretRefName string
-param provisionOpensearch bool
-param opensearchContainerAppName string
 
 param additionalVars array
 
@@ -155,15 +153,10 @@ var defaultEnvVars = [
   }
 ]
 
-resource opensearchContainerApp 'Microsoft.App/containerApps@2026-01-01' existing = if (provisionOpensearch) {
-  name: provisionOpensearch ? opensearchContainerAppName : 'placeholder'
-}
-var opensearchContainerAppFqdn = provisionOpensearch ? opensearchContainerApp!.properties.configuration.ingress.fqdn : ''
-var realOpensearchUrl = provisionOpensearch ? 'https://${opensearchContainerAppFqdn}:443' : opensearchUrl
 var opensearchEnvVars = enableOpensearch ? [
   {
     name: 'OPENSEARCH_HOST'
-    value: realOpensearchUrl
+    value: opensearchUrl
   }
   {
     name: 'SHOPWARE_ES_ENABLED'
@@ -171,7 +164,7 @@ var opensearchEnvVars = enableOpensearch ? [
   }
   {
     name: 'OPENSEARCH_URL'
-    value: realOpensearchUrl
+    value: opensearchUrl
   }
   {
     name: 'SHOPWARE_ES_INDEXING_ENABLED'
@@ -187,7 +180,7 @@ var opensearchEnvVars = enableOpensearch ? [
   }
   {
     name: 'ADMIN_OPENSEARCH_URL'
-    value: realOpensearchUrl
+    value: opensearchUrl
   }
   {
     name: 'SHOPWARE_ADMIN_ES_ENABLED'

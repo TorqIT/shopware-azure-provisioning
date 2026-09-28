@@ -15,7 +15,8 @@ env:
   IMAGE_NAME: torqit/shopware-azure-provisioning
 
 jobs:
-  CI:
+  build-scan-push:
+    name: Build, scan and push image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -25,7 +26,7 @@ jobs:
         run: find . -type f -name '*.bicep' -print0 | xargs -0 -P0 -n1 bicep lint
 
       - name: Run Checkov SAST scan
-        uses: bridgecrewio/checkov-action@59b9d7edfcad5b87fbe3f473a9a134a721ad03f8 # v12
+        uses: bridgecrewio/checkov-action@444c9db6fa75e2d9c19ebf1fde7322089be9009e # v12
         env:
           CHECKOV_OUTPUT_CODE_LINE_LIMIT: 1000
           LOG_LEVEL: debug
@@ -62,7 +63,7 @@ jobs:
             type=semver,pattern={{major}}
 
       - name: Build Azure image
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
           context: .
           load: true
@@ -82,7 +83,7 @@ jobs:
           severity: "CRITICAL,HIGH"
 
       - name: Push Azure image
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -113,5 +114,5 @@ jobs:
   update-major-release-tag:
     name: Update major release tag
     if: github.event_name == 'release'
-    needs: [CI]
+    needs: [build-scan-push]
     uses: TorqIT/github-actions-workflows/.github/workflows/update-major-release-tag.yml@v1

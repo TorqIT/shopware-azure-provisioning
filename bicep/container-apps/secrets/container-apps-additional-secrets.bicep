@@ -22,5 +22,5 @@ output secrets array = [for i in range(0, length(secrets)): {
 var secretsWithEnvVars = filter(secrets, secret => contains(secret, 'secretEnvVarNameInContainerApp'))
 output envVars array = [for secret in secretsWithEnvVars: {
   name: secret.secretEnvVarNameInContainerApp
-  secretRef: secret.secretRefInContainerapp
+  secretRef: secret.secretRefInContainerApp
 }]

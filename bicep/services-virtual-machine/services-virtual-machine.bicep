@@ -166,3 +166,5 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2024-11-01' = {
     }
   }
 }
+
+output publicIpAddress string = publicIPAddress.properties.ipAddress

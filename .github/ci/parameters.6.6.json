@@ -124,11 +124,20 @@
     "supervisordContainerAppMemory": {
       "value": "1Gi"
     },
-    "provisionOpensearch": {
+    "provisionServicesVM": {
       "value": true
     },
-    "opensearchContainerAppName": {
-      "value": "shopware-66-azure-opnsrch-ci"
+    "servicesVmSize": {
+      "value": "Standard_D2als_v6"
+    },
+    "servicesVmName": {
+      "value": "shopware-66-azure-services-ci"
+    },
+    "enableOpensearch": {
+      "value": true
+    },
+    "opensearchUrl": {
+      "value": "shopware-66-azure-services-ci.internal.cloudapp.net:9200"
     },
     "appDebug": {
       "value": "1"
