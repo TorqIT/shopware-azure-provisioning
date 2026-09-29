@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
           - parameters-file: "./.github/ci/parameters.6.6.json"
-    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/workflow-tear-down-azure-resources.yml@upstream-merge-202609
+    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/workflow-tear-down-azure-resources.yml@v8
     with:
       SERVICE_PRINCIPAL_ID: ${{ vars.CI_SERVICE_PRINCIPAL_ID }}
       PARAMETERS_FILE: ${{ matrix.parameters-file }}

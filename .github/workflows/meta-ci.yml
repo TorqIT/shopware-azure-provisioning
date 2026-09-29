@@ -37,7 +37,7 @@ jobs:
           soft_fail: false
 
       - name: Set up Docker
-        uses: TorqIT/shopware-github-actions-workflows/.github/actions/setup-docker@v7
+        uses: TorqIT/shopware-github-actions-workflows/.github/actions/setup-docker@v8
         with:
           CONTAINER_REGISTRY: ${{ env.REGISTRY }}
           CONTAINER_REGISTRY_USERNAME: ${{ github.actor }}
