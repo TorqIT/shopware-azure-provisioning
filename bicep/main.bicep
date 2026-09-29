@@ -284,7 +284,7 @@ param phpContainerAppExternal bool = true
 param phpContainerAppName string
 param phpContainerAppImageName string = 'php'
 // Optional health probes - when none are enabled, Azure's default probes are used
-param phpContainerAppProbePort int = 80
+param phpContainerAppProbePort int = phpContainerAppInternalPort
 @allowed(['HTTP', 'HTTPS', 'TCP'])
 param phpContainerAppProbeScheme string = 'HTTP'
 param phpContainerAppProvisionStartupProbe bool = false
@@ -328,18 +328,6 @@ param supervisordContainerAppImageName string = 'supervisord'
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
 param supervisordContainerAppInternalIngress bool = false
-// Optional (until v3) Opensearch Container App
-param provisionOpensearch bool = false
-param opensearchContainerAppName string = ''
-param opensearchContainerAppCpuCores string = '0.5'
-param opensearchContainerAppMemory string = '1Gi'
-param opensearchContainerAppMinReplicas int = 1
-param opensearchContainerAppMaxReplicas int = 1
-param opensearchContainerAppsEnvironmentStorageMountName string = 'opensearch-storage'
-param opensearchStorageAccountFileShareName string = 'opensearch'
-param opensearchContainerAppVolumeName string = 'opensearch-storage'
-param opensearchContainerAppJavaOpts string = '-Xms512m -Xmx512m'
-param opensearchContainerAppAutoCreateIndex bool = false
 // Symfony/Shopware runtime variables
 param appEnv string
 @allowed(['0', '1'])
@@ -459,18 +447,6 @@ module containerApps 'container-apps/container-apps.bicep' = {
     phpContainerAppResponseTimeAlertThreshold: phpContainerAppResponseTimeAlertThreshold
     phpContainerAppResponseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
     
-    // Optional (until v3) Opensearch provisioning
-    provisionOpensearch: provisionOpensearch
-    opensearchContainerAppName: opensearchContainerAppName
-    opensearchContainerAppCpuCores: opensearchContainerAppCpuCores
-    opensearchContainerAppMemory: opensearchContainerAppMemory
-    opensearchContainerAppMinReplicas: opensearchContainerAppMinReplicas
-    opensearchContainerAppMaxReplicas: opensearchContainerAppMaxReplicas
-    opensearchContainerAppsEnvironmentStorageMountName: opensearchContainerAppsEnvironmentStorageMountName
-    opensearchStorageAccountFileShareName: opensearchStorageAccountFileShareName
-    opensearchContainerAppVolumeName: opensearchContainerAppVolumeName
-    opensearchContainerAppJavaOpts: opensearchContainerAppJavaOpts
-    opensearchContainerAppAutoCreateIndex: opensearchContainerAppAutoCreateIndex
 
   }
 }
@@ -501,6 +477,7 @@ module servicesVm './services-virtual-machine/services-virtual-machine.bicep' = 
     firewallIpsForSsh: servicesVmFirewallIpsForSsh
   }
 }
+output servicesVmPublicIp string = (fullProvision && provisionServicesVM) ? servicesVm!.outputs.publicIpAddress : ''
 
 // We use a single parameters.json file for multiple Bicep files and scripts, but Bicep
 // will complain if we use it on a file that doesn't actually use all of the parameters.

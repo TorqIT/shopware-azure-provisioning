@@ -105,7 +105,7 @@ module probesModule './container-app-probes.bicep' = {
 
 // Scaling rules
 module scaleRules './scale-rules/container-app-scale-rules.bicep' = {
-  name: 'container-app-scale-rules'
+  name: 'php-container-app-scale-rules'
   params: {
     provisionHttpScaleRule: provisionHttpScaleRule
     httpScaleRuleConcurrentRequestsThreshold: httpScaleRuleConcurrentRequestsThreshold

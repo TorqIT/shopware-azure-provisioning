@@ -32,7 +32,7 @@ on:
 jobs:
   provision:
     name: Provision Azure environment
-    uses: ./.github/workflows/provision-azure-environment.yml
+    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/workflow-provision-ci-environment.yml@v8
     with:
       SERVICE_PRINCIPAL_ID: ${{ inputs.SERVICE_PRINCIPAL_ID }}
       ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
@@ -63,7 +63,7 @@ jobs:
   post-url:
     name: Post Container App URL to PR
     needs: [deploy-skeleton]
-    uses: ./.github/workflows/post-container-app-url-to-pr.yml
+    uses: TorqIT/shopware-github-actions-workflows/.github/workflows/workflow-post-container-app-url-to-pr.yml@v8
     with:
       ENVIRONMENT: ${{ inputs.GITHUB_ENVIRONMENT }}
       PARAMETERS_FILE: ${{ inputs.PARAMETERS_FILE }}
@@ -71,4 +71,3 @@ jobs:
       BUILD_IMAGE: true
     secrets:
       SERVICE_PRINCIPAL_PASSWORD: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
-      SHOPWARE_COMPOSER_TOKEN: ${{ secrets.SHOPWARE_COMPOSER_TOKEN }}
