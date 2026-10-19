@@ -26,7 +26,7 @@ jobs:
         run: find . -type f -name '*.bicep' -print0 | xargs -0 -P0 -n1 bicep lint
 
       - name: Run Checkov SAST scan
-        uses: bridgecrewio/checkov-action@29be5868bfa968f099ae80169f61f42887494b8f # v12
+        uses: bridgecrewio/checkov-action@6f26dc90000b74feb589a906cdfae540f5119895 # v12
         env:
           CHECKOV_OUTPUT_CODE_LINE_LIMIT: 1000
           LOG_LEVEL: debug
