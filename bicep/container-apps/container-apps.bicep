@@ -321,7 +321,7 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
   }
 }
 
-module redisContainerApp 'container-app-redis.bicep' = {
+module redisContainerApp 'container-app-redis.bicep' = if (provisionRedisContainerApp) {
   name: 'redis-container-app'
   dependsOn: [containerAppsEnvironment]
   params: {
