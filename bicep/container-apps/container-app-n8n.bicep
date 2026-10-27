@@ -176,7 +176,7 @@ resource n8nContainerApp 'Microsoft.App/containerApps@2024-10-02-preview' = {
       containers: [
         {
           name: 'n8n'
-          image: 'n8nio/n8n:1.123.85'
+          image: 'n8nio/n8n:1.123.88'
           resources: {
             cpu: json(cpuCores)
             memory: memory
