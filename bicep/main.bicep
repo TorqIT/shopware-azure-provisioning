@@ -330,7 +330,7 @@ param supervisordContainerAppMemory string = '2Gi'
 param supervisordContainerAppInternalIngress bool = false
 // Optional Redis Container App
 param provisionRedisContainerApp bool = false
-param redisContainerAppName string
+param redisContainerAppName string = ''
 param redisContainerAppCpuCores string = '0.25'
 param redisContainerAppMemory string = '0.5Gi'
 param redisContainerAppMaxMemorySetting string = '256mb'
