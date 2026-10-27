@@ -79,6 +79,13 @@ param supervisordContainerAppCpuCores string
 param supervisordContainerAppMemory string
 param supervisordContainerAppInternalIngress bool
 
+// Optional Redis Container App
+param provisionRedisContainerApp bool
+param redisContainerAppName string
+param redisContainerAppCpuCores string
+param redisContainerAppMemory string
+param redisContainerAppMaxMemorySetting string
+
 param appEnv string
 param appDebug string
 param appUrl string
@@ -193,6 +200,8 @@ module environmentVariables 'container-apps-env-variables.bicep' = {
     azureCdnUrl: azureCdnUrl
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
+    provisionRedisContainerApp: provisionRedisContainerApp
+    redisContainerAppName: redisContainerAppName
     databaseUrlSecretRefName: databaseUrlSecretRefName
     databaseServerName: databaseServerName
     databaseServerVersion: databaseServerVersion
@@ -309,6 +318,19 @@ module supervisordContainerApp 'container-app-supervisord.bicep' = {
     additionalSecrets: additionalSecretsModule.outputs.secrets
     additionalVolumesAndMounts: additionalVolumesAndMounts
     internalIngress: supervisordContainerAppInternalIngress
+  }
+}
+
+module redisContainerApp 'container-app-redis.bicep' = {
+  name: 'redis-container-app'
+  dependsOn: [containerAppsEnvironment]
+  params: {
+    location: location
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    containerAppName: redisContainerAppName
+    cpuCores: redisContainerAppCpuCores
+    memory: redisContainerAppMemory
+    maxMemorySetting: redisContainerAppMaxMemorySetting
   }
 }
 

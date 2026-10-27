@@ -328,6 +328,12 @@ param supervisordContainerAppImageName string = 'supervisord'
 param supervisordContainerAppCpuCores string = '1'
 param supervisordContainerAppMemory string = '2Gi'
 param supervisordContainerAppInternalIngress bool = false
+// Optional Redis Container App
+param provisionRedisContainerApp bool = false
+param redisContainerAppName string
+param redisContainerAppCpuCores string = '0.25'
+param redisContainerAppMemory string = '0.5Gi'
+param redisContainerAppMaxMemorySetting string = '256mb'
 // Symfony/Shopware runtime variables
 param appEnv string
 @allowed(['0', '1'])
@@ -440,14 +446,19 @@ module containerApps 'container-apps/container-apps.bicep' = {
     enableOpensearch: enableOpensearch
     opensearchUrl: opensearchUrl
 
+    // Optional Redis Container App
+    provisionRedisContainerApp: provisionRedisContainerApp
+    redisContainerAppName: redisContainerAppName
+    redisContainerAppCpuCores: redisContainerAppCpuCores
+    redisContainerAppMemory: redisContainerAppMemory
+    redisContainerAppMaxMemorySetting: redisContainerAppMaxMemorySetting
+
     // Optional alerts provisioning
     provisionMetricAlerts: provisionMetricAlerts
     generalMetricAlertsActionGroupName: generalMetricAlertsActionGroupName
     criticalMetricAlertsActionGroupName: criticalMetricAlertsActionGroupName
     phpContainerAppResponseTimeAlertThreshold: phpContainerAppResponseTimeAlertThreshold
     phpContainerAppResponseTimeAlertTimeWindow: phpContainerAppResponseTimeAlertTimeWindow
-    
-
   }
 }
 

@@ -14,6 +14,9 @@ param azureCdnUrl string
 param enableOpensearch bool
 param opensearchUrl string
 
+param provisionRedisContainerApp bool
+param redisContainerAppName string
+
 param storageAccountName string
 param storageAccountPublicContainerName string
 param storageAccountPrivateContainerName string
@@ -196,4 +199,11 @@ var opensearchEnvVars = enableOpensearch ? [
   }
 ]: []
 
-output envVars array = concat(defaultEnvVars, additionalVars, opensearchEnvVars)
+var redisEnvVars = provisionRedisContainerApp ? [
+  {
+    name: 'REDIS_URL'
+    value: 'redis://${redisContainerAppName}:6379/0'
+  }
+]: []
+
+output envVars array = concat(defaultEnvVars, additionalVars, opensearchEnvVars, redisEnvVars)
