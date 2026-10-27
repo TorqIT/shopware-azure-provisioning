@@ -6,10 +6,10 @@ RUN tdnf update -y; \
     tdnf install -y curl tar jq vim openssh-clients; \
     PYTHONPATH=/usr/lib/az/lib/python3.12/site-packages \
         python3.12 -m pip install --upgrade --prefix /usr/lib/az \
-        "PyJWT>=2.13.0" "cryptography>=50.0.0"; \
+        "PyJWT>=2.13.0" "cryptography>=50.0.0" "certifi>=2026.10.18"; \
     PYTHONPATH=/usr/lib/az/lib/python3.12/site-packages \
         python3.12 -m pip install --upgrade --prefix /usr \
-        "msgpack>=1.2.1" "setuptools>=78.1.1"
+        "msgpack>=1.2.1" "setuptools>=78.1.1" "certifi>=2026.10.18"
 
 # Install Docker
 ENV DOCKER_CHANNEL=stable
