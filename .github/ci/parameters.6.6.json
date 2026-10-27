@@ -127,6 +127,12 @@
     "provisionServicesVM": {
       "value": true
     },
+    "provisionRedisContainerApp": {
+      "value": true
+    },
+    "redisContainerAppName": {
+      "value": "shopware-66-azure-redis-ci"
+    },
     "servicesVmSize": {
       "value": "Standard_D2als_v6"
     },
